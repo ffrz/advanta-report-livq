@@ -24,19 +24,19 @@ class UserSeeder extends Seeder
         User::factory()->create([
             'username' => 'fahmi',
             'name' => 'Fahmi',
-            'role' => User::Role_Sales,
+            'role' => User::Role_BS,
             'active' => 1,
         ]);
         User::factory()->create([
             'username' => 'anto',
             'name' => 'Anto',
-            'role' => User::Role_Sales,
+            'role' => User::Role_BS,
             'active' => 1,
         ]);
         User::factory()->create([
             'username' => 'wildan',
             'name' => 'Wildan',
-            'role' => User::Role_Sales,
+            'role' => User::Role_BS,
             'active' => 1,
         ]);
         // User::factory(10)->create();

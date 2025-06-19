@@ -54,21 +54,23 @@ const onFilterChange = () => {
     <div class="q-pa-sm">
       <div>
         <div class="text-subtitle1 text-bold text-grey-8">Statistik Aktual</div>
-        <current-stat-cards class="q-py-none" />
+        <p class="text-grey-8">Belum Tersedia</p>
+        <!-- <current-stat-cards class="q-py-none" /> -->
         <div class="row q-col-gutter-sm q-pt-sm">
-          <recent-interactions-card class="q-my-xs" />
+          <!-- <recent-interactions-card class="q-my-xs" />
           <recent-customers-card class="q-my-xs" />
-          <recent-closings-card class="q-my-xs" />
+          <recent-closings-card class="q-my-xs" /> -->
         </div>
       </div>
       <div class="q-pt-md">
         <div class="text-subtitle1 text-bold text-grey-8">
           Statistik {{period_options.find((a) => a.value == selected_period).label}}
         </div>
-        <stat-cards class="q-py-none" />
+        <p class="text-grey-8">Belum Tersedia</p>
+        <!-- <stat-cards class="q-py-none" /> -->
       </div>
       <div>
-        <chart-card class="q-py-none q-pt-lg" />
+        <!-- <chart-card class="q-py-none q-pt-lg" /> -->
       </div>
     </div>
   </authenticated-layout>

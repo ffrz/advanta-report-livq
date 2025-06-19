@@ -9,7 +9,7 @@ import StatCard from './StatCard.vue';
       <q-card-section class="q-pa-none">
         <div class="row q-col-gutter-sm ">
           <StatCard :count="formatNumber($page.props.data.active_customer_count)" label="Client Aktif" icon="info"
-            :to="route('admin.customer.index', { status: 'active' })" wrapper-class="col-md-4 col-sm-6 col-xs-12" />
+            :to="route('admin.user.index', { status: 'active' })" wrapper-class="col-md-4 col-sm-6 col-xs-12" />
           <StatCard :count="formatNumber($page.props.data.active_sales_count)" label="Sales Aktif" icon="info"
             :bg-color="'#dc3545'" :side-color="'#cc2535'" :to="route('admin.user.index', { status: 'active' })"
             wrapper-class="col-md-4 col-sm-6 col-xs-12" />

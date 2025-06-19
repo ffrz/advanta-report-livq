@@ -27,7 +27,9 @@
           'CUSTOMER_SERVICE_STATUSES' => \App\Models\CustomerService::Statuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
-    @if(!!env('APP_DEMO'))
+    window.CONSTANTS.USER_ROLE_AGRONOMIST = "{{ \App\Models\User::Role_Agronomist }}";
+    window.CONSTANTS.USER_ROLE_BS = "{{ \App\Models\User::Role_BS }}";
+    @if (!!env('APP_DEMO'))
       window.CONFIG.APP_DEMO = 1
     @endif
   </script>

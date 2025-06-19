@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
                 CustomerSeeder::class,
                 InteractionSeeder::class,
                 ClosingSeeder::class,
+                VarietySeeder::class,
             ]);
         });
     }
