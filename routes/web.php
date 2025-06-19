@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\TargetController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VarietyController;
 use App\Http\Middleware\Auth;
@@ -53,6 +54,18 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [VarietyController::class, 'save'])->name('admin.variety.save');
             Route::post('delete/{id}', [VarietyController::class, 'delete'])->name('admin.variety.delete');
             Route::get('export', [VarietyController::class, 'export'])->name('admin.variety.export');
+        });
+
+        Route::prefix('targets')->group(function () {
+            Route::get('', [TargetController::class, 'index'])->name('admin.target.index');
+            Route::get('data', [TargetController::class, 'data'])->name('admin.target.data');
+            Route::get('add', [TargetController::class, 'editor'])->name('admin.target.add');
+            Route::get('duplicate/{id}', [TargetController::class, 'duplicate'])->name('admin.target.duplicate');
+            Route::get('edit/{id}', [TargetController::class, 'editor'])->name('admin.target.edit');
+            Route::get('detail/{id}', [TargetController::class, 'detail'])->name('admin.target.detail');
+            Route::post('save', [TargetController::class, 'save'])->name('admin.target.save');
+            Route::post('delete/{id}', [TargetController::class, 'delete'])->name('admin.target.delete');
+            Route::get('export', [TargetController::class, 'export'])->name('admin.target.export');
         });
 
         Route::prefix('settings')->group(function () {

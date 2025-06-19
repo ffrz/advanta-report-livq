@@ -15,9 +15,9 @@ class User extends Authenticatable
 
     // Display role di hardcode saja, tidak diambil dari translations
     public const Roles = [
-        self::Role_Admin => 'Administrator',
         self::Role_BS => 'BS',
         self::Role_Agronomist => 'Agronomis',
+        self::Role_Admin => 'Administrator',
     ];
 
     /** @use HasFactory<\Database\Factories\UserFactory> */

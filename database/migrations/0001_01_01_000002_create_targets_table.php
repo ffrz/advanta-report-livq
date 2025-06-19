@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('varieties', function (Blueprint $table) {
+        Schema::create('targets', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->boolean('active')->default(true);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->date('date');
             $table->text('notes')->nullable();
+            $table->unsignedTinyInteger('fm')->default(0);
+            $table->unsignedTinyInteger('odp')->default(0);
+            $table->unsignedTinyInteger('ft')->default(0);
+            $table->unsignedTinyInteger('fdd')->default(0);
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
