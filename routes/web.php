@@ -12,7 +12,6 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\VisitController;
 use App\Http\Middleware\Auth;
 use App\Http\Middleware\NonAuthenticated;
 use Illuminate\Support\Facades\Route;
@@ -51,12 +50,24 @@ Route::middleware([Auth::class])->group(function () {
 
         Route::prefix('reports')->group(function () {
             Route::get('', [ReportController::class, 'index'])->name('admin.report.index');
-            Route::match(['get', 'post'], 'interaction', [ReportController::class, 'interaction'])->name('admin.report.interaction');
-            Route::match(['get', 'post'], 'sales-activity', [ReportController::class, 'salesActivity'])->name('admin.report.sales-activity');
 
-            Route::match(['get', 'post'], 'closing-detail', [ReportController::class, 'closingDetail'])->name('admin.report.closing-detail');
-            Route::match(['get', 'post'], 'closing-by-sales', [ReportController::class, 'closingBySales'])->name('admin.report.closing-by-sales');
-            Route::match(['get', 'post'], 'closing-by-services', [ReportController::class, 'closingByServices'])->name('admin.report.closing-by-services');
+            Route::get('interaction', [ReportController::class, 'interaction'])->name('admin.report.interaction');
+            Route::get('sales-activity', [ReportController::class, 'salesActivity'])->name('admin.report.sales-activity');
+            Route::get('sales-activity-detail', [ReportController::class, 'salesActivityDetail'])->name('admin.report.sales-activity-detail');
+
+            Route::get('closing-detail', [ReportController::class, 'closingDetail'])->name('admin.report.closing-detail');
+            Route::get('closing-by-sales', [ReportController::class, 'closingBySales'])->name('admin.report.closing-by-sales');
+            Route::get('closing-by-services', [ReportController::class, 'closingByServices'])->name('admin.report.closing-by-services');
+
+            Route::get('customer-services-active', [ReportController::class, 'customerServicesActive'])->name('admin.report.customer-services-active');
+            Route::get('customer-services-new', [ReportController::class, 'customerServicesNew'])->name('admin.report.customer-services-new');
+            Route::get('customer-services-ended', [ReportController::class, 'customerServicesEnded'])->name('admin.report.customer-services-ended');
+
+            Route::get('client-new', [ReportController::class, 'clientNew'])->name('admin.report.client-new');
+            Route::get('client-active-inactive', [ReportController::class, 'clientActiveInactive'])->name('admin.report.client-active-inactive');
+            Route::get('client-history', [ReportController::class, 'clientHistory'])->name('admin.report.client-history');
+
+            Route::get('sales-performance', [ReportController::class, 'salesPerformance'])->name('admin.report.sales-performance');
         });
 
         Route::prefix('services')->group(function () {

@@ -44,7 +44,7 @@ const submit = () =>
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <q-page class="row justify-center">
-      <div class="col col-lg-6 q-pa-sm">
+      <div class="col col-md-6 q-pa-sm">
         <q-form class="row" @submit.prevent="submit" @validation-error="scrollToFirstErrorField">
           <q-card square flat bordered class="col">
             <q-inner-loading :showing="form.processing">
@@ -57,8 +57,8 @@ const submit = () =>
               <q-select v-model="form.user_id" label="Sales" :options="users" map-options emit-value
                 :error="!!form.errors.user_id" :disable="form.processing" />
               <q-select v-model="form.customer_id" label="Client" use-input input-debounce="300" clearable
-                :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn" option-label="label"
-                :display-value="selectedCustomerLabel" option-value="value" :error="!!form.errors.customer_id"
+                class="editable-select" :options="filteredCustomers" map-options emit-value @filter="filterCustomerFn"
+                option-label="label" option-value="value" :error="!!form.errors.customer_id"
                 :error-message="form.errors.customer_id" :disable="form.processing">
                 <template v-slot:no-option>
                   <q-item>
@@ -73,16 +73,16 @@ const submit = () =>
                 :rules="[
                   (val) => (val && val.length > 0) || 'Deskripsi harus diisi.',
                 ]" />
-              <LocaleNumberInput v-model:modelValue="form.amount" label="Jumlah (Rp)" lazyRules :disable="form.processing"
-                :error="!!form.errors.amount" :errorMessage="form.errors.amount" :rules="[]" />
+              <LocaleNumberInput v-model:modelValue="form.amount" label="Jumlah (Rp)" lazyRules
+                :disable="form.processing" :error="!!form.errors.amount" :errorMessage="form.errors.amount"
+                :rules="[]" />
               <q-input v-model.trim="form.notes" type="textarea" autogrow counter maxlength="255" label="Catatan"
                 lazy-rules :disable="form.processing" :error="!!form.errors.notes" :error-message="form.errors.notes"
                 :rules="[]" />
             </q-card-section>
             <q-card-section class="q-gutter-sm">
               <q-btn icon="save" type="submit" label="Simpan" color="primary" :disable="form.processing" />
-              <q-btn icon="cancel" label="Batal" :disable="form.processing"
-                @click="$goBack()" />
+              <q-btn icon="cancel" label="Batal" :disable="form.processing" @click="$goBack()" />
             </q-card-section>
           </q-card>
         </q-form>

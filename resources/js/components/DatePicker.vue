@@ -1,6 +1,7 @@
 <template>
   <q-input v-model="pickedDate" :label="props.label" :readonly="props.readonly" :disable="props.disable"
     :error="props.error" :rules="[...props.rules]" :error-message="errorMessage" :mask="props.mask"
+    :clearable="props.clearable" @clear="clearDate"
     >
     <template v-slot:append>
       <!-- Date Picker Icon -->
@@ -53,6 +54,10 @@ const props = defineProps({
   mask: {
     type: String,
     default: '####-##-##',
+  },
+  clearable: {
+    type: Boolean,
+    default: false,
   }
 });
 
@@ -62,11 +67,11 @@ const emit = defineEmits(['update:modelValue']);
 // Internal states for date and time
 const dateValue = ref('');
 
-// Watch for changes to modelValue (pickedDate) and sync with internal states
-watch(() => props.modelValue, (newValue) => {
-  const [date, time] = newValue.split(' ');
-  dateValue.value = date || '';
-});
+// // Watch for changes to modelValue (pickedDate) and sync with internal states
+// watch(() => props.modelValue, (newValue) => {
+//   const [date, time] = newValue.split(' ');
+//   dateValue.value = date || '';
+// });
 
 // Use the combined pickedDate for q-input value
 const pickedDate = ref(props.modelValue);
@@ -81,6 +86,19 @@ const updateDate = () => {
   emit('update:modelValue', val);
   pickedDate.value = val;
 };
+
+const clearDate = () => {
+  dateValue.value = '';
+  pickedDate.value = '';
+  emit('update:modelValue', '');
+};
+
+watch(() => props.modelValue, (newValue) => {
+  const [date] = (newValue || '').split(' ');
+  dateValue.value = date || '';
+  pickedDate.value = newValue || '';
+});
+
 
 </script>
 

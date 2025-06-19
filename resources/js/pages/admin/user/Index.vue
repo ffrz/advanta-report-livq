@@ -1,10 +1,13 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleFetchItems, handleDelete } from "@/helpers/client-req-handler";
 import { create_options, getQueryParams } from "@/helpers/utils";
 import i18n from "@/i18n";
 import { useQuasar } from "quasar";
+import { usePageStorage } from '@/helpers/usePageStorage'
+
+const storage = usePageStorage('users')
 
 const roles = [
   { value: "all", label: "Semua" },
@@ -23,21 +26,22 @@ const currentUser = page.props.auth.user;
 const title = i18n.global.t("users");
 const rows = ref([]);
 const loading = ref(true);
-const showFilter = ref(false);
-const filter = reactive({
+const showFilter = ref(true);
+
+const filter = reactive(storage.get('filter', {
   role: "all",
   status: "active",
   search: "",
   ...getQueryParams(),
-});
+}));
 
-const pagination = ref({
+const pagination = ref(storage.get('pagination', {
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 10,
   sortBy: "username",
   descending: false,
-});
+}));
 
 const columns = [
   {
@@ -104,6 +108,9 @@ const computedColumns = computed(() => {
 });
 
 const onRowClicked = (row) => router.get(route("admin.user.detail", row.id));
+
+watch(filter, () => storage.set('filter', filter), { deep: true })
+watch(pagination, () => storage.set('pagination', pagination.value), { deep: true })
 
 </script>
 

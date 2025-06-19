@@ -9,7 +9,7 @@ const title = "Profil Perusahaan";
     <template #title>{{ title }}</template>
     <div class="q-pa-sm">
       <div class="row justify-center">
-        <div class="col col-lg-6">
+        <div class="col col-md-6">
           <CompanyInfoForm />
         </div>
       </div>

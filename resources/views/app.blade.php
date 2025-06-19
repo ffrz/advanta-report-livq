@@ -27,6 +27,9 @@
           'CUSTOMER_SERVICE_STATUSES' => \App\Models\CustomerService::Statuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
+    @if(!!env('APP_DEMO'))
+      window.CONFIG.APP_DEMO = 1
+    @endif
   </script>
   @routes
   @vite(['resources/js/app.js', 'resources/css/app.css'])

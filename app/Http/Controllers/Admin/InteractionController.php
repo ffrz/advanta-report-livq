@@ -48,13 +48,16 @@ class InteractionController extends Controller
         return response()->json($items);
     }
 
-    public function editor($id = 0)
+    public function editor(Request $request, $id = 0)
     {
         $item = $id ? Interaction::findOrFail($id) : new Interaction([
-            'status' => Interaction::Status_Planned,
+            'status' => Interaction::Status_Done,
+            'type' => Interaction::Type_Visit,
             'user_id' => Auth::user()->id,
             'date' => Carbon::now(),
+            'customer_id' => $request->get('customer_id', null)
         ]);
+        
         return inertia('admin/interaction/Editor', [
             'data' => $item,
             'users' => User::where('active', true)->orderBy('username', 'asc')->get(),
@@ -79,6 +82,7 @@ class InteractionController extends Controller
             'notes'            => 'nullable|string|max:500',
             'location'         => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',
+            'image_path'       => 'nullable|string',
         ]);
 
         $item = !$request->id
@@ -96,7 +100,12 @@ class InteractionController extends Controller
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads'), $filename);
-            $item->image_path = 'uploads/' . $filename;
+            $validated['image_path'] = 'uploads/' . $filename; // timpah dengan path yang digenerate
+        } else if (empty($validated['image_path'])) {
+            // Hapus file lama jika ada
+            if ($item->image_path && file_exists(public_path($item->image_path))) {
+                @unlink(public_path($item->image_path)); // pakai @ untuk suppress error jika file tidak ada
+            }
         }
 
         $item->fill($validated);
@@ -214,6 +223,10 @@ class InteractionController extends Controller
 
         if (!empty($filter['type']) && ($filter['type'] != 'all')) {
             $q->where('type', '=', $filter['type']);
+        }
+
+        if (!empty($filter['customer_id']) && ($filter['customer_id'] != 'all')) {
+            $q->where('customer_id', '=', $filter['customer_id']);
         }
 
         if (!empty($filter['engagement_level']) && ($filter['engagement_level'] != 'all')) {

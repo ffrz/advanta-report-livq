@@ -105,6 +105,14 @@ a:hover {
   white-space: nowrap;
 }
 
+.editable-select .q-field__native span {
+  overflow: hidden !important;
+}
+
+.editable-select .q-field__input--padding {
+  display: none !important;
+}
+
 .custom-select.hide-input {
   overflow: hidden;
 }

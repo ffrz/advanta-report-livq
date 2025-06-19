@@ -86,6 +86,16 @@ class User extends Authenticatable
         )[0]->count;
     }
 
+    public function closings()
+    {
+        return $this->hasMany(Closing::class, 'user_id');
+    }
+
+    public function interactions()
+    {
+        return $this->hasMany(Interaction::class, 'user_id');
+    }
+
     public function customers()
     {
         return $this->hasMany(Customer::class, 'assigned_user_id');

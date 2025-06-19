@@ -7,7 +7,7 @@ defineComponent({
   name: "AuthenticatedLayout",
 });
 
-const LEFT_DRAWER_STORAGE_KEY = "hafizmonitor.layout.left-drawer-open";
+const LEFT_DRAWER_STORAGE_KEY = "shiftech-crm.layout.left-drawer-open";
 const $q = useQuasar();
 const page = usePage();
 const leftDrawerOpen = ref(

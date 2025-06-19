@@ -49,6 +49,16 @@ class Customer extends Model
         return $this->hasMany(CustomerService::class);
     }
 
+    public function interactions()
+    {
+        return $this->hasMany(Interaction::class);
+    }
+
+    public function closings()
+    {
+        return $this->hasMany(Closing::class);
+    }
+
     public static function newCustomerCount($start_date, $end_date)
     {
         return DB::select(

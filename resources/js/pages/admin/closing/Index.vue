@@ -1,23 +1,34 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, formatNumber, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
+import { usePageStorage } from '@/helpers/usePageStorage'
 
+const storage = usePageStorage('closings')
 const page = usePage();
 const title = "Closing";
 const $q = useQuasar();
-const showFilter = ref(false);
+const showFilter = ref(true);
 const rows = ref([]);
 const loading = ref(true);
-const filter = reactive({
+
+const filter = reactive(storage.get('filter', {
   search: "",
   period: "all",
   user_id: "all",
   service_id: "all",
   ...getQueryParams(),
-});
+}));
+
+const pagination = ref(storage.get('pagination', {
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: 10,
+  sortBy: "id",
+  descending: true,
+}));
 
 const period_options = [
   { value: "all", label: "Semua" },
@@ -34,6 +45,7 @@ const services = [
     label: service.name,
   })),
 ];
+
 const users = [
   { value: "all", label: "Semua" },
   ...page.props.users.map((user) => ({
@@ -41,13 +53,6 @@ const users = [
     label: `${user.name} (${user.username})`,
   })),
 ];
-const pagination = ref({
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 10,
-  sortBy: "id",
-  descending: true,
-});
 
 const columns = [
   { name: "id", label: "#", field: "id", align: "left", sortable: true },
@@ -85,6 +90,9 @@ const onRowClicked = (row) => router.get(route('admin.closing.detail', { id: row
 const computedColumns = computed(() =>
   $q.screen.gt.sm ? columns : columns.filter((col) => ["id", "action"].includes(col.name))
 );
+
+watch(filter, () => storage.set('filter', filter), { deep: true })
+watch(pagination, () => storage.set('pagination', pagination.value), { deep: true })
 
 </script>
 

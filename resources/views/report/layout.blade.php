@@ -12,25 +12,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ $title }}</title>
   <style>
-    @media screen {
-      .a4-landscape {
-        width: 1122px;
-        margin: 0 auto;
-        padding: 40px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        background-color: white;
-        overflow: hidden;
-        box-sizing: border-box;
-      }
-
-      body {
-        background: #ccc;
-        display: flex;
-        justify-content: center;
-        padding: 50px;
-      }
-    }
-
     body {
       font-family: sans-serif;
       font-size: 10pt;
@@ -57,6 +38,15 @@
 
 <body>
   <div class="a4-landscape">
+    @php
+      $logoPath = public_path(\App\Models\Setting::value('company_logo_path') ?? '');
+      $logoRelative = \App\Models\Setting::value('company_logo_path');
+    @endphp
+    @if ($logoRelative && file_exists($logoPath))
+      <div class="header-logo" style="text-align: center;">
+        <img src="{{ $logoRelative }}" alt="Logo Perusahaan" style="width: 24px; height: auto;  margin: 0 auto;" />
+      </div>
+    @endif
     <h4 style="margin:0;text-align:center;">{{ \App\Models\Setting::value('company_name', 'My Company') }}</h4>
     <h2 style="margin:0;text-align:center;">{{ $title }}</h2>
     @foreach ($subtitles as $subtitle)

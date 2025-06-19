@@ -157,18 +157,22 @@ class CustomerServiceController extends Controller
         $q = CustomerService::with(['customer', 'service']);
 
         if (!empty($filter['search'])) {
-            $q->where(function ($q) use ($filter) {
-                $q->where('subject', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('summary', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%')
-                    ->orWhereHas('customer', function ($q) use ($filter) {
-                        $q->where('name', 'like', '%' . $filter['search'] . '%')
-                            ->orWhere('company', 'like', '%' . $filter['search'] . '%');
-                    })
-                    ->orWhereHas('service', function ($q) use ($filter) {
-                        $q->where('name', 'like', '%' . $filter['search'] . '%');
+            $search = $filter['search'];
+            $q->where(function ($query) use ($search) {
+                $query->where('description', 'like', '%' . $search . '%')
+                    ->orWhere('notes', 'like', '%' . $search . '%')
+                    ->orWhere(function ($sub) use ($search) {
+                        $sub->whereHas('customer', function ($q2) use ($search) {
+                            $q2->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('company', 'like', '%' . $search . '%')
+                                ->orWhere('phone', 'like', '%' . $search . '%');
+                        });
                     });
             });
+        }
+
+        if (!empty($filter['service_id']) && ($filter['service_id'] != 'all')) {
+            $q->where('service_id', '=', $filter['service_id']);
         }
 
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {

@@ -1,28 +1,31 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
+import { usePageStorage } from '@/helpers/usePageStorage'
+
+const storage = usePageStorage('services')
 
 const title = "Layanan";
 const $q = useQuasar();
-const showFilter = ref(false);
+const showFilter = ref(true);
 const rows = ref([]);
 const loading = ref(true);
-const filter = reactive({
+const filter = reactive(storage.get('filter', {
   search: "",
   status: "all",
   ...getQueryParams(),
-});
+}));
 
-const pagination = ref({
+const pagination = ref(storage.get('pagination', {
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 10,
   sortBy: "name",
   descending: false,
-});
+}));
 
 const columns = [
   {
@@ -81,6 +84,10 @@ const computedColumns = computed(() => {
   if ($q.screen.gt.sm) return columns;
   return columns.filter((col) => col.name === "name" || col.name === "action");
 });
+
+watch(filter, () => storage.set('filter', filter), { deep: true })
+watch(pagination, () => storage.set('pagination', pagination.value), { deep: true })
+
 </script>
 
 <template>

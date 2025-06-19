@@ -106,7 +106,7 @@ class CustomerController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.customer.index'))->with('success', "Pelanggan $item->name telah disimpan.");
+        return redirect(route('admin.customer.detail', ['id' => $item->id]))->with('success', "Pelanggan $item->name telah disimpan.");
     }
 
     public function delete($id)
