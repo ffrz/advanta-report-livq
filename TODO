@@ -1,0 +1,44 @@
+GENERAL:
+- SEEDING BANYAK DATA: DONE
+- DETAIL PELANGGAN
+  - Interaksi
+  - Closing
+  - Layanan
+
+- DETAIL PENGGUNA
+  - Interaksi
+  - Closing
+  - Assigned Client
+
+- DETAIL LAYANAN
+  - Daftar Client Aktif
+
+DASHBOARD:
+---------------
+- Tabel interaksi terbaru: done
+- Tabel closing terbaru: done
+- Tabel customer terbaru: done
+- Peta
+
+Interaksi:
+----------
+- Tambahkan Foto
+- Tambahkan pin lokasi
+
+REPORTING:
+----------
+1. Laporan Kunjungan per Tim / User
+- Filter: tanggal, status kunjungan, wilayah 
+- Kolom: nama user, jumlah kunjungan planned / done, total follow-up, rasio closing
+
+2. Laporan Follow-Up
+- Semua follow-up dalam periode tertentu
+- Bisa diekspor ke Excel
+
+3. Laporan Konversi Pelanggan
+- Dari total kunjungan → berapa yang closed_won
+- Rasio konversi per marketer
+
+4. Laporan Pelanggan
+- Status prospek tiap pelanggan (new, contacted, negotiating, dll)
+- Timeline interaksi mereka
