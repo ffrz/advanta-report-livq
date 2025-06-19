@@ -7,7 +7,7 @@ defineComponent({
   name: "AuthenticatedLayout",
 });
 
-const LEFT_DRAWER_STORAGE_KEY = "shiftech-crm.layout.left-drawer-open";
+const LEFT_DRAWER_STORAGE_KEY = "advanta-report.layout.left-drawer-open";
 const $q = useQuasar();
 const page = usePage();
 const leftDrawerOpen = ref(
@@ -132,16 +132,43 @@ onMounted(() => {
 
           <q-separator />
 
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/interactions')"
-            @click="router.get(route('admin.interaction.index'))">
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/activities')"
+            @click="router.get(route('admin.activity.index'))">
             <q-item-section avatar>
-              <q-icon name="touch_double" />
+              <q-icon name="event" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Interaksi Client</q-item-label>
+              <q-item-label>Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/closings')"
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/demplots')"
+            @click="router.get(route('admin.demplot.index'))">
+            <q-item-section avatar>
+              <q-icon name="assignment" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Demplot</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/targets')"
+            @click="router.get(route('admin.target.index'))">
+            <q-item-section avatar>
+              <q-icon name="target" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Target</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/varieties')" @click="router.get(route('admin.varieties.index'))">
+            <q-item-section avatar>
+              <q-icon name="category" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Varietas</q-item-label>
+            </q-item-section>
+          </q-item>
+          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/closings')"
             @click="router.get(route('admin.closing.index'))">
             <q-item-section avatar>
               <q-icon name="handshake" />
@@ -159,7 +186,6 @@ onMounted(() => {
               <q-item-label>Layanan Client</q-item-label>
             </q-item-section>
           </q-item>
-          <q-separator />
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')"
             @click="router.get(route('admin.customer.index'))">
             <q-item-section avatar>
@@ -168,8 +194,8 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Client</q-item-label>
             </q-item-section>
-          </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/services')"
+          </q-item> -->
+          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/services')"
             @click="router.get(route('admin.service.index'))">
             <q-item-section avatar>
               <q-icon name="apps" />
@@ -177,7 +203,9 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Layanan</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
+          <q-separator />
+
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/settings/users')" @click="router.get(route('admin.user.index'))">
             <q-item-section avatar>

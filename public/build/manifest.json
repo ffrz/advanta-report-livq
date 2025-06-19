@@ -1,30 +1,33 @@
 {
-  "_vendor1-OoAx3i2x.css": {
-    "file": "assets/vendor1-OoAx3i2x.css",
-    "src": "_vendor1-OoAx3i2x.css"
+  "_vendor1-B66eveH2.css": {
+    "file": "assets/vendor1-B66eveH2.css",
+    "src": "_vendor1-B66eveH2.css"
   },
-  "_vendor1-TYPCHOI5.js": {
-    "file": "assets/vendor1-TYPCHOI5.js",
+  "_vendor1-DNKqCGmd.js": {
+    "file": "assets/vendor1-DNKqCGmd.js",
     "name": "vendor1",
     "css": [
-      "assets/vendor1-OoAx3i2x.css"
+      "assets/vendor1-B66eveH2.css"
     ],
     "assets": [
-      "assets/MaterialIcons-Regular-BjXOXp5c.eot"
+      "assets/MaterialIcons-Regular-BjXOXp5c.eot",
+      "assets/MaterialIcons-Regular-DOtZ65Va.woff2",
+      "assets/MaterialIcons-Regular-FsbMSDLx.woff",
+      "assets/MaterialIcons-Regular-DEUTIz1o.ttf"
     ]
   },
-  "_vendor2-BLEQpJCu.js": {
-    "file": "assets/vendor2-BLEQpJCu.js",
+  "_vendor2-CtwM4IIp.js": {
+    "file": "assets/vendor2-CtwM4IIp.js",
     "name": "vendor2",
     "imports": [
-      "_vendor1-TYPCHOI5.js"
+      "_vendor1-DNKqCGmd.js"
     ]
   },
-  "_vendor3-DUQ4981J.js": {
-    "file": "assets/vendor3-DUQ4981J.js",
+  "_vendor3-DkTEOI7U.js": {
+    "file": "assets/vendor3-DkTEOI7U.js",
     "name": "vendor3",
     "imports": [
-      "_vendor2-BLEQpJCu.js"
+      "_vendor2-CtwM4IIp.js"
     ]
   },
   "node_modules/@quasar/extras/fontawesome-v6/fa-brands-400.ttf": {
@@ -87,23 +90,35 @@
     "file": "assets/MaterialIcons-Regular-BjXOXp5c.eot",
     "src": "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.eot"
   },
+  "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.ttf": {
+    "file": "assets/MaterialIcons-Regular-DEUTIz1o.ttf",
+    "src": "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.ttf"
+  },
+  "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff": {
+    "file": "assets/MaterialIcons-Regular-FsbMSDLx.woff",
+    "src": "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff"
+  },
+  "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff2": {
+    "file": "assets/MaterialIcons-Regular-DOtZ65Va.woff2",
+    "src": "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff2"
+  },
   "resources/css/app.css": {
     "file": "assets/app-B-zRk8ZN.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-93_cc6W1.js",
+    "file": "assets/app-BJaTe2he.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_vendor1-TYPCHOI5.js",
-      "_vendor2-BLEQpJCu.js",
-      "_vendor3-DUQ4981J.js"
+      "_vendor1-DNKqCGmd.js",
+      "_vendor2-CtwM4IIp.js",
+      "_vendor3-DkTEOI7U.js"
     ],
     "css": [
-      "assets/app-vCLAEp8q.css"
+      "assets/app-BqMdEjWR.css"
     ],
     "assets": [
       "assets/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ-D-x-0Q06.woff2",

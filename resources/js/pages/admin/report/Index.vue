@@ -11,8 +11,6 @@ const form = useApiForm({
   preview: true,
   report_type: page.props.report_type ?? null,
   user_id: 'all',
-  service_id: 'all',
-  client_id: 'all',
   period: 'this_month',
   start_date: dayjs().format('YYYY-MM-DD'),
   end_date: dayjs().format('YYYY-MM-DD'),
@@ -20,25 +18,25 @@ const form = useApiForm({
 
 const filter_options = reactive({
   show_user: false,
-  show_service: false,
   show_period: false,
-  show_client: false,
 });
 
 const report_types = [
-  { value: 'interaction', label: 'Laporan Interaksi' },
-  { value: 'closing-detail', label: 'Laporan Closing Penjualan' },
-  { value: 'closing-by-sales', label: 'Laporan Rekapitulasi Closing Sales' },
-  { value: 'closing-by-services', label: 'Laporan Rekap Closing Layanan' },
-  { value: 'customer-services-active', label: 'Laporan Layanan Pelanggan Aktif' },
-  { value: 'customer-services-new', label: 'Laporan Layanan Pelanggan Baru' },
-  { value: 'customer-services-ended', label: 'Laporan Layanan Pelanggan Berakhir' },
-  { value: 'sales-performance', label: 'Laporan Rekapitulasi Kinerja Sales' },
-  { value: 'sales-activity', label: 'Laporan Rekap Aktivitas Sales' },
-  { value: 'sales-activity-detail', label: 'Laporan Rincian Aktivitas Sales' },
-  { value: 'client-new', label: 'Laporan Klien Baru' },
-  { value: 'client-active-inactive', label: 'Laporan Klien Aktif / Nonaktif' },
-  { value: 'client-history', label: 'Laporan Riwayat Klien' },
+  { value: 'activity', label: 'Laporan Kegiatan' },
+  { value: 'demplot', label: 'Laporan Demplot' },
+  { value: 'target', label: 'Laporan Target' },
+  // { value: 'closing-detail', label: 'Laporan Closing Penjualan' },
+  // { value: 'closing-by-sales', label: 'Laporan Rekapitulasi Closing Sales' },
+  // { value: 'closing-by-services', label: 'Laporan Rekap Closing Layanan' },
+  // { value: 'customer-services-active', label: 'Laporan Layanan Pelanggan Aktif' },
+  // { value: 'customer-services-new', label: 'Laporan Layanan Pelanggan Baru' },
+  // { value: 'customer-services-ended', label: 'Laporan Layanan Pelanggan Berakhir' },
+  // { value: 'sales-performance', label: 'Laporan Rekapitulasi Kinerja Sales' },
+  // { value: 'sales-activity', label: 'Laporan Rekap Aktivitas Sales' },
+  // { value: 'sales-activity-detail', label: 'Laporan Rincian Aktivitas Sales' },
+  // { value: 'client-new', label: 'Laporan Klien Baru' },
+  // { value: 'client-active-inactive', label: 'Laporan Klien Aktif / Nonaktif' },
+  // { value: 'client-history', label: 'Laporan Riwayat Klien' },
 ];
 
 const period_options = ref([
@@ -85,14 +83,6 @@ const submit = () => {
   const query = new URLSearchParams();
   if (filter_options.show_user) {
     query.append('user_id', form.user_id);
-  }
-
-  if (filter_options.show_client) {
-    query.append('client_id', form.client_id);
-  }
-
-  if (filter_options.show_service) {
-    query.append('service_id', form.service_id);
   }
 
   if (filter_options.show_period) {
@@ -153,21 +143,13 @@ const validate = () => {
     }
   }
 
-  form.errors.client_id = null;
-  if (form.report_type == 'client-history') {
-    if (form.client_id == 'all') {
-      is_valid = false;
-      form.errors.client_id = 'Pilih client terlebih dahulu!';
-    }
-  }
-
   form.errors.user_id = null;
-  if (form.report_type == 'sales-activity-detail') {
-    if (form.user_id == 'all') {
-      is_valid = false;
-      form.errors.user_id = 'Pilih Sales terlebih dahulu!';
-    }
-  }
+  // if (form.report_type == 'sales-activity-detail') {
+  //   if (form.user_id == 'all') {
+  //     is_valid = false;
+  //     form.errors.user_id = 'Pilih Sales terlebih dahulu!';
+  //   }
+  // }
 
   return is_valid;
 };
@@ -183,33 +165,23 @@ function updateState() {
   }
 
   if ([
-    'interaction',
-    'sales-activity',
-    'closing-detail',
-    'closing-by-services',
-    'client-new',
-    'client-active-inactive',
-    'sales-activity-detail',
+    'activity',
+    'demplot',
+    'target',
   ].includes(form.report_type)) {
     filter_options.show_period = true;
     filter_options.show_user = true;
   }
-  else if ([
-    'customer-services-active',
-    'customer-services-new',
-    'customer-services-ended',
-    'closing-by-sales',
-    'sales-performance',
-  ].includes(form.report_type)
-  ) {
-    filter_options.show_period = true;
-  }
-  else if ([
-    'client-history',
-  ].includes(form.report_type)) {
-    filter_options.show_client = true;
-    filter_options.show_period = true;
-  }
+  // else if ([
+  // ].includes(form.report_type)
+  // ) {
+  //   filter_options.show_period = true;
+  // }
+  // else if ([
+  //   'client-history',
+  // ].includes(form.report_type)) {
+  //   filter_options.show_period = true;
+  // }
 
   validate();
 }
@@ -241,12 +213,6 @@ watch(
               <q-select v-if="filter_options.show_user" v-model="form.user_id" label="Sales" :options="users"
                 map-options emit-value :error="!!form.errors.user_id" :disable="form.processing"
                 :error-message="form.errors.user_id" />
-              <q-select v-if="filter_options.show_service" v-model="form.service_id" label="Layanan" :options="services"
-                map-options emit-value :error="!!form.errors.service_id" :disable="form.processing"
-                :error-message="form.errors.service_id" />
-              <q-select v-if="filter_options.show_client" v-model="form.client_id" label="Client" :options="clients"
-                map-options emit-value :error="!!form.errors.client_id" :disable="form.processing"
-                :error-message="form.errors.client_id" />
               <q-select v-if="filter_options.show_period" class="custom-select col-12" style="min-width: 150px"
                 v-model="form.period" :options="period_options" label="Periode" map-options emit-value
                 :error="!!form.errors.period" :disable="form.processing" />
