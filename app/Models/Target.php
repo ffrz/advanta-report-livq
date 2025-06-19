@@ -15,6 +15,8 @@ class Target extends Model
         'odp',
         'ft',
         'fdd',
+        'total_target',
+        'progress',
         'notes',
     ];
 

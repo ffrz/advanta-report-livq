@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('targets', function (Blueprint $table) {
+        Schema::create('demplots', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('variety_id')->constrained()->onDelete('cascade');
+            $table->string('owner_name');
             $table->date('date');
+            $table->string('location')->nullable();
+            $table->string('latlong')->nullable();
+            $table->string('image_path')->nullable();
             $table->text('notes')->nullable();
-            $table->unsignedTinyInteger('fm')->default(0);
-            $table->unsignedTinyInteger('odp')->default(0);
-            $table->unsignedTinyInteger('ft')->default(0);
-            $table->unsignedTinyInteger('fdd')->default(0);
-            $table->unsignedTinyInteger('total_target')->default(0);
-            $table->unsignedTinyInteger('progress')->default(0);
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();

@@ -15,7 +15,6 @@ const rows = ref([]);
 const loading = ref(true);
 
 const filter = reactive(storage.get('filter', {
-  search: "",
   period: "all",
   user_id: "all",
   ...getQueryParams(),
@@ -120,16 +119,11 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
     <template #header v-if="showFilter">
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
-          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.period"
-            :options="period_options" label="Periode" dense map-options emit-value outlined
-            @update:model-value="onFilterChange" />
-          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.user_id"
-            :options="users" label="BS" dense map-options emit-value outlined @update:model-value="onFilterChange" />
-          <q-input class="col" outlined dense debounce="300" v-model="filter.search" placeholder="Cari" clearable>
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+          <q-select class="custom-select col" style="min-width: 150px" v-model="filter.period" :options="period_options"
+            label="Periode" dense map-options emit-value outlined @update:model-value="onFilterChange" />
+          <q-select v-if="check_role($CONSTANTS.USER_ROLE_ADMIN) || check_role($CONSTANTS.USER_ROLE_AGRONOMIST)"
+            class="custom-select col" style="min-width: 150px" v-model="filter.user_id" :options="users" label="BS"
+            dense map-options emit-value outlined @update:model-value="onFilterChange" />
         </div>
       </q-toolbar>
     </template>
@@ -155,16 +149,33 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
             @click="onRowClicked(props.row)">
             <q-td key="id" :props="props" class="wrap-column">
               <div>
-                {{ props.row.id }}
+                #{{ props.row.id }}
                 <template v-if="$q.screen.lt.md">
-                  - <span><q-icon name="history" /> {{ $dayjs(props.row.date).format('DD MMMM YYYY') }}</span>
+                  - <span><q-icon name="history" /> {{ $dayjs(props.row.date).format('MMMM YYYY') }}</span>
                 </template>
               </div>
               <template v-if="$q.screen.lt.md">
                 <div>
                   <q-icon name="person" /> {{ props.row.user.name }} ({{ props.row.user.username }})
                 </div>
-                <div><q-icon name="target" /> Rp. {{ formatNumber(props.row.amount) }}</div>
+                <div>
+                  <q-icon name="target" />
+                  FM: {{ formatNumber(props.row.fm) }},
+                  ODP: {{ formatNumber(props.row.odp) }},
+                  FT: {{ formatNumber(props.row.ft) }},
+                  FDD: {{ formatNumber(props.row.fdd) }}<br />
+                </div>
+                <div>
+                  <q-icon name="timeline" />
+                  <span>{{ formatNumber(props.row.progress) }} / {{
+                    formatNumber(props.row.total_target) }}
+                    ({{ formatNumber(props.row.total_target > 0 ? (props.row.progress / props.row.total_target) * 100 :
+                      0)
+                    }}%)</span>
+                  <q-linear-progress :value="props.row.total_target > 0
+                    ? props.row.progress / props.row.total_target
+                    : 0" color="primary" track-color="grey-3" size="10px" rounded stripe animated />
+                </div>
                 <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes }}</div>
               </template>
             </q-td>
@@ -187,7 +198,12 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
               {{ formatNumber(props.row.fdd) }}
             </q-td>
             <q-td key="progress" :props="props">
-              {{ formatNumber(props.row.progress) }}
+              {{ formatNumber(props.row.progress) }} / {{ formatNumber(props.row.total_target) }}
+              ({{ formatNumber(props.row.total_target > 0 ? (props.row.progress / props.row.total_target) * 100 : 0)
+              }}%)
+              <q-linear-progress :value="props.row.total_target > 0
+                ? props.row.progress / props.row.total_target
+                : 0" color="primary" track-color="grey-3" size="10px" rounded stripe animated />
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">

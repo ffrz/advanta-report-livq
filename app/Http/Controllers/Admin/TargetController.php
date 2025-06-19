@@ -9,7 +9,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -122,6 +121,7 @@ class TargetController extends Controller
         }
 
         $item->fill($validated);
+        $item->total_target = $validated['fm'] + $validated['odp'] + $validated['ft'] + $validated['fdd'];
         $item->save();
 
         if (!$request->id) {
@@ -214,25 +214,28 @@ class TargetController extends Controller
 
     protected function createQuery(Request $request)
     {
+        $user = Auth::user();
         $filter = $request->get('filter', []);
 
         $q = Target::with([
             'user:id,username,name',
         ]);
 
-        if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
+        if ($user->role == User::Role_BS) {
+            $q->where('user_id', '=', $user->id);
+        } else if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
             $q->where('user_id', '=', $filter['user_id']);
         }
 
-        if (!empty($filter['search'])) {
-            $q->where(function ($q) use ($filter) {
-                $q->where('notes', 'like', '%' . $filter['search'] . '%')
-                    ->orWhereHas('user', function ($q) use ($filter) {
-                        $q->where('name', 'like', '%' . $filter['search'] . '%');
-                        $q->orWhere('username', 'like', '%' . $filter['search'] . '%');
-                    });
-            });
-        }
+        // if (!empty($filter['search'])) {
+        //     $q->where(function ($q) use ($filter) {
+        //         $q->where('notes', 'like', '%' . $filter['search'] . '%')
+        //             ->orWhereHas('user', function ($q) use ($filter) {
+        //                 $q->where('name', 'like', '%' . $filter['search'] . '%');
+        //                 $q->orWhere('username', 'like', '%' . $filter['search'] . '%');
+        //             });
+        //     });
+        // }
 
         if (!empty($filter['period']) && ($filter['period'] != 'all')) {
             if ($filter['period'] == 'this_month') {
