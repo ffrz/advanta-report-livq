@@ -220,6 +220,10 @@ class TargetController extends Controller
             'user:id,username,name',
         ]);
 
+        if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
+            $q->where('user_id', '=', $filter['user_id']);
+        }
+
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
                 $q->where('notes', 'like', '%' . $filter['search'] . '%')
