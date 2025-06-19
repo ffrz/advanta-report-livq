@@ -17,7 +17,7 @@ use App\Http\Middleware\NonAuthenticated;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('homepage');
+    return view('homepage-new');
 })->name('home');
 
 Route::get('/test', function () {
