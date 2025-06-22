@@ -71,6 +71,8 @@ class UserController extends Controller
         $user->created_at = null;
         return inertia('admin/user/Editor', [
             'data' => $user,
+            'users' => User::where('role', '<>', User::Role_Admin)
+                ->where('role', '<>', User::Role_BS)->orderBy('name')->get()
         ]);
     }
 
