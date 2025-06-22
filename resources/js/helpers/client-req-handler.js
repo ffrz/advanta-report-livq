@@ -20,7 +20,7 @@ export function handleSubmit(data) {
   const { form, url, onSuccess, onError, method, forceFormData } = data;
 
   form.clearErrors();
-  form[method ?? 'post' ](url,
+  form[method ?? 'post'](url,
     {
       preserveScroll: true,
       forceFormData: forceFormData ?? false,
@@ -44,7 +44,7 @@ export function handleSubmit(data) {
         }
 
         _scrollToFirstError();
-        if (!error || typeof (error.response?.data) === 'object' || error.message.length === 0)
+        if (!error || typeof (error.response?.data) === 'object' || error.message?.length === 0)
           return;
 
         Notify.create({

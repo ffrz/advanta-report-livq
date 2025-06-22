@@ -2,7 +2,8 @@
 import { handleSubmit } from "@/helpers/client-req-handler";
 import { create_options } from "@/helpers/utils";
 import { validateUsername } from "@/helpers/validations";
-import { router, useForm, usePage } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const roles = create_options(window.CONSTANTS.USER_ROLES);
 const page = usePage();
@@ -13,7 +14,25 @@ const form = useForm({
   username: page.props.data.username,
   password: "",
   role: !!page.props.data.role ? page.props.data.role : roles[0].value,
+  parent_id: page.props.data.parent_id ? Number(page.props.data.parent_id) : null,
+  work_area: page.props.data.work_area ? page.props.data.work_area : null,
   active: !!page.props.data.active,
+});
+
+const users = ref(page.props.users.map(user => ({
+  value: user.id,
+  label: `${user.name} (${user.username})`,
+  role: user.role,
+})));
+
+const computedUsers = computed(() => {
+  if (form.role === window.CONSTANTS.USER_ROLE_BS) {
+    return users.value.filter(item => item.role === window.CONSTANTS.USER_ROLE_AGRONOMIST);
+  }
+  if (form.role === window.CONSTANTS.USER_ROLE_AGRONOMIST) {
+    return users.value.filter(item => item.role === window.CONSTANTS.USER_ROLE_ASM);
+  }
+  return users.value;
 });
 
 const submit = () =>
@@ -45,10 +64,15 @@ const submit = () =>
                 ]" />
               <q-input v-model="form.password" type="password" label="Kata Sandi" lazy-rules :disable="form.processing"
                 :error="!!form.errors.password" :error-message="form.errors.password" />
-              <q-select v-model="form.role" label="Hak Akses" :options="roles" map-options emit-value lazy-rules
+              <p v-if="form.id" class="text-subtitle text-grey-8 q-pt-none">Isi jika ingin mengatur ulang sandi.</p>
+              <q-select v-model="form.role" label="Role" :options="roles" map-options emit-value lazy-rules
                 :disable="form.processing" transition-show="jump-up" transition-hide="jump-up"
                 :error="!!form.errors.role" :error-message="form.errors.role">
               </q-select>
+              <q-select v-model="form.parent_id" label="Bawahan Dari" :options="computedUsers" map-options emit-value
+                :error="!!form.errors.parent_id" :disable="form.processing" />
+              <q-input v-model="form.work_area" type="text" label="Area Kerja" lazy-rules :disable="form.processing"
+                :error="!!form.errors.work_area" :error-message="form.errors.work_area" />
               <div style="margin-left:-10px;">
                 <q-checkbox class="full-width" v-model="form.active" :disable="form.processing" label="Aktif" />
               </div>

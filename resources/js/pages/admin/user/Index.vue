@@ -44,47 +44,15 @@ const pagination = ref(storage.get('pagination', {
 }));
 
 const columns = [
-  {
-    name: "username",
-    label: "Username",
-    field: "username",
-    align: "left",
-    sortable: true,
-  },
-  {
-    name: "name",
-    label: "Nama",
-    field: "name",
-    align: "left",
-    sortable: true,
-  },
-  {
-    name: "role",
-    label: "Role",
-    field: "role",
-    align: "center",
-  },
-  {
-    name: "work_area",
-    label: "Area Kerja",
-    field: "work_area",
-    align: "center",
-  },
-  {
-    name: "parent",
-    label: "Atasan",
-    field: "parent",
-    align: "center",
-  },
-  {
-    name: "action",
-    align: "right",
-  },
+  { name: "username", label: "Username", field: "username", align: "left", sortable: true },
+  { name: "name", label: "Nama", field: "name", align: "left", sortable: true },
+  { name: "role", label: "Role", field: "role", align: "center" },
+  { name: "work_area", label: "Area Kerja", field: "work_area", align: "center", },
+  { name: "parent", label: "Atasan", field: "parent", align: "center" },
+  { name: "action", align: "right" },
 ];
 
-onMounted(() => {
-  fetchItems();
-});
+onMounted(() => fetchItems());
 
 const onFilterChange = () => fetchItems();
 
@@ -106,10 +74,9 @@ const deleteItem = (row) =>
     loading,
   });
 
-const computedColumns = computed(() => {
-  if ($q.screen.gt.sm) return columns;
-  return columns.filter((col) => col.name === "username" || col.name === "action");
-});
+const computedColumns = computed(() =>
+  $q.screen.gt.sm ? columns : columns.filter((col) => ["username", "action"].includes(col.name))
+);
 
 const onRowClicked = (row) => router.get(route("admin.user.detail", row.id));
 
@@ -179,11 +146,22 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
           <q-tr :props="props" :class="!props.row.active ? 'bg-red-1' : ''" @click="onRowClicked(props.row)"
             class="cursor-pointer">
             <q-td key="username" :props="props">
-              <div>{{ props.row.username }}</div>
+              <div v-if="$q.screen.gt.sm">
+                {{ props.row.username }}
+              </div>
+              <div v-else>
+                <q-icon name="person" />
+                {{ props.row.name }} ({{ props.row.username }})
+              </div>
               <template v-if="!$q.screen.gt.sm">
-                <div><q-icon name="person" /> {{ props.row.name }}</div>
-                <div class="elipsis" style="max-width: 200px;"><q-icon name="group" /> <span>{{
+                <div class="elipsis" style="max-width: 200px;"><q-icon name="assignment_ind" /> <span>{{
                   $CONSTANTS.USER_ROLES[props.row.role] }}</span></div>
+                <div v-if="props.row.parent">
+                  <q-icon name="supervisor_account" /> {{ props.row.parent.name }}
+                </div>
+                <div v-if="props.row.work_area">
+                  <q-icon name="explore" /> {{ props.row.work_area }}
+                </div>
               </template>
             </q-td>
             <q-td key="name" :props="props">

@@ -41,12 +41,21 @@ const title = "Rincian Pengguna";
                     <td>:</td>
                     <td>{{ $CONSTANTS.USER_ROLES[page.props.data.role] }}</td>
                   </tr>
-                  <tr>
-                    <td>Klien Ditangani</td>
+                  <tr v-if="page.props.data.parent">
+                    <td>Bawahan dari</td>
                     <td>:</td>
-                    <td>{{ page.props.data.active_customers_count }}</td>
+                    <td>
+                      <my-link :href="route('admin.user.detail', { id: page.props.data.parent.id })">
+                        {{ page.props.data.parent.name }} ({{ $CONSTANTS.USER_ROLES[page.props.data.parent.role] }})
+                      </my-link>
+                    </td>
                   </tr>
                   <tr>
+                    <td>Area Kerja</td>
+                    <td>:</td>
+                    <td>{{ page.props.data.work_area }}</td>
+                  </tr>
+                  <tr v-if="page.props.data.created_at">
                     <td>Dibuat</td>
                     <td>:</td>
                     <td>
@@ -54,7 +63,7 @@ const title = "Rincian Pengguna";
                       {{ $dayjs(page.props.data.created_at).format("DD MMMM YY HH:mm:ss") }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="page.props.data.updated_at">
                     <td>Diperbarui</td>
                     <td>:</td>
                     <td>

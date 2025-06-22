@@ -7,10 +7,11 @@
     <thead>
       <tr>
         <th>No</th>
-        <th>ID</th>
         <th>Username</th>
         <th>Nama Lengkap</th>
-        <th>Hak Akses</th>
+        <th>Role</th>
+        <th>Atasan</th>
+        <th>Area Kerja</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -18,10 +19,11 @@
       @forelse ($items as $index => $item)
         <tr>
           <td align="right">{{ $index + 1 }}</td>
-          <td>{{ $item->id }}</td>
           <td>{{ $item->username }}</td>
           <td>{{ $item->name }}</td>
           <td>{{ \App\Models\User::Roles[$item->role] }}</td>
+          <td>{{ $item->parent ? $item->parent->name : '' }}</td>
+          <td>{{ $item->work_area }}</td>
           <td>{{ $item->active ? 'Aktif' : 'Non Aktif' }}</td>
         </tr>
       @empty

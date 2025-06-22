@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         // tambahkan jumlah client yang ditangani oleh user ini
         return inertia('admin/user/Detail', [
-            'data' => User::findOrFail($id),
+            'data' => User::with('parent')->findOrFail($id),
         ]);
     }
 
@@ -85,6 +85,8 @@ class UserController extends Controller
 
         return inertia('admin/user/Editor', [
             'data' => $user,
+            'users' => User::where('role', '<>', User::Role_Admin)
+                ->where('role', '<>', User::Role_BS)->orderBy('name')->get()
         ]);
     }
 
@@ -94,6 +96,8 @@ class UserController extends Controller
             'name' => 'required|max:255',
             'password' => 'required|min:5|max:40',
             'role' => 'required',
+            'parent_id' => 'required|exists:users,id',
+            'work_area' => 'nullable|string|max:100',
         ];
 
         $user = null;
@@ -150,7 +154,7 @@ class UserController extends Controller
      */
     public function export(Request $request)
     {
-        $items = User::orderBy('id', 'asc')->get();
+        $items = User::orderBy('name', 'asc')->get();
         $title = 'Daftar Pengguna';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
@@ -164,20 +168,24 @@ class UserController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Tambahkan header
-            $sheet->setCellValue('A1', 'ID');
+            $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', 'Username');
             $sheet->setCellValue('C1', 'Nama Lengkap');
-            $sheet->setCellValue('D1', 'Hak Akses');
-            $sheet->setCellValue('E1', 'Status');
+            $sheet->setCellValue('D1', 'Role');
+            $sheet->setCellValue('E1', 'Atasan');
+            $sheet->setCellValue('F1', 'Area Kerja');
+            $sheet->setCellValue('G1', 'Status');
 
             // Tambahkan data ke Excel
             $row = 2;
-            foreach ($items as $item) {
-                $sheet->setCellValue('A' . $row, $item->id);
+            foreach ($items as $num => $item) {
+                $sheet->setCellValue('A' . $row, $num + 1);
                 $sheet->setCellValue('B' . $row, $item->username);
                 $sheet->setCellValue('C' . $row, $item->name);
                 $sheet->setCellValue('D' . $row, User::Roles[$item->role]);
-                $sheet->setCellValue('E' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('E' . $row, $item->parent ? $item->parent->name : '');
+                $sheet->setCellValue('F' . $row, $item->work_area);
+                $sheet->setCellValue('G' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
                 $row++;
             }
 
