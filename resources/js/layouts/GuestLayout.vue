@@ -22,7 +22,7 @@ defineComponent({
       <q-toolbar style="max-width: 980px; margin:0 auto;">
         <q-toolbar-title align="center">
           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+            <img src="/assets/img/app-logo.png">
           </q-avatar>
           <a class="q-pl-md text-white" :href="route('home')">{{ $config.APP_NAME }}</a>
         </q-toolbar-title>

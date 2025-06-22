@@ -120,7 +120,7 @@ onMounted(() => {
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/reports')"
+          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/reports')"
             @click="router.get(route('admin.report.index'))">
             <q-item-section avatar>
               <q-icon name="docs" />
@@ -128,11 +128,11 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Laporan</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
 
-          <q-separator />
+          <!-- <q-separator /> -->
 
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/activities')"
+          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/activities')"
             @click="router.get(route('admin.activity.index'))">
             <q-item-section avatar>
               <q-icon name="event" />
@@ -158,7 +158,7 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Target</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
           <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/closings')"
             @click="router.get(route('admin.closing.index'))">
             <q-item-section avatar>
@@ -195,8 +195,8 @@ onMounted(() => {
               <q-item-label>Layanan</q-item-label>
             </q-item-section>
           </q-item> -->
-          <q-separator />
-          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+          <!-- <q-separator /> -->
+          <!-- <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/farmers')" @click="router.get(route('admin.farmer.index'))">
             <q-item-section avatar>
               <q-icon name="agriculture" />
@@ -213,7 +213,7 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Client (Distributor)</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
           <q-separator />
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/products')" @click="router.get(route('admin.product.index'))">
