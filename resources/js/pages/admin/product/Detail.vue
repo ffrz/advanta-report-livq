@@ -1,6 +1,6 @@
 <script setup>
 import { formatNumber } from "@/helpers/utils";
-import { usePage } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
 
 const page = usePage();
@@ -13,6 +13,13 @@ const $q = useQuasar();
   <i-head :title="title" />
   <authenticated-layout>
     <template #title>{{ title }}</template>
+    <template #right-button>
+      <div class="q-gutter-sm">
+        <q-btn icon="arrow_back" dense color="grey-7" @click="$goBack()" />
+        <q-btn icon="edit" dense color="primary"
+          @click="router.get(route('admin.product.edit', { id: page.props.data.id }))" />
+      </div>
+    </template>
     <div class="row justify-center">
       <div class="col col-lg-6 q-pa-sm">
         <div class="row">

@@ -4,7 +4,7 @@ import { handleSubmit } from "@/helpers/client-req-handler";
 import { scrollToFirstErrorField } from "@/helpers/utils";
 
 const page = usePage();
-const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Kategori Produk";
+const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Kategori Varietas";
 
 const form = useForm({
   id: page.props.data.id,
@@ -12,8 +12,7 @@ const form = useForm({
   description: page.props.data.description,
 });
 
-const computedColumns = computed(() =>
-  $q.screen.gt.sm ? columns : columns.filter((col) => ["name", "action"].includes(col.name)));
+const submit = () => handleSubmit({ form, url: route('admin.product.save') });
 
 </script>
 

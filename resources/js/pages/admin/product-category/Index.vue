@@ -5,7 +5,7 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 
-const title = "Kategori Produk";
+const title = "Kategori Varietas";
 const $q = useQuasar();
 const showFilter = ref(false);
 const rows = ref([]);
@@ -64,9 +64,8 @@ const fetchItems = (props = null) => {
   });
 };
 
-const computedColumns = computed(() => {
-  return $q.screen.gt.sm ? columns : columns.filter((col) => ["name", "action"].includes(col.name))
-});
+const computedColumns = computed(() =>
+  $q.screen.gt.sm ? columns : columns.filter((col) => ["name", "action"].includes(col.name)));
 
 </script>
 
