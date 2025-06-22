@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TargetController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\VarietyController;
+
 use App\Http\Middleware\Auth;
 use App\Http\Middleware\NonAuthenticated;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +24,7 @@ Route::get('/test', function () {
 })->name('test');
 
 Route::middleware(NonAuthenticated::class)->group(function () {
+    Route::redirect('/', 'admin/auth/login', 301);
     Route::prefix('/admin/auth')->group(function () {
         Route::match(['get', 'post'], 'login', [AuthController::class, 'login'])->name('admin.auth.login');
         Route::match(['get', 'post'], 'register', [AuthController::class, 'register'])->name('admin.auth.register');
