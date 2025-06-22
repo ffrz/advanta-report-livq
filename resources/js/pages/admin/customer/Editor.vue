@@ -57,6 +57,9 @@ const submit = () =>
                 :error="!!form.errors.phone" :error-message="form.errors.phone" />
               <q-input v-model.trim="form.address" type="textarea" autogrow counter maxlength="1000" label="Alamat"
                 lazy-rules :disable="form.processing" :error="!!form.errors.address" :error-message="form.address" />
+              <q-input v-model.trim="form.shipping_address" type="textarea" autogrow counter maxlength="1000"
+                label="Alamat Pengiriman" lazy-rules :disable="form.processing" :error="!!form.errors.shipping_address"
+                :error-message="form.shipping_address" />
               <q-select v-model="form.assigned_user_id" label="Assigned To" :options="users" map-options emit-value
                 :error="!!form.errors.assigned_user_id" :disable="form.processing" />
               <q-input v-model.trim="form.notes" type="textarea" autogrow counter maxlength="1000" label="Catatan"
