@@ -44,7 +44,7 @@ export function handleSubmit(data) {
         }
 
         _scrollToFirstError();
-        if (!error || typeof (error.response?.data) === 'object' || error.message?.length === 0)
+        if (!error || typeof (error.response?.data) === 'object' || error.message === undefined || error.message?.length === 0)
           return;
 
         Notify.create({

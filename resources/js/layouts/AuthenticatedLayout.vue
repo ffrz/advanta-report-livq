@@ -234,6 +234,16 @@ onMounted(() => {
               <q-item-label>Kategori Varietas</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/activity-types')"
+            @click="router.get(route('admin.activity-type.index'))">
+            <q-item-section avatar>
+              <q-icon name="activity_zone" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Jenis Kegiatan (DGA)</q-item-label>
+            </q-item-section>
+          </q-item>
           <!-- <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/activities')" @click="router.get(route('admin.activity.index'))">
             <q-item-section avatar>

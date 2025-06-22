@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityTypeController;
 use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
@@ -67,6 +68,16 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('edit/{id}', [ProductCategoryController::class, 'editor'])->name('admin.product-category.edit');
             Route::post('save', [ProductCategoryController::class, 'save'])->name('admin.product-category.save');
             Route::post('delete/{id}', [ProductCategoryController::class, 'delete'])->name('admin.product-category.delete');
+        });
+
+        Route::prefix('activity-types')->group(function () {
+            Route::get('', [ActivityTypeController::class, 'index'])->name('admin.activity-type.index');
+            Route::get('data', [ActivityTypeController::class, 'data'])->name('admin.activity-type.data');
+            Route::get('add', [ActivityTypeController::class, 'editor'])->name('admin.activity-type.add');
+            Route::get('duplicate/{id}', [ActivityTypeController::class, 'duplicate'])->name('admin.activity-type.duplicate');
+            Route::get('edit/{id}', [ActivityTypeController::class, 'editor'])->name('admin.activity-type.edit');
+            Route::post('save', [ActivityTypeController::class, 'save'])->name('admin.activity-type.save');
+            Route::post('delete/{id}', [ActivityTypeController::class, 'delete'])->name('admin.activity-type.delete');
         });
 
         Route::prefix('targets')->group(function () {

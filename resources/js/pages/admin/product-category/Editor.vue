@@ -12,7 +12,7 @@ const form = useForm({
   description: page.props.data.description,
 });
 
-const submit = () => handleSubmit({ form, url: route('admin.product.save') });
+const submit = () => handleSubmit({ form, url: route('admin.product-category.save') });
 
 </script>
 
