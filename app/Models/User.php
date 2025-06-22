@@ -12,11 +12,13 @@ class User extends Authenticatable
     public const Role_Admin = 'admin';
     public const Role_BS = 'bs';
     public const Role_Agronomist = 'agronomist';
+    public const Role_ASM = 'asm';
 
     // Display role di hardcode saja, tidak diambil dari translations
     public const Roles = [
         self::Role_BS => 'BS',
         self::Role_Agronomist => 'Agronomis',
+        self::Role_ASM => 'ASM',
         self::Role_Admin => 'Administrator',
     ];
 
@@ -34,6 +36,8 @@ class User extends Authenticatable
         'active',
         'password',
         'role',
+        'work_area',
+        'parent_id',
         'last_login_datetime',
         'last_activity_description',
         'last_activity_datetime'
@@ -74,37 +78,13 @@ class User extends Authenticatable
         $this->save();
     }
 
-    public static function activeUserCount()
+    public function parent()
     {
-        return DB::select(
-            'select count(0) as count from users where active = 1'
-        )[0]->count;
+        return $this->belongsTo(User::class, 'parent_id');
     }
 
-    public static function activeSalesCount()
+    public function children()
     {
-        return DB::select(
-            'select count(0) as count from users where active = 1 and role = \'' . self::Role_BS . '\''
-        )[0]->count;
-    }
-
-    public function closings()
-    {
-        return $this->hasMany(Closing::class, 'user_id');
-    }
-
-    public function interactions()
-    {
-        return $this->hasMany(Interaction::class, 'user_id');
-    }
-
-    public function customers()
-    {
-        return $this->hasMany(Customer::class, 'assigned_user_id');
-    }
-
-    public function activeCustomers()
-    {
-        return $this->hasMany(Customer::class, 'assigned_user_id')->where('active', true);
+        return $this->hasMany(User::class, 'parent_id');
     }
 }

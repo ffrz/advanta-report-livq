@@ -46,7 +46,7 @@ const pagination = ref(storage.get('pagination', {
 const columns = [
   {
     name: "username",
-    label: "ID Pengguna",
+    label: "Username",
     field: "username",
     align: "left",
     sortable: true,
@@ -60,17 +60,21 @@ const columns = [
   },
   {
     name: "role",
-    label: "Hak Akses",
+    label: "Role",
     field: "role",
     align: "center",
-    sortable: true,
   },
   {
-    name: "active_customers_count",
-    label: "Client",
-    field: "active_customers_count",
+    name: "work_area",
+    label: "Area Kerja",
+    field: "work_area",
     align: "center",
-    sortable: true,
+  },
+  {
+    name: "parent",
+    label: "Atasan",
+    field: "parent",
+    align: "center",
   },
   {
     name: "action",
@@ -188,8 +192,11 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
             <q-td key="role" :props="props" align="center">
               <span>{{ $CONSTANTS.USER_ROLES[props.row.role] }}</span>
             </q-td>
-            <q-td key="active_customers_count" :props="props">
-              {{ props.row.active_customers_count }}
+            <q-td key="work_area" :props="props">
+              {{ props.row.work_area }}
+            </q-td>
+            <q-td key="parent" :props="props">
+              {{ props.row.parent ? props.row.parent.name : '' }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">

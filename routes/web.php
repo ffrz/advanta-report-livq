@@ -4,6 +4,9 @@ use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DemplotController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TargetController;
 use App\Http\Controllers\Admin\UserController;
@@ -30,7 +33,7 @@ Route::middleware(NonAuthenticated::class)->group(function () {
 
 Route::middleware([Auth::class])->group(function () {
     Route::prefix('api')->group(function () {
-        Route::get('active-customers', [ApiController::class, 'activeCustomers'])->name('api.active-customers');
+        // Route::get('active-customers', [ApiController::class, 'activeCustomers'])->name('api.active-customers');
     });
 
     Route::match(['get', 'post'], 'admin/auth/logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
@@ -56,6 +59,27 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('export', [VarietyController::class, 'export'])->name('admin.variety.export');
         });
 
+        Route::prefix('products')->group(function () {
+            Route::get('', [ProductController::class, 'index'])->name('admin.product.index');
+            Route::get('data', [ProductController::class, 'data'])->name('admin.product.data');
+            Route::get('add', [ProductController::class, 'editor'])->name('admin.product.add');
+            Route::get('duplicate/{id}', [ProductController::class, 'duplicate'])->name('admin.product.duplicate');
+            Route::get('edit/{id}', [ProductController::class, 'editor'])->name('admin.product.edit');
+            Route::post('save', [ProductController::class, 'save'])->name('admin.product.save');
+            Route::post('delete/{id}', [ProductController::class, 'delete'])->name('admin.product.delete');
+            Route::get('detail/{id}', [ProductController::class, 'detail'])->name('admin.product.detail');
+        });
+
+        Route::prefix('product-categories')->group(function () {
+            Route::get('', [ProductCategoryController::class, 'index'])->name('admin.product-category.index');
+            Route::get('data', [ProductCategoryController::class, 'data'])->name('admin.product-category.data');
+            Route::get('add', [ProductCategoryController::class, 'editor'])->name('admin.product-category.add');
+            Route::get('duplicate/{id}', [ProductCategoryController::class, 'duplicate'])->name('admin.product-category.duplicate');
+            Route::get('edit/{id}', [ProductCategoryController::class, 'editor'])->name('admin.product-category.edit');
+            Route::post('save', [ProductCategoryController::class, 'save'])->name('admin.product-category.save');
+            Route::post('delete/{id}', [ProductCategoryController::class, 'delete'])->name('admin.product-category.delete');
+        });
+
         Route::prefix('targets')->group(function () {
             Route::get('', [TargetController::class, 'index'])->name('admin.target.index');
             Route::get('data', [TargetController::class, 'data'])->name('admin.target.data');
@@ -66,6 +90,17 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [TargetController::class, 'save'])->name('admin.target.save');
             Route::post('delete/{id}', [TargetController::class, 'delete'])->name('admin.target.delete');
             Route::get('export', [TargetController::class, 'export'])->name('admin.target.export');
+        });
+
+        Route::prefix('demplots')->group(function () {
+            Route::get('', [DemplotController::class, 'index'])->name('admin.demplot.index');
+            Route::get('data', [DemplotController::class, 'data'])->name('admin.demplot.data');
+            Route::get('add', [DemplotController::class, 'editor'])->name('admin.demplot.add');
+            Route::get('edit/{id}', [DemplotController::class, 'editor'])->name('admin.demplot.edit');
+            Route::get('detail/{id}', [DemplotController::class, 'detail'])->name('admin.demplot.detail');
+            Route::post('save', [DemplotController::class, 'save'])->name('admin.demplot.save');
+            Route::post('delete/{id}', [DemplotController::class, 'delete'])->name('admin.demplot.delete');
+            Route::get('export', [DemplotController::class, 'export'])->name('admin.demplot.export');
         });
 
         Route::prefix('settings')->group(function () {

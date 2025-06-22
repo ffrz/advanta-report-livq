@@ -197,12 +197,40 @@ onMounted(() => {
           </q-item> -->
           <q-separator />
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/varieties')" @click="router.get(route('admin.variety.index'))">
+            :active="$page.url.startsWith('/admin/farmers')" @click="router.get(route('admin.farmer.index'))">
             <q-item-section avatar>
-              <q-icon name="category" />
+              <q-icon name="agriculture" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Varietas</q-item-label>
+              <q-item-label>Petani</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/clients')" @click="router.get(route('admin.client.index'))">
+            <q-item-section avatar>
+              <q-icon name="local_shipping" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Client (Distributor)</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator />
+          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/varieties')" @click="router.get(route('admin.variety.index'))">
+            <q-item-section avatar>
+              <q-icon name="potted_plant" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Varietas Tanaman</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/activities')" @click="router.get(route('admin.activity.index'))">
+            <q-item-section avatar>
+              <q-icon name="campaign" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Jenis Aktifitas</q-item-label>
             </q-item-section>
           </q-item>
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple

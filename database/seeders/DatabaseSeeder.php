@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
                 InteractionSeeder::class,
                 ClosingSeeder::class,
                 VarietySeeder::class,
+                ProductCategorySeeder::class,
+                ProductSeeder::class,
             ]);
         });
     }

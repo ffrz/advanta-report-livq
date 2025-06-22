@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', array_keys(User::Roles));
             $table->boolean('active')->default(false);
+            $table->string('work_area')->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained('users')->nullOnDelete();
             $table->datetime('last_login_datetime')->nullable();
             $table->string('last_activity_description')->default('');
             $table->datetime('last_activity_datetime')->nullable();

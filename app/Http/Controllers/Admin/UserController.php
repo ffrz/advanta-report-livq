@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         // tambahkan jumlah client yang ditangani oleh user ini
         return inertia('admin/user/Detail', [
-            'data' => User::withCount('activeCustomers')->findOrFail($id),
+            'data' => User::findOrFail($id),
         ]);
     }
 
@@ -40,7 +40,7 @@ class UserController extends Controller
         $filter = $request->get('filter', []);
 
         // tambahkan jumlah client yang ditangani oleh user ini
-        $q = User::query()->withCount('activeCustomers');
+        $q = User::with(['parent:id,username,name']);
         $q->orderBy($orderBy, $orderType);
 
         if (!empty($filter['role'] && $filter['role'] != 'all')) {

@@ -21,12 +21,9 @@
     window.CONFIG.APP_VERSION_STR = "{{ config('app.version_str', '1.0.0') }}";
     window.CONSTANTS = <?= json_encode([
           'USER_ROLES' => \App\Models\User::Roles,
-          'INTERACTION_STATUSES' => \App\Models\Interaction::Statuses,
-          'INTERACTION_TYPES' => \App\Models\Interaction::Types,
-          'INTERACTION_ENGAGEMENT_LEVELS' => \App\Models\Interaction::EngagementLevels,
-          'CUSTOMER_SERVICE_STATUSES' => \App\Models\CustomerService::Statuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
+    window.CONSTANTS.USER_ROLE_ASM = "{{ \App\Models\User::Role_ASM }}";
     window.CONSTANTS.USER_ROLE_AGRONOMIST = "{{ \App\Models\User::Role_Agronomist }}";
     window.CONSTANTS.USER_ROLE_BS = "{{ \App\Models\User::Role_BS }}";
     @if (!!env('APP_DEMO'))
