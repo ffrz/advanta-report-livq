@@ -216,7 +216,7 @@ onMounted(() => {
           </q-item>
           <q-separator />
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/varieties')" @click="router.get(route('admin.variety.index'))">
+            :active="$page.url.startsWith('/admin/products')" @click="router.get(route('admin.product.index'))">
             <q-item-section avatar>
               <q-icon name="potted_plant" />
             </q-item-section>
@@ -225,6 +225,16 @@ onMounted(() => {
             </q-item-section>
           </q-item>
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/product-categories')"
+            @click="router.get(route('admin.product-category.index'))">
+            <q-item-section avatar>
+              <q-icon name="category" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Kategori Varietas</q-item-label>
+            </q-item-section>
+          </q-item>
+          <!-- <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/activities')" @click="router.get(route('admin.activity.index'))">
             <q-item-section avatar>
               <q-icon name="campaign" />
@@ -232,7 +242,8 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Jenis Aktifitas</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
+          <q-separator />
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/settings/users')" @click="router.get(route('admin.user.index'))">
             <q-item-section avatar>
@@ -242,7 +253,6 @@ onMounted(() => {
               <q-item-label>Pengguna</q-item-label>
             </q-item-section>
           </q-item>
-          <q-separator />
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/settings/profile')"
             @click="router.get(route('admin.profile.edit'))">
             <q-item-section avatar>

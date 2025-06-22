@@ -47,18 +47,6 @@ Route::middleware([Auth::class])->group(function () {
             return inertia('admin/About');
         })->name('admin.about');
 
-        Route::prefix('varieties')->group(function () {
-            Route::get('', [VarietyController::class, 'index'])->name('admin.variety.index');
-            Route::get('data', [VarietyController::class, 'data'])->name('admin.variety.data');
-            Route::get('add', [VarietyController::class, 'editor'])->name('admin.variety.add');
-            Route::get('duplicate/{id}', [VarietyController::class, 'duplicate'])->name('admin.variety.duplicate');
-            Route::get('edit/{id}', [VarietyController::class, 'editor'])->name('admin.variety.edit');
-            Route::get('detail/{id}', [VarietyController::class, 'detail'])->name('admin.variety.detail');
-            Route::post('save', [VarietyController::class, 'save'])->name('admin.variety.save');
-            Route::post('delete/{id}', [VarietyController::class, 'delete'])->name('admin.variety.delete');
-            Route::get('export', [VarietyController::class, 'export'])->name('admin.variety.export');
-        });
-
         Route::prefix('products')->group(function () {
             Route::get('', [ProductController::class, 'index'])->name('admin.product.index');
             Route::get('data', [ProductController::class, 'data'])->name('admin.product.data');

@@ -12,7 +12,8 @@ const form = useForm({
   description: page.props.data.description,
 });
 
-const submit = () => handleSubmit({ form, url: route('admin.product-category.save') });
+const computedColumns = computed(() =>
+  $q.screen.gt.sm ? columns : columns.filter((col) => ["name", "action"].includes(col.name)));
 
 </script>
 
@@ -24,14 +25,14 @@ const submit = () => handleSubmit({ form, url: route('admin.product-category.sav
       <div class="col col-lg-6 q-pa-sm">
         <q-form class="row" @submit.prevent="submit" @validation-error="scrollToFirstErrorField">
           <q-card square flat bordered class="col">
-            <q-card-section class="q-pt-none">
+            <q-card-section class="q-pt-md">
               <input type="hidden" name="id" v-model="form.id" />
               <q-input autofocus v-model.trim="form.name" label="Nama Kategori" lazy-rules :error="!!form.errors.name"
                 :disable="form.processing" :error-message="form.errors.name" :rules="[
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]" />
-              <q-input v-model.trim="form.description" type="textarea" autogrow counter maxlength="1000" label="Deskripsi"
-                lazy-rules :disable="form.processing" :error="!!form.errors.description"
+              <q-input v-model.trim="form.description" type="textarea" autogrow counter maxlength="1000"
+                label="Deskripsi" lazy-rules :disable="form.processing" :error="!!form.errors.description"
                 :error-message="form.errors.description" />
             </q-card-section>
             <q-card-section class="q-gutter-sm">

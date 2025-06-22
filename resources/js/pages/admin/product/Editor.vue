@@ -49,7 +49,7 @@ const margin = computed(() => {
       <div class="col col-lg-6 q-pa-sm">
         <q-form class="row" @submit.prevent="submit" @validation-error="scrollToFirstErrorField">
           <q-card square flat bordered class="col">
-            <q-card-section class="q-pt-none">
+            <q-card-section class="q-pt-md">
               <input type="hidden" name="id" v-model="form.id" />
               <div class="text-subtitle1 q-pt-lg">Info Utama</div>
               <q-select autofocus v-model="form.type" class="custom-select" :options="types" label="Jenis" map-options
@@ -97,9 +97,10 @@ const margin = computed(() => {
               <div class="text-subtitle1 q-pt-lg">Info Harga</div>
               <LocaleNumberInput v-model:modelValue="form.cost" label="Modal / Harga Beli (Rp)" lazyRules
                 :disable="form.processing" :error="!!form.errors.cost" :errorMessage="form.errors.cost" />
-              <LocaleNumberInput v-model:modelValue="form.price" label="Harga Jual (Rp)" lazyRules :disable="form.processing"
-                :error="!!form.errors.max_stock" :errorMessage="form.errors.price" />
-              <LocaleNumberInput v-model:modelValue="margin" label="Margin (%)" lazyRules :disable="form.processing" :maxDecimals="2"/>
+              <LocaleNumberInput v-model:modelValue="form.price" label="Harga Jual (Rp)" lazyRules
+                :disable="form.processing" :error="!!form.errors.max_stock" :errorMessage="form.errors.price" />
+              <LocaleNumberInput v-model:modelValue="margin" label="Margin (%)" lazyRules :disable="form.processing"
+                :maxDecimals="2" />
               <div class="text-subtitle1 q-pt-lg">Info Lainnya</div>
               <q-input v-model.trim="form.notes" type="textarea" autogrow counter maxlength="1000" label="Catatan"
                 lazy-rules :disable="form.processing" :error="!!form.errors.notes" :error-message="form.errors.notes" />

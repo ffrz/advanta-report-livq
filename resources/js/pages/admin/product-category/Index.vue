@@ -31,7 +31,7 @@ const columns = [
   },
   {
     name: "description",
-    label: "Catatan",
+    label: "Deskripsi",
     field: "description",
     align: "left",
   },
@@ -64,14 +64,10 @@ const fetchItems = (props = null) => {
   });
 };
 
-const onFilterChange = () => {
-  fetchItems();
-};
-
 const computedColumns = computed(() => {
-  if ($q.screen.gt.sm) return columns;
-  return columns.filter((col) => col.name === "name" || col.name === "action");
+  return $q.screen.gt.sm ? columns : columns.filter((col) => ["name", "action"].includes(col.name))
 });
+
 </script>
 
 <template>
@@ -95,9 +91,9 @@ const computedColumns = computed(() => {
       </q-toolbar>
     </template>
     <div class="q-pa-sm">
-      <q-table class="full-height-table" flat bordered square color="primary" row-key="id" virtual-scroll
-        v-model:pagination="pagination" :filter="filter.search" :loading="loading" :columns="computedColumns"
-        :rows="rows" :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
+      <q-table flat bordered square color="primary" row-key="id" virtual-scroll v-model:pagination="pagination"
+        :filter="filter.search" :loading="loading" :columns="computedColumns" :rows="rows"
+        :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
         <template v-slot:loading>
           <q-inner-loading showing color="red" />
         </template>

@@ -162,9 +162,9 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
       </q-toolbar>
     </template>
     <div class="q-pa-sm">
-      <q-table class="full-height-table" flat bordered square color="primary" row-key="id" virtual-scroll
-        v-model:pagination="pagination" :filter="filter.search" :loading="loading" :columns="computedColumns"
-        :rows="rows" :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
+      <q-table flat bordered square color="primary" row-key="id" virtual-scroll v-model:pagination="pagination"
+        :filter="filter.search" :loading="loading" :columns="computedColumns" :rows="rows"
+        :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
         <template v-slot:loading>
           <q-inner-loading showing color="red" />
         </template>
