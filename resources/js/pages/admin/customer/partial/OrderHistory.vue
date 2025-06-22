@@ -86,7 +86,7 @@ const computedColumns = computed(() =>
 <template>
 
   <div class="q-pa-none">
-    <q-table class="full-height-table" flat bordered square color="primary" row-key="id" virtual-scroll
+    <q-table v-if="false" flat bordered square color="primary" row-key="id" virtual-scroll
       v-model:pagination="pagination" :filter="filter.search" :loading="loading" :columns="computedColumns" :rows="rows"
       :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
       <template v-slot:loading>
@@ -145,11 +145,7 @@ const computedColumns = computed(() =>
           <q-td key="sales" :props="props">
             {{ props.row.user.username }}
           </q-td>
-          <!-- <q-td key="customer" :props="props">
-            {{ props.row.customer.name }} - {{ props.row.customer.company }} (#{{ props.row.customer.id }})
-            <br />{{ props.row.customer.business_type }}
-            <br />{{ props.row.customer.address }}
-          </q-td> -->
+
           <q-td key="service" :props="props">
             {{ props.row.service.name }}
           </q-td>

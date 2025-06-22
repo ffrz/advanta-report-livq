@@ -2,7 +2,7 @@
 import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
-import Interaction from "./partial/Interaction.vue";
+//import OrderHistory from "./partial/OrderHistory.vue";
 
 const page = usePage();
 const title = "Rincian Client";
@@ -27,19 +27,15 @@ const tab = ref('main')
             <q-card-section>
               <q-tabs v-model="tab" align="left">
                 <q-tab name="main" label="Info Utama" />
-                <q-tab name="interaction" label="Riwayat Interaksi" />
+                <!-- <q-tab name="history" label="Riwayat PO" /> -->
               </q-tabs>
               <q-tab-panels v-model="tab">
                 <q-tab-panel name="main">
                   <main-info />
-                  <div class="q-mt-lg">
-                    <q-btn label="Catat Interaksi" color="secondary" size="sm" icon="add"
-                      :href="route('admin.interaction.add', { customer_id: page.props.data.id })" />
-                  </div>
                 </q-tab-panel>
-                <q-tab-panel name="interaction" class="q-pa-none q-pt-sm">
-                  <interaction class="q-pa-none q-ma-none"/>
-                </q-tab-panel>
+                <!-- <q-tab-panel name="history" class="q-pa-none q-pt-sm">
+                  <order-history class="q-pa-none q-ma-none" />
+                </q-tab-panel> -->
               </q-tab-panels>
             </q-card-section>
           </q-card>

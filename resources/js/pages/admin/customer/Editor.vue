@@ -11,18 +11,22 @@ const users = page.props.users.map(user => ({
   label: `${user.name} (${user.username})`,
 }));
 
+const types = [
+  { value: 'Distributor', label: 'Distributor' },
+  { value: 'R1', label: 'R1' },
+  { value: 'R2', label: 'R2' },
+];
+
 const form = useForm({
   id: page.props.data.id,
   name: page.props.data.name,
   phone: page.props.data.phone,
-  email: page.props.data.email,
+  type: page.props.data.type,
   address: page.props.data.address,
-  company: page.props.data.company,
-  business_type: page.props.data.business_type,
-  active: !!page.props.data.active,
-  source: page.props.data.source,
+  shipping_address: page.props.data.shipping_address,
   notes: page.props.data.notes,
   assigned_user_id: page.props.data.assigned_user_id ? Number(page.props.data.assigned_user_id) : null,
+  active: !!page.props.data.active,
 });
 
 const submit = () =>
@@ -41,30 +45,18 @@ const submit = () =>
             <q-inner-loading :showing="form.processing">
               <q-spinner size="50px" color="primary" />
             </q-inner-loading>
-            <q-card-section class="q-pt-none">
+            <q-card-section class="q-pt-md">
               <input type="hidden" name="id" v-model="form.id" />
               <q-input autofocus v-model.trim="form.name" label="Nama" lazy-rules :error="!!form.errors.name"
                 :disable="form.processing" :error-message="form.errors.name" :rules="[
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]" />
-              <q-input v-model.trim="form.company" label="Nama Perusahaan" lazy-rules :error="!!form.errors.company"
-                :disable="form.processing" :error-message="form.errors.company" :rules="[]" />
-              <q-input v-model.trim="form.business_type" label="Jenis Usaha" lazy-rules
-                :error="!!form.errors.business_type" :disable="form.processing"
-                :error-message="form.errors.business_type" :rules="[]" />
-              <q-input v-model.trim="form.phone" type="text" label="No HP" lazy-rules :disable="form.processing"
-                :error="!!form.errors.phone" :error-message="form.errors.phone" :rules="[
-                  (val) => (val && val.length > 0) || 'No HP harus diisi.',
-                ]" />
+              <q-select v-model="form.type" label="Jenis" :options="types" map-options emit-value
+                :error="!!form.errors.type" :disable="form.processing" :error-message="form.errors.type" />
+              <q-input v-model.trim="form.phone" type="text" label="No Telepon" lazy-rules :disable="form.processing"
+                :error="!!form.errors.phone" :error-message="form.errors.phone" />
               <q-input v-model.trim="form.address" type="textarea" autogrow counter maxlength="1000" label="Alamat"
-                lazy-rules :disable="form.processing" :error="!!form.errors.address" :error-message="form.address"
-                :rules="[]" />
-              <q-input v-model.trim="form.source" type="text" label="Sumber" lazy-rules :disable="form.processing"
-                :error="!!form.errors.source" :error-message="form.errors.source" :rules="[]" />
-              <q-input v-model.trim="form.email" type="email" label="Alamat Email" lazy-rules :disable="form.processing"
-                :error="!!form.errors.email" :error-message="form.errors.email" :rules="[
-                  val => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Format email tidak valid'
-                ]" />
+                lazy-rules :disable="form.processing" :error="!!form.errors.address" :error-message="form.address" />
               <q-select v-model="form.assigned_user_id" label="Assigned To" :options="users" map-options emit-value
                 :error="!!form.errors.assigned_user_id" :disable="form.processing" />
               <q-input v-model.trim="form.notes" type="textarea" autogrow counter maxlength="1000" label="Catatan"

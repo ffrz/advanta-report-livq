@@ -28,8 +28,6 @@ class CustomerController extends Controller
                 'assigned_user:id,username,name',
                 'created_by_user:id,username,name',
                 'updated_by_user:id,username,name',
-                'services',
-                'services.service:id,name',
             ])->findOrFail($id),
         ]);
     }
@@ -40,20 +38,14 @@ class CustomerController extends Controller
         $orderType = $request->get('order_type', 'asc');
         $filter = $request->get('filter', []);
 
-        $q = Customer::with([
-            'services',
-            'services.service:id,name',
-        ]);
+        $q = Customer::with(['assigned_user']);
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
                 $q->where('name', 'like', '%' . $filter['search'] . '%');
                 $q->orWhere('phone', 'like', '%' . $filter['search'] . '%');
                 $q->orWhere('address', 'like', '%' . $filter['search'] . '%');
-                $q->orWhere('email', 'like', '%' . $filter['search'] . '%');
-                $q->orWhere('company', 'like', '%' . $filter['search'] . '%');
-                $q->orWhere('source', 'like', '%' . $filter['search'] . '%');
-                $q->orWhere('business_type', 'like', '%' . $filter['search'] . '%');
+                $q->orWhere('type', 'like', '%' . $filter['search'] . '%');
             });
         }
 
@@ -75,6 +67,7 @@ class CustomerController extends Controller
         $item->created_at = null;
         return inertia('admin/customer/Editor', [
             'data' => $item,
+            'users' => User::where('active', true)->orderBy('username', 'asc')->get(),
         ]);
     }
 
@@ -92,12 +85,10 @@ class CustomerController extends Controller
         $validated =  $request->validate([
             'name'           => 'required|string|max:255',
             'phone'          => 'nullable|string|max:50',
-            'email'          => 'nullable|email|max:255',
+            'type'           => 'nullable|string|max:255',
             'address'        => 'nullable|string|max:500',
-            'company'        => 'nullable|string|max:255',
-            'business_type'  => 'nullable|string|max:255',
+            'shipping_address' => 'nullable|string|max:255',
             'active'         => 'required|boolean',
-            'source'         => 'nullable|string|max:100',
             'notes'          => 'nullable|string',
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);

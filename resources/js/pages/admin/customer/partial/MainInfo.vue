@@ -14,24 +14,14 @@ const page = usePage();
         <td>{{ page.props.data.name }}</td>
       </tr>
       <tr>
-        <td>Perusahaan</td>
+        <td>Jenis</td>
         <td>:</td>
-        <td>{{ page.props.data.company }}</td>
-      </tr>
-      <tr>
-        <td>Jenis Usaha</td>
-        <td>:</td>
-        <td>{{ page.props.data.business_type }}</td>
+        <td>{{ page.props.data.type }}</td>
       </tr>
       <tr>
         <td>No Telepon</td>
         <td>:</td>
         <td>{{ page.props.data.phone }}</td>
-      </tr>
-      <tr v-if="page.props.data.email">
-        <td>Email</td>
-        <td>:</td>
-        <td>{{ page.props.data.email }}</td>
       </tr>
       <tr>
         <td>Alamat</td>
@@ -39,17 +29,19 @@ const page = usePage();
         <td>{{ page.props.data.address }}</td>
       </tr>
       <tr>
-        <td>Sumber</td>
+        <td>Alamat Pengiriman</td>
         <td>:</td>
-        <td>{{ page.props.data.source }}</td>
+        <td>{{ page.props.data.shipping_address }}</td>
       </tr>
       <tr>
         <td>Assigned to</td>
         <td>:</td>
         <td>
           <template v-if="page.props.data.assigned_user">
-            {{ page.props.data.assigned_user.name + ' - ' +
-              (page.props.data.assigned_user.username) }}
+            <my-link :href="route('admin.user.detail', { id: page.props.data.assigned_user.id })">
+              {{ page.props.data.assigned_user.name + ' - ' +
+                (page.props.data.assigned_user.username) }}
+            </my-link>
           </template>
           <template v-else>
             -
@@ -61,20 +53,7 @@ const page = usePage();
         <td>:</td>
         <td>{{ page.props.data.active ? 'Aktif' : 'Tidak Aktif' }}</td>
       </tr>
-      <tr>
-        <td>Layanan</td>
-        <td>:</td>
-        <td>
-          <div v-for="item in page.props.data.services" :key="item.id">
-            {{ item.service.name }} -
-            <q-badge>
-              {{ $CONSTANTS.CUSTOMER_SERVICE_STATUSES[item.status] }}
-            </q-badge>
-            | <span>{{ item.start_date ?? '?' }}</span>
-            - <span>{{ item.end_date ?? '?' }}</span>
-          </div>
-        </td>
-      </tr>
+
       <tr>
         <td>Catatan</td>
         <td>:</td>
@@ -88,9 +67,9 @@ const page = usePage();
           {{ $dayjs(page.props.data.created_datetime).format("DD MMMM YY HH:mm:ss") }}
           <template v-if="page.props.data.created_by_user">
             oleh
-            <a :href="route('admin.user.detail', { id: page.props.data.created_by_user.id })">
+            <my-link :href="route('admin.user.detail', { id: page.props.data.created_by_user.id })">
               {{ page.props.data.created_by_user.username }}
-            </a>
+            </my-link>
           </template>
         </td>
       </tr>
@@ -102,9 +81,9 @@ const page = usePage();
           {{ $dayjs(page.props.data.updated_datetime).format("DD MMMM YY HH:mm:ss") }}
           <template v-if="page.props.data.updated_by_user">
             oleh
-            <a :href="route('admin.user.detail', { id: page.props.data.updated_by_user.id })">
+            <my-link :href="route('admin.user.detail', { id: page.props.data.updated_by_user.id })">
               {{ page.props.data.updated_by_user.username }}
-            </a>
+            </my-link>
           </template>
         </td>
       </tr>

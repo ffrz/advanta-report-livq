@@ -13,11 +13,9 @@ class Customer extends Model
         'assigned_user_id',
         'name',
         'phone',
-        'email',
+        'type',
         'address',
-        'company',
-        'business_type',
-        'source',
+        'shipping_address',
         'notes',
         'active',
     ];

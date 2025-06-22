@@ -27,11 +27,10 @@ const pagination = ref(storage.get('pagination', {
 }));
 
 const columns = [
-  { name: "id", label: "#", field: "id", align: "left", sortable: true },
+  { name: "type", label: "Jenis", field: "type", align: "left", sortable: true },
   { name: "name", label: "Nama", field: "name", align: "left", sortable: true },
-  { name: "company", label: "Perusahaan", field: "company", align: "left", sortable: true },
   { name: "phone", label: "No HP", field: "phone", align: "left" },
-  { name: "services", label: "Layanan", field: "services", align: "left" },
+  { name: "address", label: "Alamat", field: "address", align: "left" },
   { name: "action", align: "right" },
 ];
 
@@ -118,9 +117,9 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
       </q-toolbar>
     </template>
     <div class="q-pa-sm">
-      <q-table class="full-height-table" ref="tableRef" flat bordered square color="primary" row-key="id" virtual-scroll
-        v-model:pagination="pagination" :filter="filter.search" :loading="loading" :columns="computedColumns"
-        :rows="rows" :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
+      <q-table flat bordered square color="primary" row-key="id" virtual-scroll v-model:pagination="pagination"
+        :filter="filter.search" :loading="loading" :columns="computedColumns" :rows="rows"
+        :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
         <template v-slot:loading>
           <q-inner-loading showing color="red" />
         </template>
@@ -140,28 +139,24 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
             <q-td key="id" :props="props" class="wrap-column">
               <div>{{ props.row.id }}</div>
             </q-td>
+            <q-td key="type" :props="props">
+              {{ props.row.type }}
+            </q-td>
             <q-td key="name" :props="props" class="wrap-column">
-              <div><q-icon name="person" v-if="$q.screen.lt.md" /> {{ props.row.name }}</div>
+              <div><q-icon name="domain" v-if="$q.screen.lt.md" /> {{ props.row.name }}</div>
               <template v-if="$q.screen.lt.md">
-                <div><q-icon name="domain" /> {{ props.row.company }}
-                  <template v-if="props.row.business_type"> - {{ props.row.business_type }}</template>
-                </div>
                 <div><q-icon name="phone" /> {{ props.row.phone }}</div>
                 <div><q-icon name="home_pin" /> {{ props.row.address }}</div>
-                <div v-if="props.row.email"><q-icon name="email" /> {{ props.row.email }}</div>
-                <!-- <div><q-badge :color="statusColors[props.row.status]">{{ props.row.status }}</q-badge></div> -->
+                <div><q-icon name="local_shipping" /> {{ props.row.shipping_address }}</div>
+                <div><q-icon name="category" /> {{ props.row.type }}</div>
                 <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes }}</div>
               </template>
-            </q-td>
-            <q-td key="company" :props="props">
-              {{ props.row.company }} <template v-if="props.row.business_type"> - {{ props.row.business_type
-                }}</template>
             </q-td>
             <q-td key="phone" :props="props">
               {{ props.row.phone }}
             </q-td>
-            <q-td key="services" :props="props">
-              {{props.row.services.filter(s => s.status === 'active').map(s => s.service.name).join(', ')}}
+            <q-td key="address" :props="props">
+              {{ props.row.address }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">

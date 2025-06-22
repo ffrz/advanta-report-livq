@@ -172,6 +172,7 @@ onMounted(() => {
               <q-item-label>Petani</q-item-label>
             </q-item-section>
           </q-item> -->
+          <q-separator />
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/demo-plots')"
             @click="router.get(route('admin.demo-plot.index'))">
             <q-item-section avatar>
