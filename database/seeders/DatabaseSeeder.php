@@ -15,11 +15,6 @@ class DatabaseSeeder extends Seeder
         DB::transaction(function () {
             $this->call([
                 UserSeeder::class,
-                ServiceSeeder::class,
-                CustomerSeeder::class,
-                InteractionSeeder::class,
-                ClosingSeeder::class,
-                VarietySeeder::class,
                 ProductCategorySeeder::class,
                 ProductSeeder::class,
             ]);
