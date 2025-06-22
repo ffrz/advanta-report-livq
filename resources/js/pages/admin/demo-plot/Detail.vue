@@ -2,7 +2,7 @@
 import { router, usePage } from "@inertiajs/vue3";
 
 const page = usePage();
-const title = "Rincian Demplot";
+const title = "Rincian Interaksi";
 
 </script>
 
@@ -14,7 +14,7 @@ const title = "Rincian Demplot";
       <div class="q-gutter-sm">
         <q-btn icon="arrow_back" dense color="grey-7" @click="$goBack()" />
         <q-btn icon="edit" dense color="primary"
-          @click="router.get(route('admin.demplot.edit', { id: page.props.data.id }))" />
+          @click="router.get(route('admin.interaction.edit', { id: page.props.data.id }))" />
       </div>
     </template>
     <q-page class="row justify-center">
@@ -22,7 +22,7 @@ const title = "Rincian Demplot";
         <div class="row">
           <q-card square flat bordered class="col">
             <q-card-section>
-              <div class="text-subtitle1 text-bold text-grey-8">Info Demplot</div>
+              <div class="text-subtitle1 text-bold text-grey-8">Info Interaksi</div>
               <table class="detail">
                 <tbody>
                   <tr>
@@ -31,7 +31,22 @@ const title = "Rincian Demplot";
                     <td>#{{ page.props.data.id }}</td>
                   </tr>
                   <tr>
-                    <td>BS</td>
+                    <td>Tanggal</td>
+                    <td>:</td>
+                    <td>{{ $dayjs(page.props.data.date).format('DD MMMM YYYY') }}</td>
+                  </tr>
+                  <tr>
+                    <td>Jenis</td>
+                    <td>:</td>
+                    <td>{{ $CONSTANTS.INTERACTION_TYPES[page.props.data.type] }}</td>
+                  </tr>
+                  <tr>
+                    <td>Status</td>
+                    <td>:</td>
+                    <td>{{ $CONSTANTS.INTERACTION_STATUSES[page.props.data.status] }}</td>
+                  </tr>
+                  <tr>
+                    <td>Sales</td>
                     <td>:</td>
                     <td>
                       <a :href="route('admin.user.detail', { id: page.props.data.user.id })">
@@ -40,18 +55,42 @@ const title = "Rincian Demplot";
                     </td>
                   </tr>
                   <tr>
-                    <td>Varietas</td>
+                    <td>Client</td>
                     <td>:</td>
                     <td>
-                      <a :href="route('admin.variety.detail', { id: page.props.data.variety.id })">
-                        {{ page.props.data.variety.name }}
+                      <a :href="route('admin.customer.detail', { id: page.props.data.customer.id })">
+                        {{ page.props.data.customer.name }}
+                        {{ page.props.data.customer.company ? `- ${page.props.data.customer.company}` : '' }}
+                        - (#{{ page.props.data.customer.id }})
+                      </a>
+                      <template v-if="page.props.data.customer.address">
+                        <br />{{ page.props.data.customer.address }}
+                      </template>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Service</td>
+                    <td>:</td>
+                    <td>
+                      <a :href="route('admin.service.detail', { id: page.props.data.service.id })">
+                        {{ page.props.data.service.name }}
                       </a>
                     </td>
                   </tr>
                   <tr>
-                    <td>Tanggal Tanam</td>
+                    <td>Engagement Level</td>
                     <td>:</td>
-                    <td>{{ $dayjs(page.props.data.date).format('DD MMMM YYYY') }}</td>
+                    <td>{{ $CONSTANTS.INTERACTION_ENGAGEMENT_LEVELS[page.props.data.engagement_level] }}</td>
+                  </tr>
+                  <tr>
+                    <td>Subject</td>
+                    <td>:</td>
+                    <td>{{ page.props.data.subject }}</td>
+                  </tr>
+                  <tr>
+                    <td>Summary</td>
+                    <td>:</td>
+                    <td>{{ page.props.data.summary }}</td>
                   </tr>
                   <tr>
                     <td>Catatan</td>

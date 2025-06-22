@@ -141,15 +141,7 @@ onMounted(() => {
               <q-item-label>Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/demplots')"
-            @click="router.get(route('admin.demplot.index'))">
-            <q-item-section avatar>
-              <q-icon name="assignment" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Demplot</q-item-label>
-            </q-item-section>
-          </q-item>
+
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/targets')"
             @click="router.get(route('admin.target.index'))">
             <q-item-section avatar>
@@ -168,33 +160,8 @@ onMounted(() => {
               <q-item-label>Closing</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customer-services')"
-            @click="router.get(route('admin.customer-service.index'))">
-            <q-item-section avatar>
-              <q-icon name="linked_services" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Layanan Client</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')"
-            @click="router.get(route('admin.customer.index'))">
-            <q-item-section avatar>
-              <q-icon name="partner_exchange" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Client</q-item-label>
-            </q-item-section>
-          </q-item> -->
-          <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/services')"
-            @click="router.get(route('admin.service.index'))">
-            <q-item-section avatar>
-              <q-icon name="apps" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Layanan</q-item-label>
-            </q-item-section>
-          </q-item> -->
+          -->
+
           <!-- <q-separator /> -->
           <!-- <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/farmers')" @click="router.get(route('admin.farmer.index'))">
@@ -204,16 +171,25 @@ onMounted(() => {
             <q-item-section>
               <q-item-label>Petani</q-item-label>
             </q-item-section>
-          </q-item>
-          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/clients')" @click="router.get(route('admin.client.index'))">
+          </q-item> -->
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/demo-plots')"
+            @click="router.get(route('admin.demo-plot.index'))">
             <q-item-section avatar>
-              <q-icon name="local_shipping" />
+              <q-icon name="assignment" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Client (Distributor)</q-item-label>
+              <q-item-label>Demplot</q-item-label>
             </q-item-section>
-          </q-item> -->
+          </q-item>
+          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
+            :active="$page.url.startsWith('/admin/customers')" @click="router.get(route('admin.customer.index'))">
+            <q-item-section avatar>
+              <q-icon name="storefront" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Client</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-separator />
           <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
             :active="$page.url.startsWith('/admin/products')" @click="router.get(route('admin.product.index'))">

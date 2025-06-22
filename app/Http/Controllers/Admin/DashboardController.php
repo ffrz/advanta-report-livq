@@ -16,76 +16,76 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $period = $request->get('period', 'this_month');
-        [$start_date, $end_date] = resolve_period($period);
+        // $period = $request->get('period', 'this_month');
+        // [$start_date, $end_date] = resolve_period($period);
 
-        $labels = [];
-        $count_interactions = [];
-        $count_closings = [];
-        $count_new_customers = [];
-        $total_closings = [];
+        // $labels = [];
+        // $count_interactions = [];
+        // $count_closings = [];
+        // $count_new_customers = [];
+        // $total_closings = [];
 
-        $start = $start_date ? Carbon::parse($start_date) : Carbon::createFromDate(2000, 1, 1);
-        $end = $end_date ? Carbon::parse($end_date) : Carbon::now();
+        // $start = $start_date ? Carbon::parse($start_date) : Carbon::createFromDate(2000, 1, 1);
+        // $end = $end_date ? Carbon::parse($end_date) : Carbon::now();
 
-        if (in_array($period, ['all_time', 'this_year', 'last_year'])) {
-            // BULANAN
-            $current = $start->copy();
+        // if (in_array($period, ['all_time', 'this_year', 'last_year'])) {
+        //     // BULANAN
+        //     $current = $start->copy();
 
-            while ($current->lessThanOrEqualTo($end)) {
-                $labels[] = $current->format('F Y'); // e.g., January 2024
+        //     while ($current->lessThanOrEqualTo($end)) {
+        //         $labels[] = $current->format('F Y'); // e.g., January 2024
 
-                $monthStart = $current->copy()->startOfMonth();
-                $monthEnd = $current->copy()->endOfMonth();
+        //         $monthStart = $current->copy()->startOfMonth();
+        //         $monthEnd = $current->copy()->endOfMonth();
 
-                $countInteraction = Interaction::where('status', 'done')
-                    ->whereBetween('date', [$monthStart, $monthEnd])
-                    ->count();
+        //         $countInteraction = Interaction::where('status', 'done')
+        //             ->whereBetween('date', [$monthStart, $monthEnd])
+        //             ->count();
 
-                $countClosing = Closing::whereBetween('date', [$monthStart, $monthEnd])
-                    ->count();
+        //         $countClosing = Closing::whereBetween('date', [$monthStart, $monthEnd])
+        //             ->count();
 
-                $countNewCustomer = Customer::whereBetween('created_datetime', [$monthStart, $monthEnd])
-                    ->count();
+        //         $countNewCustomer = Customer::whereBetween('created_datetime', [$monthStart, $monthEnd])
+        //             ->count();
 
-                $sum_closing = Closing::whereBetween('date', [$monthStart, $monthEnd])
-                    ->sum('amount');
+        //         $sum_closing = Closing::whereBetween('date', [$monthStart, $monthEnd])
+        //             ->sum('amount');
 
-                $count_interactions[]  = $countInteraction;
-                $count_closings[]      = $countClosing;
-                $count_new_customers[] = $countNewCustomer;
-                $total_closings[]      = $sum_closing;
+        //         $count_interactions[]  = $countInteraction;
+        //         $count_closings[]      = $countClosing;
+        //         $count_new_customers[] = $countNewCustomer;
+        //         $total_closings[]      = $sum_closing;
 
-                $current->addMonth();
-            }
-        } else {
-            // HARIAN
-            $current = $start->copy();
+        //         $current->addMonth();
+        //     }
+        // } else {
+        //     // HARIAN
+        //     $current = $start->copy();
 
-            while ($current->lessThanOrEqualTo($end)) {
-                $labels[] = $current->format('d'); // e.g., 01, 02, ..., 31
+        //     while ($current->lessThanOrEqualTo($end)) {
+        //         $labels[] = $current->format('d'); // e.g., 01, 02, ..., 31
 
-                $countInteraction = Interaction::where('status', 'done')
-                    ->whereDate('date', $current->format('Y-m-d'))
-                    ->count();
+        //         $countInteraction = Interaction::where('status', 'done')
+        //             ->whereDate('date', $current->format('Y-m-d'))
+        //             ->count();
 
-                $countClosing = Closing::whereDate('date', $current->format('Y-m-d'))
-                    ->count();
+        //         $countClosing = Closing::whereDate('date', $current->format('Y-m-d'))
+        //             ->count();
 
-                $countNewCustomer = Customer::whereDate('created_datetime', $current->format('Y-m-d'))
-                    ->count();
+        //         $countNewCustomer = Customer::whereDate('created_datetime', $current->format('Y-m-d'))
+        //             ->count();
 
-                $sum_closing = Closing::whereDate('date', $current->format('Y-m-d'))
-                    ->sum('amount');
+        //         $sum_closing = Closing::whereDate('date', $current->format('Y-m-d'))
+        //             ->sum('amount');
 
-                $count_interactions[]  = $countInteraction;
-                $count_closings[]      = $countClosing;
-                $count_new_customers[] = $countNewCustomer;
-                $total_closings[]      = $sum_closing;
+        //         $count_interactions[]  = $countInteraction;
+        //         $count_closings[]      = $countClosing;
+        //         $count_new_customers[] = $countNewCustomer;
+        //         $total_closings[]      = $sum_closing;
 
-                $current->addDay();
-            }
-        }
+        //         $current->addDay();
+        //     }
+        // }
 
         return inertia('admin/dashboard/Index', [
             'chart_data' => [

@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\Demplot;
-use App\Models\Service;
+use App\Models\DemoPlot;
 use App\Models\User;
-use App\Models\Variety;
+use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,19 +15,19 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DemplotController extends Controller
+class DemoPlotController extends Controller
 {
     public function index()
     {
-        return inertia('admin/demplot/Index');
+        return inertia('admin/demo-plot/Index');
     }
 
     public function detail($id = 0)
     {
-        return inertia('admin/demplot/Detail', [
-            'data' => Demplot::with([
+        return inertia('admin/demo-plot/Detail', [
+            'data' => DemoPlot::with([
                 'user',
-                'variety',
+                'product',
                 'created_by_user:id,username',
                 'updated_by_user:id,username',
             ])->findOrFail($id),
@@ -51,17 +49,20 @@ class DemplotController extends Controller
 
     public function editor(Request $request, $id = 0)
     {
-        $item = $id ? Demplot::findOrFail($id) : new Demplot([
-            // 'user_id' => Auth::user()->id,
-            // 'date' => Carbon::now(),
+        $user = Auth::user();
+        $item = $id ? DemoPlot::findOrFail($id) : new DemoPlot([
+            'user_id' => $user->role == User::Role_BS ? $user->id : null,
+            'plant_date' => Carbon::now(),
+            'active' => true,
+            'plant_status' => DemoPlot::PlantStatus_Planted,
         ]);
 
-        return inertia('admin/demplot/Editor', [
+        return inertia('admin/demo-plot/Editor', [
             'data' => $item,
             'users' => User::where('active', true)
                 ->where('role', User::Role_BS)
                 ->orderBy('username', 'asc')->get(),
-            'varieties' => Variety::orderBy('name', 'asc')->get(),
+            'products' => Product::orderBy('name', 'asc')->get(),
         ]);
     }
 
@@ -69,18 +70,21 @@ class DemplotController extends Controller
     {
         $validated =  $request->validate([
             'user_id'          => 'required|exists:users,id',
-            'variety_id'       => 'required|exists:varieties,id',
-            'date'             => 'required|date',
+            'product_id'       => 'required|exists:products,id',
+            'plant_date'       => 'required|date',
+            'plant_status'     => 'required|in:' . implode(',', array_keys(DemoPlot::PlantStatuses)),
+            'owner_name'       => 'required|string|max:100',
+            'owner_phone'      => 'nullable|string|max:30',
             'notes'            => 'nullable|string|max:500',
-            'location'         => 'nullable|string|max:100',
+            'field_location'   => 'nullable|string|max:100',
             'latlong'          => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',
             'image_path'       => 'nullable|string',
         ]);
 
         $item = !$request->id
-            ? new Demplot()
-            : Demplot::findOrFail($request->post('id', 0));
+            ? new DemoPlot()
+            : DemoPlot::findOrFail($request->post('id', 0));
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
@@ -104,18 +108,18 @@ class DemplotController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.demplot.index'))->with('success', "Demplot #$item->id telah disimpan.");
+        return redirect(route('admin.demo-plot.index'))->with('success', "DemoPlot #$item->id telah disimpan.");
     }
 
     public function delete($id)
     {
         allowed_roles([User::Role_Admin]);
 
-        $item = Demplot::findOrFail($id);
+        $item = DemoPlot::findOrFail($id);
         $item->delete();
 
         return response()->json([
-            'message' => "Demplot #$item->id telah dihapus."
+            'message' => "Demo Plot #$item->id telah dihapus."
         ]);
     }
 
@@ -126,11 +130,11 @@ class DemplotController extends Controller
     {
         $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
 
-        $title = 'Laporan Demplot';
+        $title = 'Laporan Demo Plot';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            $pdf = Pdf::loadView('export.demplot-list-pdf', compact('items', 'title'))
+            $pdf = Pdf::loadView('export.demo-plot-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
         }
@@ -159,12 +163,12 @@ class DemplotController extends Controller
             // foreach ($items as $item) {
             //     $sheet->setCellValue('A' . $row, $item->id);
             //     $sheet->setCellValue('B' . $row, $item->date);
-            //     $sheet->setCellValue('C' . $row, Demplot::Types[$item->type]);
-            //     $sheet->setCellValue('D' . $row, Demplot::Statuses[$item->status]);
+            //     $sheet->setCellValue('C' . $row, DemoPlot::Types[$item->type]);
+            //     $sheet->setCellValue('D' . $row, DemoPlot::Statuses[$item->status]);
             //     $sheet->setCellValue('E' . $row, $item->user->name .  ' (' . $item->user->username . ')');
             //     $sheet->setCellValue('F' . $row, $item->customer->name . ' - ' . $item->customer->company . ' - ' . $item->customer->address);
             //     $sheet->setCellValue('I' . $row, $item->service->name);
-            //     $sheet->setCellValue('G' . $row, Demplot::EngagementLevels[$item->engagement_level]);
+            //     $sheet->setCellValue('G' . $row, DemoPlot::EngagementLevels[$item->engagement_level]);
             //     $sheet->setCellValue('H' . $row, $item->subject);
             //     $sheet->setCellValue('J' . $row, $item->summary);
             //     $sheet->setCellValue('K' . $row, $item->notes);
@@ -191,15 +195,16 @@ class DemplotController extends Controller
     {
         $filter = $request->get('filter', []);
 
-        $q = Demplot::with([
+        $q = DemoPlot::with([
             'user:id,username,name',
-            'variety:id,name',
+            'product:id,name',
         ]);
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
                 $q->where('owner_name', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('location', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('owner_phone', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('field_location', 'like', '%' . $filter['search'] . '%')
                     ->orWhere('notes', 'like', '%' . $filter['search'] . '%');
             });
         }

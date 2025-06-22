@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('interactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
+            // $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            // $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->enum('type', array_keys(Interaction::Types))->default(Interaction::Type_Visit);
             $table->enum('status', array_keys(Interaction::Statuses))->default(Interaction::Status_Planned);
             $table->enum('engagement_level', array_keys(Interaction::EngagementLevels))->default(Interaction::EngagementLevel_None);

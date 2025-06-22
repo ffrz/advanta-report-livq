@@ -5,17 +5,20 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from '@/helpers/usePageStorage'
+import dayjs from 'dayjs';
 
-const storage = usePageStorage('demplots')
-const title = "Demplot";
+const storage = usePageStorage('demo-plots')
+const title = "Demo Plot";
 const $q = useQuasar();
-const showFilter = ref(true);
+const showFilter = ref(storage.get('show-filter', false));
 const rows = ref([]);
 const loading = ref(true);
 
 const filter = reactive(storage.get('filter', {
   search: "",
-  //  period: "all",
+  user_id: "all",
+  plant_status: "all",
+  status: "all",
   ...getQueryParams(),
 }));
 
@@ -27,28 +30,44 @@ const pagination = ref(storage.get('pagination', {
   descending: true,
 }));
 
-// const period_options = [
-//   { value: "all", label: "Semua" },
-//   { value: "this_month", label: "Bulan Ini" },
-//   { value: "last_month", label: "Bulan Lalu" },
-//   { value: "this_year", label: "Tahun Ini" },
-//   { value: "last_year", label: "Tahun Lalu" },
-// ];
+const statuses = [
+  { value: "all", label: "Semua" },
+  { value: "active", label: "Aktif" },
+  { value: "inactive", label: "Tidak Aktif" },
+];
+
+const plant_statuses = [
+  { value: "all", label: "Semua" },
+  ...Object.entries(window.CONSTANTS.DEMO_PLOT_PLANT_STATUSES).map(([key, value]) => ({
+    value: key,
+    label: value,
+  })),
+];
+
+const plant_status_colors = {
+  planted: "grey",
+  satisfactory: "green",
+  unsatisfactory: "red",
+  failed: "black",
+  completed: "blue",
+};
 
 const columns = [
   { name: "id", label: "#", field: "id", align: "left", sortable: true },
-  { name: "sales", label: "Sales", field: "sales", align: "left" },
-  { name: "variety", label: "Varietas", field: "variety", align: "left" },
-  { name: "date", label: "Tanggal Tanam", field: "date", align: "left" },
-  { name: "age", label: "Usia", field: "age", align: "left" },
+  { name: "field", label: "Lahan", field: "field", align: "left" },
+  { name: "product", label: "Varietas", field: "product", align: "left" },
+  { name: "plant_date", label: "Tanggal Tanam", field: "date", align: "left", sortable: true },
+  { name: "bs", label: "BS", field: "bs", align: "left" },
+  { name: "last_visit", label: "Last Visit", field: "last_visit", align: "left" },
+  { name: "plant_status", label: "Status Tanaman", field: "plant_status", align: "left" },
   { name: "action", align: "right" },
 ];
 
 onMounted(() => fetchItems());
 
 const deleteItem = (row) => handleDelete({
-  message: `Hapus demplot ${row.name}?`,
-  url: route("admin.demplot.delete", row.id),
+  message: `Hapus Demo Plot ${row.name}?`,
+  url: route("admin.demo-plot.delete", row.id),
   fetchItemsCallback: fetchItems,
   loading,
 });
@@ -58,20 +77,28 @@ const fetchItems = (props = null) => handleFetchItems({
   filter,
   props,
   rows,
-  url: route("admin.demplot.data"),
+  url: route("admin.demo-plot.data"),
   loading,
 });
 
 const onFilterChange = () => fetchItems();
 
-const onRowClicked = (row) => router.get(route("admin.demplot.detail", { id: row.id }));
+const onRowClicked = (row) => router.get(route("admin.demo-plot.detail", { id: row.id }));
 
 const computedColumns = computed(() =>
   $q.screen.gt.sm ? columns : columns.filter((col) => ["id", "action"].includes(col.name))
 );
 
+const plantAge = (row) => {
+  if (!row.active || !row.plant_date) return '-';
+  const today = dayjs();
+  const planted = dayjs(row.plant_date);
+  return `${today.diff(planted, 'day')} hari`;
+};
+
 watch(filter, () => storage.set('filter', filter), { deep: true })
 watch(pagination, () => storage.set('pagination', pagination.value), { deep: true })
+watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: true })
 
 </script>
 
@@ -80,21 +107,21 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.demplot.add'))" />
+      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.demo-plot.add'))" />
       <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
       <q-btn icon="file_export" dense class="q-ml-sm" color="grey" style="" @click.stop>
         <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
           <q-list style="width: 200px">
             <q-item clickable v-ripple v-close-popup
-              :href="route('admin.demplot.export', { format: 'pdf', filter: filter })">
+              :href="route('admin.demo-plot.export', { format: 'pdf', filter: filter })">
               <q-item-section avatar>
                 <q-icon name="picture_as_pdf" color="red-9" />
               </q-item-section>
               <q-item-section>Export PDF</q-item-section>
             </q-item>
             <q-item clickable v-ripple v-close-popup
-              :href="route('admin.demplot.export', { format: 'excel', filter: filter })">
+              :href="route('admin.demo-plot.export', { format: 'excel', filter: filter })">
               <q-item-section avatar>
                 <q-icon name="csv" color="green-9" />
               </q-item-section>
@@ -107,9 +134,12 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
     <template #header v-if="showFilter">
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
-          <!-- <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.period"
-            :options="period_options" label="Periode" dense map-options emit-value outlined
-            @update:model-value="onFilterChange" /> -->
+          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.status"
+            :options="statuses" label="Status" dense map-options emit-value outlined
+            @update:model-value="onFilterChange" />
+          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.plant_status"
+            :options="plant_statuses" label="Status Tanaman" dense map-options emit-value outlined
+            @update:model-value="onFilterChange" />
           <q-input class="col" outlined dense debounce="300" v-model="filter.search" placeholder="Cari" clearable>
             <template v-slot:append>
               <q-icon name="search" />
@@ -119,13 +149,12 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
       </q-toolbar>
     </template>
     <div class="q-pa-sm">
-      <q-table class="full-height-table" ref="tableRef" flat bordered square color="primary" row-key="id" virtual-scroll
-        v-model:pagination="pagination" :filter="filter.search" :loading="loading" :columns="computedColumns"
-        :rows="rows" :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
+      <q-table flat bordered square color="primary" row-key="id" virtual-scroll v-model:pagination="pagination"
+        :filter="filter.search" :loading="loading" :columns="computedColumns" :rows="rows"
+        :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>
         <template v-slot:loading>
           <q-inner-loading showing color="red" />
         </template>
-
         <template v-slot:no-data="{ icon, message, filter }">
           <div class="full-width row flex-center text-grey-8 q-gutter-sm">
             <span>
@@ -147,59 +176,41 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
               </div>
               <template v-if="$q.screen.lt.md">
                 <div>
-                  <q-icon name="people" /> #{{ props.row.customer.id }} - {{ props.row.customer.name }}
-                  - {{ props.row.customer.company }}
+                  <q-icon name="people" /> {{ props.row.owner_name }} - {{ props.row.owner_phone }}
                 </div>
-                <div v-if="props.row.customer.address">
-                  <q-icon name="location_on" />{{ props.row.customer.address }}
+                <div v-if="props.row.field_location">
+                  <q-icon name="location_on" />{{ props.row.field_location }}
                 </div>
-                <div><q-icon name="apps" /> {{ props.row.service.name }}</div>
+
                 <div><q-icon name="input" /> {{ props.row.subject }}</div>
                 <div class="flex items-center q-gutter-sm">
-                  <q-badge :color="type_colors[props.row.type]">
-                    {{ $CONSTANTS.INTERACTION_TYPES[props.row.type] }}
-                  </q-badge>
-                  <q-badge :color="engagement_level_colors[props.row.engagement_level]">
-                    <q-icon name="favorite" />&nbsp;{{
-                      $CONSTANTS.INTERACTION_ENGAGEMENT_LEVELS[props.row.engagement_level] }}
-                  </q-badge>
-                  <q-badge :color="status_colors[props.row.status]">
-                    {{ $CONSTANTS.INTERACTION_STATUSES[props.row.status] }}
+                  <q-badge :color="plant_status_colors[props.row.type]">
+                    {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.type] }}
                   </q-badge>
                 </div>
                 <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes }}</div>
               </template>
             </q-td>
-            <q-td key="date" :props="props" class="wrap-column">
-              <div>
-                {{ $dayjs(props.row.demplot_date).format('YYYY-MM-DD') }}
-                <template v-if="props.row.demplot_time">
-                  <span class="text-grey-6">({{ props.row.demplot_time }})</span>
-                </template>
-              </div>
-              <div><q-icon name="history" v-if="$q.screen.lt.md" /> {{ props.row.name }}</div>
+
+            <q-td key="field" :props="props">
+              {{ props.row.owner_name }} - {{ props.row.user.owner_phone }}
+              <br>{{ props.row.field_location }}
             </q-td>
-            <q-td key="type" :props="props">
-              {{ $CONSTANTS.INTERACTION_TYPES[props.row.type] }}
+            <q-td key="product" :props="props">
+              {{ props.row.product.name }}
             </q-td>
-            <q-td key="sales" :props="props">
-              {{ props.row.user.username }}
+
+            <q-td key="plant_date" :props="props">
+              {{ $dayjs(props.row.plant_date).format('YYYY-MM-DD') }} ({{ plantAge(props.row) }})
             </q-td>
-            <q-td key="customer" :props="props">
-              {{ props.row.customer.name }} - {{ props.row.customer.company }} (#{{ props.row.customer.id }})
-              <br />{{ props.row.customer.business_type }}
-              <br />{{ props.row.customer.address }}
+            <q-td key="bs" :props="props">
+              {{ props.row.user.name }} ({{ props.row.user.username }})
             </q-td>
-            <q-td key="service" :props="props">
-              {{ props.row.service.name }}
+            <q-td key="last_visit" :props="props">
+              {{ props.row.last_visit ? $dayjs(props.row.last_visit).format('YYYY-MM-DD') : 'Belum dikunjungi' }}
             </q-td>
-            <q-td key="subject" :props="props">
-              {{ props.row.subject }}
-            </q-td>
-            <q-td key="engagement_level" :props="props">
-              <q-badge :color="engagement_level_colors[props.row.engagement_level]">
-                {{ $CONSTANTS.INTERACTION_ENGAGEMENT_LEVELS[props.row.engagement_level] }}
-              </q-badge>
+            <q-td key="plant_status" :props="props">
+              {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.plant_status] }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
@@ -208,7 +219,7 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
                       <q-item clickable v-ripple v-close-popup
-                        @click.stop="router.get(route('admin.demplot.edit', props.row.id))">
+                        @click.stop="router.get(route('admin.demo-plot.edit', props.row.id))">
                         <q-item-section avatar>
                           <q-icon name="edit" />
                         </q-item-section>

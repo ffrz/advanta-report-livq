@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\DemplotController;
+use App\Http\Controllers\Admin\DemoPlotController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -92,15 +92,15 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('export', [TargetController::class, 'export'])->name('admin.target.export');
         });
 
-        Route::prefix('demplots')->group(function () {
-            Route::get('', [DemplotController::class, 'index'])->name('admin.demplot.index');
-            Route::get('data', [DemplotController::class, 'data'])->name('admin.demplot.data');
-            Route::get('add', [DemplotController::class, 'editor'])->name('admin.demplot.add');
-            Route::get('edit/{id}', [DemplotController::class, 'editor'])->name('admin.demplot.edit');
-            Route::get('detail/{id}', [DemplotController::class, 'detail'])->name('admin.demplot.detail');
-            Route::post('save', [DemplotController::class, 'save'])->name('admin.demplot.save');
-            Route::post('delete/{id}', [DemplotController::class, 'delete'])->name('admin.demplot.delete');
-            Route::get('export', [DemplotController::class, 'export'])->name('admin.demplot.export');
+        Route::prefix('demo-plots')->group(function () {
+            Route::get('', [DemoPlotController::class, 'index'])->name('admin.demo-plot.index');
+            Route::get('data', [DemoPlotController::class, 'data'])->name('admin.demo-plot.data');
+            Route::get('add', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.add');
+            Route::get('edit/{id}', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.edit');
+            Route::get('detail/{id}', [DemoPlotController::class, 'detail'])->name('admin.demo-plot.detail');
+            Route::post('save', [DemoPlotController::class, 'save'])->name('admin.demo-plot.save');
+            Route::post('delete/{id}', [DemoPlotController::class, 'delete'])->name('admin.demo-plot.delete');
+            Route::get('export', [DemoPlotController::class, 'export'])->name('admin.demo-plot.export');
         });
 
         Route::prefix('settings')->group(function () {

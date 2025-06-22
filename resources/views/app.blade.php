@@ -23,6 +23,7 @@
     window.CONSTANTS = <?= json_encode([
           'USER_ROLES' => \App\Models\User::Roles,
           'ACTIVITY_TYPE_TARGET_PERIODS' => \App\Models\ActivityType::TargetPeriods,
+          'DEMO_PLOT_PLANT_STATUSES' => \App\Models\DemoPlot::PlantStatuses,
       ]) ?>;
     window.CONSTANTS.USER_ROLE_ADMIN = "{{ \App\Models\User::Role_Admin }}";
     window.CONSTANTS.USER_ROLE_ASM = "{{ \App\Models\User::Role_ASM }}";

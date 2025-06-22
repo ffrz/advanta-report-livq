@@ -12,15 +12,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->boolean('active')->default(true);
+            $table->string('name');
+            $table->string('type')->nullable();
+            $table->string('phone')->nullable()->index();
+            $table->string('address')->nullable();
+            $table->string('shipping_address')->nullable();
             $table->text('notes')->nullable();
+            $table->boolean('active')->default(true);
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
 
+            $table->foreignId('assigned_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('created_by_uid')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by_uid')->nullable()->constrained('users')->nullOnDelete();
         });
@@ -31,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('customers');
     }
 };
