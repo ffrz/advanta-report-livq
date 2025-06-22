@@ -1,12 +1,13 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from '@/helpers/usePageStorage'
 import dayjs from 'dayjs';
 
+const page = usePage();
 const storage = usePageStorage('demo-plots')
 const title = "Demo Plot";
 const $q = useQuasar();
@@ -43,6 +44,23 @@ const plant_statuses = [
     label: value,
   })),
 ];
+
+const users = [
+  { value: "all", label: "Semua" },
+  ...page.props.users.map(user => ({
+    value: user.id,
+    label: `${user.name} (${user.username})`,
+  })),
+];
+
+const products = [
+  { value: "all", label: "Semua" },
+  ...page.props.products.map(product => ({
+    value: product.id,
+    label: `${product.name}`,
+  })),
+];
+
 
 const plant_status_colors = {
   planted: "grey",
@@ -140,6 +158,11 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
           <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.plant_status"
             :options="plant_statuses" label="Status Tanaman" dense map-options emit-value outlined
             @update:model-value="onFilterChange" />
+          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.user_id"
+            :options="users" label="BS" dense map-options emit-value outlined @update:model-value="onFilterChange" />
+          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.product_id"
+            :options="products" label="Varietas" dense map-options emit-value outlined
+            @update:model-value="onFilterChange" />
           <q-input class="col" outlined dense debounce="300" v-model="filter.search" placeholder="Cari" clearable>
             <template v-slot:append>
               <q-icon name="search" />
@@ -168,24 +191,35 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
           <q-tr :props="props" :class="props.row.active == 'inactive' ? 'bg-red-1' : ''" class="cursor-pointer"
             @click="onRowClicked(props.row)">
             <q-td key="id" :props="props" class="wrap-column">
-              <div>
-                {{ props.row.id }}
-                <template v-if="$q.screen.lt.md">
-                  - <span><q-icon name="history" /> {{ $dayjs(props.row.date).format('DD MMMM YYYY') }}</span>
-                </template>
-              </div>
+              #{{ props.row.id }}
               <template v-if="$q.screen.lt.md">
                 <div>
-                  <q-icon name="people" /> {{ props.row.owner_name }} - {{ props.row.owner_phone }}
+                  <q-icon name="edit_calendar" /> Tgl Tanam: {{ $dayjs(props.row.plant_date).format('DD MMMM YYYY') }}
+                  ({{ plantAge(props.row) }})
+                </div>
+                <template v-if="props.row.active">
+                  <div>
+                    <q-icon name="calendar_clock" /> Umur: {{ plantAge(props.row) }}
+                  </div>
+                </template>
+                <template v-if="props.row.last_visit">
+                  <div>
+                    <q-icon name="calendar_clock" /> Last Visit:
+                    {{ $dayjs(props.row.last_visit).format('DD MMMM YYYY') }} /
+                    {{ $dayjs(props.row.last_visit).fromNow() }}
+                  </div>
+                </template>
+              </template>
+              <template v-if="$q.screen.lt.md">
+                <div>
+                  <q-icon name="people" /> Pemilik: {{ props.row.owner_name }} - {{ props.row.owner_phone }}
                 </div>
                 <div v-if="props.row.field_location">
-                  <q-icon name="location_on" />{{ props.row.field_location }}
+                  <q-icon name="location_on" /> Lokasi: {{ props.row.field_location }}
                 </div>
-
-                <div><q-icon name="input" /> {{ props.row.subject }}</div>
                 <div class="flex items-center q-gutter-sm">
-                  <q-badge :color="plant_status_colors[props.row.type]">
-                    {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.type] }}
+                  <q-badge :color="plant_status_colors[props.row.plant_status]">
+                    Status: {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.plant_status] }}
                   </q-badge>
                 </div>
                 <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes }}</div>
@@ -207,7 +241,10 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
               {{ props.row.user.name }} ({{ props.row.user.username }})
             </q-td>
             <q-td key="last_visit" :props="props">
-              {{ props.row.last_visit ? $dayjs(props.row.last_visit).format('YYYY-MM-DD') : 'Belum dikunjungi' }}
+              <template v-if="props.row.last_visit">
+                {{ $dayjs(props.row.last_visit).format('DD MMMM YYYY') }} /
+                {{ $dayjs(props.row.last_visit).fromNow() }}
+              </template>
             </q-td>
             <q-td key="plant_status" :props="props">
               {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.plant_status] }}
@@ -218,6 +255,13 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
                   style="height: 40px; width: 30px" @click.stop>
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
+                      <q-item clickable v-ripple v-close-popup
+                        @click.stop="router.get(route('admin.demo-plot.duplicate', props.row.id))">
+                        <q-item-section avatar>
+                          <q-icon name="content_copy" />
+                        </q-item-section>
+                        <q-item-section icon="content_copy">Duplikat</q-item-section>
+                      </q-item>
                       <q-item clickable v-ripple v-close-popup
                         @click.stop="router.get(route('admin.demo-plot.edit', props.row.id))">
                         <q-item-section avatar>

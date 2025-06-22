@@ -19,7 +19,10 @@ class DemoPlotController extends Controller
 {
     public function index()
     {
-        return inertia('admin/demo-plot/Index');
+        return inertia('admin/demo-plot/Index', [
+            'products' => Product::query()->orderBy('name')->get(),
+            'users' => User::query()->where('role', User::Role_BS)->orderBy('name')->get(),
+        ]);
     }
 
     public function detail($id = 0)
@@ -45,6 +48,21 @@ class DemoPlotController extends Controller
             ->withQueryString();
 
         return response()->json($items);
+    }
+
+    public function duplicate(Request $request, $id)
+    {
+        $user = Auth::user();
+        $item = DemoPlot::findOrFail($id);
+        $item->id = 0;
+        $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
+        return inertia('admin/demo-plot/Editor', [
+            'data' => $item,
+            'users' => User::where('active', true)
+                ->where('role', User::Role_BS)
+                ->orderBy('username', 'asc')->get(),
+            'products' => Product::orderBy('name', 'asc')->get(),
+        ]);
     }
 
     public function editor(Request $request, $id = 0)
@@ -211,6 +229,18 @@ class DemoPlotController extends Controller
 
         if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
             $q->where('user_id', '=', $filter['user_id']);
+        }
+
+        if (!empty($filter['product_id']) && ($filter['product_id'] != 'all')) {
+            $q->where('product_id', '=', $filter['product_id']);
+        }
+
+        if (!empty($filter['plant_status']) && ($filter['plant_status'] != 'all')) {
+            $q->where('plant_status', '=', $filter['plant_status']);
+        }
+
+        if (!empty($filter['status']) && ($filter['status'] != 'all')) {
+            $q->where('active', '=', $filter['status'] == 'active');
         }
 
         // if (!empty($filter['period']) && ($filter['period'] != 'all')) {

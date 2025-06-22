@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ActivityTypeController;
 use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DemoPlotController;
 use App\Http\Controllers\Admin\ProductCategoryController;
@@ -70,6 +71,17 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('delete/{id}', [ProductCategoryController::class, 'delete'])->name('admin.product-category.delete');
         });
 
+        Route::prefix('customers')->group(function () {
+            Route::get('', [CustomerController::class, 'index'])->name('admin.customer.index');
+            Route::get('data', [CustomerController::class, 'data'])->name('admin.customer.data');
+            Route::get('add', [CustomerController::class, 'editor'])->name('admin.customer.add');
+            Route::get('duplicate/{id}', [CustomerController::class, 'duplicate'])->name('admin.customer.duplicate');
+            Route::get('edit/{id}', [CustomerController::class, 'editor'])->name('admin.customer.edit');
+            Route::post('save', [CustomerController::class, 'save'])->name('admin.customer.save');
+            Route::post('delete/{id}', [CustomerController::class, 'delete'])->name('admin.customer.delete');
+            Route::get('detail/{id}', [CustomerController::class, 'detail'])->name('admin.customer.detail');
+        });
+
         Route::prefix('activity-types')->group(function () {
             Route::get('', [ActivityTypeController::class, 'index'])->name('admin.activity-type.index');
             Route::get('data', [ActivityTypeController::class, 'data'])->name('admin.activity-type.data');
@@ -95,6 +107,7 @@ Route::middleware([Auth::class])->group(function () {
         Route::prefix('demo-plots')->group(function () {
             Route::get('', [DemoPlotController::class, 'index'])->name('admin.demo-plot.index');
             Route::get('data', [DemoPlotController::class, 'data'])->name('admin.demo-plot.data');
+            Route::get('duplicate/{id}', [DemoPlotController::class, 'duplicate'])->name('admin.demo-plot.duplicate');
             Route::get('add', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.add');
             Route::get('edit/{id}', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.edit');
             Route::get('detail/{id}', [DemoPlotController::class, 'detail'])->name('admin.demo-plot.detail');
