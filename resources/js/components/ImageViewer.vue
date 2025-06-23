@@ -2,9 +2,10 @@
   <q-dialog v-model="visible" persistent transition-show="scale" transition-hide="scale">
     <q-card class="bg-white" style="max-width: 95vw; max-height: 95vh; overflow: hidden;">
       <q-card-section class="q-pa-none">
-        <div ref="container" class="relative-position overflow-hidden flex flex-center"
-          style="touch-action: none; height: 80vh;" @mousedown="startPan" @mousemove="onPan" @mouseup="endPan"
-          @mouseleave="endPan" @touchstart="startTouchPan" @touchmove="onTouchPan" @touchend="endPan">
+        <div ref="container" class="relative-position overflow-hidden flex flex-center" style="touch-action: none;"
+          @mousedown="startPan" @mousemove="onPan" @mouseup="endPan"
+          :class="imageOrientation === 'portrait' ? 'viewer-portrait' : 'viewer-landscape'" @mouseleave="endPan"
+          @touchstart="startTouchPan" @touchmove="onTouchPan" @touchend="endPan">
           <img ref="image" :src="imageUrl" :style="imgStyle" class="no-pointer-events" draggable="false"
             @load="resetView" />
         </div>
@@ -31,6 +32,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const visible = ref(props.modelValue);
+const imageOrientation = ref('landscape');
+
 watch(() => props.modelValue, val => visible.value = val);
 watch(visible, val => emit('update:modelValue', val));
 
@@ -49,9 +52,36 @@ const imgStyle = computed(() => ({
   'max-width': '100%',
   'max-height': '100%',
 }))
+
 function resetView() {
-  scale.value = 1
-  offset.value = { x: 0, y: 0 }
+  nextTick(() => {
+    const img = image.value;
+    if (!img) return;
+
+    imageOrientation.value = img.naturalWidth > img.naturalHeight ? 'landscape' : 'portrait';
+
+    scale.value = 1;
+    offset.value = { x: 0, y: 0 };
+  });
+}
+
+function clampOffset(newOffset) {
+  const img = image.value;
+  const cont = container.value;
+  if (!img || !cont) return newOffset;
+
+  const scaledWidth = img.naturalWidth * scale.value;
+  const scaledHeight = img.naturalHeight * scale.value;
+  const containerWidth = cont.clientWidth;
+  const containerHeight = cont.clientHeight;
+
+  const maxOffsetX = Math.max(0, (scaledWidth - containerWidth) / 2);
+  const maxOffsetY = Math.max(0, (scaledHeight - containerHeight) / 2);
+
+  return {
+    x: Math.min(maxOffsetX, Math.max(-maxOffsetX, newOffset.x)),
+    y: Math.min(maxOffsetY, Math.max(-maxOffsetY, newOffset.y)),
+  };
 }
 
 function zoomIn() {
@@ -69,8 +99,13 @@ function onPan(e) {
   if (!dragging.value) return;
   const dx = e.clientX - start.value.x;
   const dy = e.clientY - start.value.y;
-  offset.value.x += dx;
-  offset.value.y += dy;
+
+  const newOffset = {
+    x: offset.value.x + dx,
+    y: offset.value.y + dy,
+  };
+
+  offset.value = clampOffset(newOffset);
   start.value = { x: e.clientX, y: e.clientY };
 }
 function endPan() {
@@ -86,8 +121,13 @@ function onTouchPan(e) {
   if (!dragging.value || e.touches.length !== 1) return;
   const dx = e.touches[0].clientX - start.value.x;
   const dy = e.touches[0].clientY - start.value.y;
-  offset.value.x += dx;
-  offset.value.y += dy;
+
+  const newOffset = {
+    x: offset.value.x + dx,
+    y: offset.value.y + dy,
+  };
+
+  offset.value = clampOffset(newOffset);
   start.value = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 }
 
