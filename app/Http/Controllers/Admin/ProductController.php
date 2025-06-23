@@ -154,12 +154,10 @@ class ProductController extends Controller
             $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', 'Kategori');
             $sheet->setCellValue('C1', 'Nama Varietas');
-            $sheet->setCellValue('D1', 'Satuan Distributor');
-            $sheet->setCellValue('E1', 'Harga Distributor (Rp)');
-            $sheet->setCellValue('F1', 'Satuan Reseller');
-            $sheet->setCellValue('G1', 'Harga Reseller (Rp)');
-            $sheet->setCellValue('H1', 'Status');
-            $sheet->setCellValue('I1', 'Catatan');
+            $sheet->setCellValue('D1', 'Harga Distributor');
+            $sheet->setCellValue('E1', 'Harga');
+            $sheet->setCellValue('F1', 'Status');
+            $sheet->setCellValue('G1', 'Catatan');
 
             // Tambahkan data ke Excel
             $row = 2;
@@ -167,12 +165,10 @@ class ProductController extends Controller
                 $sheet->setCellValue('A' . $row, $num + 1);
                 $sheet->setCellValue('B' . $row, $item->category ? $item->category->name : '');
                 $sheet->setCellValue('C' . $row, $item->name);
-                $sheet->setCellValue('D' . $row, $item->uom_1);
-                $sheet->setCellValue('E' . $row, $item->price_1);
-                $sheet->setCellValue('F' . $row, $item->uom_2);
-                $sheet->setCellValue('G' . $row, $item->price_2);
-                $sheet->setCellValue('H' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
-                $sheet->setCellValue('I' . $row, $item->notes);
+                $sheet->setCellValue('D' . $row, "$item->price_1 / $item->uom_1");
+                $sheet->setCellValue('E' . $row, "$item->price_2 / $item->uom_2");
+                $sheet->setCellValue('F' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('G' . $row, $item->notes);
                 $row++;
             }
 
