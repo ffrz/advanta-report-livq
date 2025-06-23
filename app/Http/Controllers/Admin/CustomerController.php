@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
-use App\Models\Interaction;
-use App\Models\Service;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -123,6 +121,7 @@ class CustomerController extends Controller
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
+            return view('export.customer-list-pdf', compact('items', 'title'));
             $pdf = Pdf::loadView('export.customer-list-pdf', compact('items', 'title'))
                 ->setPaper('a4', 'landscape');
             return $pdf->download($filename . '.pdf');
@@ -133,30 +132,28 @@ class CustomerController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Tambahkan header
-            $sheet->setCellValue('A1', 'ID');
-            $sheet->setCellValue('B1', 'Nama');
-            $sheet->setCellValue('C1', 'Telepon');
-            $sheet->setCellValue('D1', 'Email');
+            $sheet->setCellValue('A1', 'NO');
+            $sheet->setCellValue('B1', 'Jenis');
+            $sheet->setCellValue('C1', 'Nama');
+            $sheet->setCellValue('D1', 'Telepon');
             $sheet->setCellValue('E1', 'Alamat');
-            $sheet->setCellValue('F1', 'Nama Perusahaan');
-            $sheet->setCellValue('G1', 'Jenis Usaha');
-            $sheet->setCellValue('H1', 'Source');
-            $sheet->setCellValue('I1', 'Status');
-            $sheet->setCellValue('J1', 'Catatan');
+            $sheet->setCellValue('F1', 'Alamat Pengiriman');
+            $sheet->setCellValue('G1', 'Assigned To');
+            $sheet->setCellValue('H1', 'Status');
+            $sheet->setCellValue('I1', 'Catatan');
 
             // Tambahkan data ke Excel
             $row = 2;
-            foreach ($items as $item) {
-                $sheet->setCellValue('A' . $row, $item->id);
-                $sheet->setCellValue('B' . $row, $item->name);
-                $sheet->setCellValue('C' . $row, $item->phone);
-                $sheet->setCellValue('D' . $row, $item->email);
+            foreach ($items as $num => $item) {
+                $sheet->setCellValue('A' . $row, $num + 1);
+                $sheet->setCellValue('B' . $row, $item->type);
+                $sheet->setCellValue('C' . $row, $item->name);
+                $sheet->setCellValue('D' . $row, $item->phone);
                 $sheet->setCellValue('E' . $row, $item->address);
-                $sheet->setCellValue('F' . $row, $item->company);
-                $sheet->setCellValue('G' . $row, $item->business_type);
-                $sheet->setCellValue('H' . $row, $item->source);
-                $sheet->setCellValue('I' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
-                $sheet->setCellValue('J' . $row, $item->notes);
+                $sheet->setCellValue('F' . $row, $item->shipping_address);
+                $sheet->setCellValue('G' . $row, $item->assigned_user ? $item->assigned_user->name : '');
+                $sheet->setCellValue('H' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('I' . $row, $item->notes);
                 $row++;
             }
 

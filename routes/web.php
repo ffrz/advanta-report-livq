@@ -59,6 +59,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [ProductController::class, 'save'])->name('admin.product.save');
             Route::post('delete/{id}', [ProductController::class, 'delete'])->name('admin.product.delete');
             Route::get('detail/{id}', [ProductController::class, 'detail'])->name('admin.product.detail');
+            Route::get('export/{id}', [ProductController::class, 'export'])->name('admin.product.export');
         });
 
         Route::prefix('product-categories')->group(function () {
@@ -80,6 +81,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [CustomerController::class, 'save'])->name('admin.customer.save');
             Route::post('delete/{id}', [CustomerController::class, 'delete'])->name('admin.customer.delete');
             Route::get('detail/{id}', [CustomerController::class, 'detail'])->name('admin.customer.detail');
+            Route::get('export', [CustomerController::class, 'export'])->name('admin.customer.export');
         });
 
         Route::prefix('activity-types')->group(function () {
