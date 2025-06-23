@@ -61,7 +61,6 @@ const products = [
   })),
 ];
 
-
 const plant_status_colors = {
   planted: "grey",
   satisfactory: "green",
@@ -71,7 +70,6 @@ const plant_status_colors = {
 };
 
 const columns = [
-  { name: "id", label: "#", field: "id", align: "left", sortable: true },
   { name: "field", label: "Lahan", field: "field", align: "left" },
   { name: "product", label: "Varietas", field: "product", align: "left" },
   { name: "plant_date", label: "Tanggal Tanam", field: "date", align: "left", sortable: true },
@@ -104,7 +102,7 @@ const onFilterChange = () => fetchItems();
 const onRowClicked = (row) => router.get(route("admin.demo-plot.detail", { id: row.id }));
 
 const computedColumns = computed(() =>
-  $q.screen.gt.sm ? columns : columns.filter((col) => ["id", "action"].includes(col.name))
+  $q.screen.gt.sm ? columns : columns.filter((col) => ["field", "action"].includes(col.name))
 );
 
 const plantAge = (row) => {
@@ -190,8 +188,25 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
         <template v-slot:body="props">
           <q-tr :props="props" :class="props.row.active == 'inactive' ? 'bg-red-1' : ''" class="cursor-pointer"
             @click="onRowClicked(props.row)">
-            <q-td key="id" :props="props" class="wrap-column">
-              #{{ props.row.id }}
+            <q-td key="field" :props="props">
+              <template v-if="!$q.screen.lt.md">
+                <div class="row items-start q-gutter-sm">
+                  <q-img :src="`/${props.row.image_path}`" style="width: 64px; height: 64px; border: 1px solid #ddd"
+                    spinner-color="grey" fit="cover" class="rounded-borders" />
+                  <div class="column">
+                    <div class="text-subtitle2">{{ props.row.owner_name }} - {{ props.row.user.owner_phone }}</div>
+                    <div class="text-caption">{{ props.row.field_location }}</div>
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <q-img :src="`/${props.row.image_path}`" style="border: 1px solid #ddd; max-height: 150px;"
+                  spinner-color="grey" fit="scale-down" class="rounded-borders bg-light-green-2" />
+                <div class="text-subtitle2"><q-icon name="person" /> {{ props.row.owner_name }} - {{
+                  props.row.user.owner_phone }}</div>
+                <div class="text-caption"><q-icon name="distance" /> Lokasi: {{ props.row.field_location }}</div>
+              </template>
+
               <template v-if="$q.screen.lt.md">
                 <div>
                   <q-icon name="edit_calendar" /> Tgl Tanam: {{ $dayjs(props.row.plant_date).format('DD MMMM YYYY') }}
@@ -211,12 +226,6 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
                 </template>
               </template>
               <template v-if="$q.screen.lt.md">
-                <div>
-                  <q-icon name="people" /> Pemilik: {{ props.row.owner_name }} - {{ props.row.owner_phone }}
-                </div>
-                <div v-if="props.row.field_location">
-                  <q-icon name="location_on" /> Lokasi: {{ props.row.field_location }}
-                </div>
                 <div class="flex items-center q-gutter-sm">
                   <q-badge :color="plant_status_colors[props.row.plant_status]">
                     Status: {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.plant_status] }}
@@ -225,15 +234,9 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
                 <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes }}</div>
               </template>
             </q-td>
-
-            <q-td key="field" :props="props">
-              {{ props.row.owner_name }} - {{ props.row.user.owner_phone }}
-              <br>{{ props.row.field_location }}
-            </q-td>
             <q-td key="product" :props="props">
               {{ props.row.product.name }}
             </q-td>
-
             <q-td key="plant_date" :props="props">
               {{ $dayjs(props.row.plant_date).format('YYYY-MM-DD') }} ({{ plantAge(props.row) }})
             </q-td>

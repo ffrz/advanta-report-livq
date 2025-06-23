@@ -1,8 +1,11 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
-
+import { ref } from "vue";
+import MainInfo from "./partial/MainInfo.vue";
+//import OrderHistory from "./partial/OrderHistory.vue";
 const page = usePage();
 const title = "Rincian Demo Plot";
+const tab = ref("main");
 
 </script>
 
@@ -20,8 +23,8 @@ const title = "Rincian Demo Plot";
     <q-page class="row justify-center">
       <div class="col col-lg-6 q-pa-sm">
         <div class="row">
-          <q-card square flat bordered class="col">
-            <q-card-section>
+          <q-card square flat bordered class="col q-pa-none">
+            <q-card-section class="q-pa-none">
               <q-tabs v-model="tab" align="left">
                 <q-tab name="main" label="Info Utama" />
                 <q-tab name="interaction" label="Riwayat Visit" />
@@ -30,12 +33,15 @@ const title = "Rincian Demo Plot";
                 <q-tab-panel name="main">
                   <main-info />
                   <div class="q-mt-lg">
-                    <q-btn label="Catat Interaksi" color="secondary" size="sm" icon="add"
-                      :href="route('admin.interaction.add', { customer_id: page.props.data.id })" />
+                    <!-- <q-btn label="Catat Interaksi" color="secondary" size="sm" icon="add"
+                      :href="route('admin.interaction.add', { customer_id: page.props.data.id })" /> -->
                   </div>
                 </q-tab-panel>
                 <q-tab-panel name="interaction" class="q-pa-none q-pt-sm">
-                  <interaction class="q-pa-none q-ma-none" />
+                  <!-- <interaction class="q-pa-none q-ma-none" /> -->
+                  <div class="q-pa-md">
+                    <p class="text-grey-8">Maaf, fitur belum tersedia.</p>
+                  </div>
                 </q-tab-panel>
               </q-tab-panels>
             </q-card-section>
