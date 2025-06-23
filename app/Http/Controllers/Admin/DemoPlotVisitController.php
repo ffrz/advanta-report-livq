@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DemoPlot;
+use App\Models\DemoPlotVisit;
 use App\Models\User;
 use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,11 +17,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DemoPlotController extends Controller
+class DemoPlotVisitController extends Controller
 {
     public function index()
     {
-        return inertia('admin/demo-plot/Index', [
+        return inertia('admin/demo-plot-visit/Index', [
             'products' => Product::query()->orderBy('name')->get(),
             'users' => User::query()->where('role', User::Role_BS)->orderBy('name')->get(),
         ]);
@@ -28,13 +29,31 @@ class DemoPlotController extends Controller
 
     public function detail($id = 0)
     {
-        return inertia('admin/demo-plot/Detail', [
-            'data' => DemoPlot::with([
-                'user',
-                'product',
-                'created_by_user:id,username',
-                'updated_by_user:id,username',
-            ])->findOrFail($id),
+        $visit = DemoPlotVisit::with([
+            'user',
+            'demo_plot',
+            'demo_plot.product',
+            'created_by_user:id,username',
+            'updated_by_user:id,username',
+        ])->findOrFail($id);
+
+        $demoPlotId = $visit->demo_plot_id;
+        $currentDate = $visit->visit_date;
+
+        $prevVisit = DemoPlotVisit::where('demo_plot_id', $demoPlotId)
+            ->where('visit_date', '<', $currentDate)
+            ->orderBy('visit_date', 'desc')
+            ->first();
+
+        $nextVisit = DemoPlotVisit::where('demo_plot_id', $demoPlotId)
+            ->where('visit_date', '>', $currentDate)
+            ->orderBy('visit_date', 'asc')
+            ->first();
+
+        return inertia('admin/demo-plot-visit/Detail', [
+            'data' => $visit,
+            'prev_visit_id' => $prevVisit ? $prevVisit->id : null,
+            'next_visit_id' => $nextVisit ? $nextVisit->id : null,
         ]);
     }
 
@@ -54,10 +73,10 @@ class DemoPlotController extends Controller
     public function duplicate(Request $request, $id)
     {
         $user = Auth::user();
-        $item = DemoPlot::findOrFail($id);
+        $item = DemoPlotVisit::findOrFail($id);
         $item->id = 0;
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
-        return inertia('admin/demo-plot/Editor', [
+        return inertia('admin/demo-plot-visit/Editor', [
             'data' => $item,
             'users' => User::where('active', true)
                 ->where('role', User::Role_BS)
@@ -69,19 +88,18 @@ class DemoPlotController extends Controller
     public function editor(Request $request, $id = 0)
     {
         $user = Auth::user();
-        $item = $id ? DemoPlot::findOrFail($id) : new DemoPlot([
+        $item = $id ? DemoPlotVisit::findOrFail($id) : new DemoPlotVisit([
             'user_id' => $user->role == User::Role_BS ? $user->id : null,
-            'plant_date' => Carbon::now(),
-            'active' => true,
-            'plant_status' => DemoPlot::PlantStatus_Planted,
+            'visit_date' => Carbon::now(),
+            'plant_status' => DemoPlot::PlantStatus_Satisfactoy,
+            'demo_plot_id' => $request->get('demo_plot_id')
         ]);
 
-        return inertia('admin/demo-plot/Editor', [
+        return inertia('admin/demo-plot-visit/Editor', [
             'data' => $item,
             'users' => User::where('active', true)
                 ->where('role', User::Role_BS)
                 ->orderBy('username', 'asc')->get(),
-            'products' => Product::orderBy('name', 'asc')->get(),
         ]);
     }
 
@@ -89,21 +107,18 @@ class DemoPlotController extends Controller
     {
         $validated =  $request->validate([
             'user_id'          => 'required|exists:users,id',
-            'product_id'       => 'required|exists:products,id',
-            'plant_date'       => 'required|date',
+            'demo_plot_id'     => 'required|exists:demo_plots,id',
+            'visit_date'       => 'required|date',
             'plant_status'     => 'required|in:' . implode(',', array_keys(DemoPlot::PlantStatuses)),
-            'owner_name'       => 'required|string|max:100',
-            'owner_phone'      => 'nullable|string|max:30',
             'notes'            => 'nullable|string|max:500',
-            'field_location'   => 'nullable|string|max:100',
             'latlong'          => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',
             'image_path'       => 'nullable|string',
         ]);
 
         $item = !$request->id
-            ? new DemoPlot()
-            : DemoPlot::findOrFail($request->post('id', 0));
+            ? new DemoPlotVisit()
+            : DemoPlotVisit::findOrFail($request->post('id', 0));
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
@@ -150,19 +165,19 @@ class DemoPlotController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.demo-plot.detail', ['id' => $item->id]))
-            ->with('success', "DemoPlot #$item->id telah disimpan.");
+        return redirect(route('admin.demo-plot-visit.detail', ['id' => $item->id]))
+            ->with('success', "Kunjungan Demo Plot #$item->id - $item->visit_date telah disimpan.");
     }
 
     public function delete($id)
     {
         allowed_roles([User::Role_Admin]);
 
-        $item = DemoPlot::findOrFail($id);
+        $item = DemoPlotVisit::findOrFail($id);
         $item->delete();
 
         return response()->json([
-            'message' => "Demo Plot #$item->id telah dihapus."
+            'message' => "Kunjungan Demo Plot #$item->id telah dihapus."
         ]);
     }
 
@@ -177,7 +192,7 @@ class DemoPlotController extends Controller
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            $pdf = Pdf::loadView('export.demo-plot-list-pdf', compact('items', 'title'))
+            $pdf = Pdf::loadView('export.demo-plot-visit-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
         }
@@ -206,12 +221,12 @@ class DemoPlotController extends Controller
             // foreach ($items as $item) {
             //     $sheet->setCellValue('A' . $row, $item->id);
             //     $sheet->setCellValue('B' . $row, $item->date);
-            //     $sheet->setCellValue('C' . $row, DemoPlot::Types[$item->type]);
-            //     $sheet->setCellValue('D' . $row, DemoPlot::Statuses[$item->status]);
+            //     $sheet->setCellValue('C' . $row, DemoPlotVisit::Types[$item->type]);
+            //     $sheet->setCellValue('D' . $row, DemoPlotVisit::Statuses[$item->status]);
             //     $sheet->setCellValue('E' . $row, $item->user->name .  ' (' . $item->user->username . ')');
             //     $sheet->setCellValue('F' . $row, $item->customer->name . ' - ' . $item->customer->company . ' - ' . $item->customer->address);
             //     $sheet->setCellValue('I' . $row, $item->service->name);
-            //     $sheet->setCellValue('G' . $row, DemoPlot::EngagementLevels[$item->engagement_level]);
+            //     $sheet->setCellValue('G' . $row, DemoPlotVisit::EngagementLevels[$item->engagement_level]);
             //     $sheet->setCellValue('H' . $row, $item->subject);
             //     $sheet->setCellValue('J' . $row, $item->summary);
             //     $sheet->setCellValue('K' . $row, $item->notes);
@@ -238,17 +253,13 @@ class DemoPlotController extends Controller
     {
         $filter = $request->get('filter', []);
 
-        $q = DemoPlot::with([
+        $q = DemoPlotVisit::with([
             'user:id,username,name',
-            'product:id,name',
         ]);
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('owner_name', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('owner_phone', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('field_location', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%');
+                $q->where('notes', 'like', '%' . $filter['search'] . '%');
             });
         }
 

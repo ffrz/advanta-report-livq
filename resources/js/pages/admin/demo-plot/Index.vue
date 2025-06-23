@@ -62,6 +62,7 @@ const products = [
 ];
 
 const plant_status_colors = {
+  not_yet_planted: 'grey',
   planted: "grey",
   satisfactory: "green",
   unsatisfactory: "red",

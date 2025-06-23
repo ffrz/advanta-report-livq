@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DemoPlotController;
+use App\Http\Controllers\Admin\DemoPlotVisitController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -35,10 +36,6 @@ Route::middleware(NonAuthenticated::class)->group(function () {
 });
 
 Route::middleware([Auth::class])->group(function () {
-    Route::prefix('api')->group(function () {
-        // Route::get('active-customers', [ApiController::class, 'activeCustomers'])->name('api.active-customers');
-    });
-
     Route::match(['get', 'post'], 'admin/auth/logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
 
     Route::prefix('admin')->group(function () {
@@ -116,6 +113,17 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [DemoPlotController::class, 'save'])->name('admin.demo-plot.save');
             Route::post('delete/{id}', [DemoPlotController::class, 'delete'])->name('admin.demo-plot.delete');
             Route::get('export', [DemoPlotController::class, 'export'])->name('admin.demo-plot.export');
+        });
+
+        Route::prefix('demo-plot-vistis')->group(function () {
+            Route::get('', [DemoPlotVisitController::class, 'index'])->name('admin.demo-plot-visit.index');
+            Route::get('data', [DemoPlotVisitController::class, 'data'])->name('admin.demo-plot-visit.data');
+            Route::get('add', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.add');
+            Route::get('edit/{id}', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.edit');
+            Route::get('detail/{id}', [DemoPlotVisitController::class, 'detail'])->name('admin.demo-plot-visit.detail');
+            Route::post('save', [DemoPlotVisitController::class, 'save'])->name('admin.demo-plot-visit.save');
+            Route::post('delete/{id}', [DemoPlotVisitController::class, 'delete'])->name('admin.demo-plot-visit.delete');
+            Route::get('export', [DemoPlotVisitController::class, 'export'])->name('admin.demo-plot-visit.export');
         });
 
         Route::prefix('settings')->group(function () {

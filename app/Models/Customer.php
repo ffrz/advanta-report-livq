@@ -42,21 +42,6 @@ class Customer extends Model
         return $this->belongsTo(User::class, 'updated_by_uid');
     }
 
-    public function services()
-    {
-        return $this->hasMany(CustomerService::class);
-    }
-
-    public function interactions()
-    {
-        return $this->hasMany(Interaction::class);
-    }
-
-    public function closings()
-    {
-        return $this->hasMany(Closing::class);
-    }
-
     public static function newCustomerCount($start_date, $end_date)
     {
         return DB::select(

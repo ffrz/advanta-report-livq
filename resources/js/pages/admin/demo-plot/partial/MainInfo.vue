@@ -1,5 +1,5 @@
 <script setup>
-import { usePage } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import ImageViewer from '@/components/ImageViewer.vue'
 const page = usePage();
@@ -50,13 +50,19 @@ const showViewer = ref(false)
         <td>{{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[page.props.data.plant_status] }}</td>
       </tr>
       <tr>
-        <td>Terakhir Visit</td>
+        <td>Terakhir Dikunjungi</td>
         <td>:</td>
         <td>
           <template v-if="page.props.data.last_visit">
             {{ $dayjs(page.props.data.last_visit).fromNow() }} -
             {{ $dayjs(page.props.data.last_visit).format("DD MMMM YYYY") }}
           </template>
+          <template v-else>
+            <span>Belum pernah</span>
+          </template>
+          <br>
+          <q-btn label="Buat Kunjungan" color="secondary" size="sm" icon="add"
+            @click="router.get(route('admin.demo-plot-visit.add', { demo_plot_id: page.props.data.id }))" />
         </td>
       </tr>
       <tr>
