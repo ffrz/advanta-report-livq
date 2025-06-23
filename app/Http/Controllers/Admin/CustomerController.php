@@ -115,13 +115,12 @@ class CustomerController extends Controller
      */
     public function export(Request $request)
     {
-        $items = Customer::orderBy('id', 'asc')->get();
+        $items = Customer::orderBy('name', 'asc')->get();
 
         $title = 'Daftar Client';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            return view('export.customer-list-pdf', compact('items', 'title'));
             $pdf = Pdf::loadView('export.customer-list-pdf', compact('items', 'title'))
                 ->setPaper('a4', 'landscape');
             return $pdf->download($filename . '.pdf');
@@ -132,7 +131,7 @@ class CustomerController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Tambahkan header
-            $sheet->setCellValue('A1', 'NO');
+            $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', 'Jenis');
             $sheet->setCellValue('C1', 'Nama');
             $sheet->setCellValue('D1', 'Telepon');

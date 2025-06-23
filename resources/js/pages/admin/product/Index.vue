@@ -87,6 +87,24 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
       <q-btn icon="add" dense color="primary" @click="router.get(route('admin.product.add'))" />
       <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
+      <q-btn icon="file_export" dense class="q-ml-sm" color="grey" style="" @click.stop>
+        <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
+          <q-list style="width: 200px">
+            <q-item clickable v-ripple v-close-popup :href="route('admin.product.export', { format: 'pdf' })">
+              <q-item-section avatar>
+                <q-icon name="picture_as_pdf" color="red-9" />
+              </q-item-section>
+              <q-item-section>Export PDF</q-item-section>
+            </q-item>
+            <q-item clickable v-ripple v-close-popup :href="route('admin.product.export', { format: 'excel' })">
+              <q-item-section avatar>
+                <q-icon name="csv" color="green-9" />
+              </q-item-section>
+              <q-item-section>Export Excel</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
     </template>
     <template #header v-if="showFilter">
       <q-toolbar class="filter-bar">

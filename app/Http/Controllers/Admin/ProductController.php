@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\StockMovement;
-use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
@@ -126,5 +128,67 @@ class ProductController extends Controller
         return response()->json([
             'message' => "Varietas $item->name telah dihapus."
         ]);
+    }
+
+    /**
+     * Mengekspor daftar client ke dalam format PDF atau Excel.
+     */
+    public function export(Request $request)
+    {
+        $items = Product::orderBy('name', 'asc')->get();
+
+        $title = 'Daftar Varietas';
+        $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
+
+        if ($request->get('format') == 'pdf') {
+            $pdf = Pdf::loadView('export.product-list-pdf', compact('items', 'title'))
+                ->setPaper('a4', 'landscape');
+            return $pdf->download($filename . '.pdf');
+        }
+
+        if ($request->get('format') == 'excel') {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Tambahkan header
+            $sheet->setCellValue('A1', 'No');
+            $sheet->setCellValue('B1', 'Kategori');
+            $sheet->setCellValue('C1', 'Nama Varietas');
+            $sheet->setCellValue('D1', 'Satuan Distributor');
+            $sheet->setCellValue('E1', 'Harga Distributor (Rp)');
+            $sheet->setCellValue('F1', 'Satuan Reseller');
+            $sheet->setCellValue('G1', 'Harga Reseller (Rp)');
+            $sheet->setCellValue('H1', 'Status');
+            $sheet->setCellValue('I1', 'Catatan');
+
+            // Tambahkan data ke Excel
+            $row = 2;
+            foreach ($items as $num => $item) {
+                $sheet->setCellValue('A' . $row, $num + 1);
+                $sheet->setCellValue('B' . $row, $item->category ? $item->category->name : '');
+                $sheet->setCellValue('C' . $row, $item->name);
+                $sheet->setCellValue('D' . $row, $item->uom_1);
+                $sheet->setCellValue('E' . $row, $item->price_1);
+                $sheet->setCellValue('F' . $row, $item->uom_2);
+                $sheet->setCellValue('G' . $row, $item->price_2);
+                $sheet->setCellValue('H' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('I' . $row, $item->notes);
+                $row++;
+            }
+
+            // Kirim ke memori tanpa menyimpan file
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
+
+            // Atur header response untuk download
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+
+            return $response;
+        }
+
+        return abort(400, 'Format tidak didukung');
     }
 }
