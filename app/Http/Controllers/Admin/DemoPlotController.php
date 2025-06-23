@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\ImageManager;
 use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -114,8 +115,31 @@ class DemoPlotController extends Controller
             // Simpan file baru
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename);
             $validated['image_path'] = 'uploads/' . $filename; // timpah dengan path yang digenerate
+
+            // Resize dan simpan dengan Intervention Image v3
+            $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $image = $manager->read($file);
+
+            // Hitung sisi panjang
+            $width = $image->width();
+            $height = $image->height();
+
+            // Hitung rasio
+            $ratio = max($width / 1024, $height / 1024);
+
+            if ($ratio > 1) {
+                // Jika lebih besar dari batas, resize berdasarkan rasio terbesar
+                $newWidth = (int) round($width / $ratio);
+                $newHeight = (int) round($height / $ratio);
+
+                $image->resize($newWidth, $newHeight, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+            }
+
+            $image->save(public_path($validated['image_path']));
         } else if (empty($validated['image_path'])) {
             // Hapus file lama jika ada
             if ($item->image_path && file_exists(public_path($item->image_path))) {

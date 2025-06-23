@@ -151,7 +151,7 @@ function removeLocation() {
                 <input type="file" ref="fileInput" accept="image/*" capture="environment" style="display: none"
                   @change="onFileChange" />
                 <div>
-                  <q-img v-if="imagePreview" :src="imagePreview" class="q-mt-md" style="max-width: 500px;" :ratio="1"
+                  <q-img v-if="imagePreview" :src="imagePreview" class="q-mt-md" style="max-width: 500px;"
                     :style="{ border: '1px solid #ddd' }">
                     <template v-slot:error>
                       <div class="text-negative text-center q-pa-md">Gambar tidak tersedia</div>
