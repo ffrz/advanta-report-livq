@@ -154,8 +154,8 @@ class ProductController extends Controller
             $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', 'Kategori');
             $sheet->setCellValue('C1', 'Nama Varietas');
-            $sheet->setCellValue('D1', 'Harga Distributor');
-            $sheet->setCellValue('E1', 'Harga');
+            $sheet->setCellValue('D1', 'Harga Distributor (Rp / sat)');
+            $sheet->setCellValue('E1', 'Harga (Rp / sat)');
             $sheet->setCellValue('F1', 'Status');
             $sheet->setCellValue('G1', 'Catatan');
 

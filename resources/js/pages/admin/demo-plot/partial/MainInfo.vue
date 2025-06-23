@@ -1,6 +1,7 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
+import { plantAge } from '@/helpers/utils';
 import ImageViewer from '@/components/ImageViewer.vue'
 const page = usePage();
 const showViewer = ref(false)
@@ -10,7 +11,7 @@ const showViewer = ref(false)
   <table class="detail">
     <tbody>
       <tr>
-        <td>BS</td>
+        <td style="width:150px">BS</td>
         <td>:</td>
         <td>
           <template v-if="page.props.data.user">
@@ -30,6 +31,15 @@ const showViewer = ref(false)
         <td>{{ page.props.data.product.name }}</td>
       </tr>
       <tr>
+        <td>Tanggal Tanam</td>
+        <td>:</td>
+        <td>
+          {{ $dayjs(page.props.data.plant_date).fromNow() }} -
+          {{ $dayjs(page.props.data.plant_date).format("DD MMMM YYYY") }}
+          <br> ({{ plantAge(page.props.data) }})
+        </td>
+      </tr>
+      <tr>
         <td>Pemilik Lahan</td>
         <td>:</td>
         <td>{{ page.props.data.owner_name }}</td>
@@ -45,7 +55,7 @@ const showViewer = ref(false)
         <td>{{ page.props.data.field_location }}</td>
       </tr>
       <tr>
-        <td>Status Tanaman</td>
+        <td>Status Terkini</td>
         <td>:</td>
         <td>{{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[page.props.data.plant_status] }}</td>
       </tr>
@@ -60,9 +70,9 @@ const showViewer = ref(false)
           <template v-else>
             <span>Belum pernah</span>
           </template>
-          <br>
+          <!-- <br>
           <q-btn label="Buat Kunjungan" color="secondary" size="sm" icon="add"
-            @click="router.get(route('admin.demo-plot-visit.add', { demo_plot_id: page.props.data.id }))" />
+            @click="router.get(route('admin.demo-plot-visit.add', { demo_plot_id: page.props.data.id }))" /> -->
         </td>
       </tr>
       <tr>

@@ -1,4 +1,5 @@
 import { usePage } from "@inertiajs/vue3";
+import dayjs from 'dayjs';
 
 export const getQueryParams = (...args) => {
   const page = usePage();
@@ -47,44 +48,16 @@ export function create_month_options() {
   ];
 }
 
+export function plantAge(row) {
+  if (!row.active || !row.plant_date) return '-';
+  const today = dayjs();
+  const planted = dayjs(row.plant_date);
+  return `${today.diff(planted, 'day')} hari`;
+};
+
 export function create_options(data) {
   return Object.entries(data)
     .map(([key, value]) => ({ 'value': key, 'label': value }));
-}
-
-// TODO: remove this function, move to useOperationalCostCategory
-export function create_options_from_operational_cost_categories(items) {
-  return items.map((item) => {
-    return { 'value': item.id, 'label': `${item.name}` };
-  });
-}
-
-// TODO: remove this function
-export function create_options_from_users(items) {
-  return items.map((user) => {
-    return { 'value': user.id, 'label': `${user.username} - ${user.name}` };
-  });
-}
-
-// TODO: remove this function
-export function create_options_from_technicians(items) {
-  return items.map((technician) => {
-    return { 'value': technician.id, 'label': `#${technician.id} - ${technician.name}` };
-  });
-}
-
-// TODO: remove this function
-export function create_options_from_customers(items) {
-  return items.map((customer) => {
-    return { 'value': customer.id, 'label': `#${customer.id}: ${customer.name}` };
-  });
-}
-
-// TODO: remove this function
-export function create_options_from_customers_with_phone(items) {
-  return items.map((customer) => {
-    return { 'value': customer.id, 'label': `#${customer.id}: ${customer.name} - ${customer.phone}` };
-  });
 }
 
 export async function scrollToFirstErrorField(ref) {

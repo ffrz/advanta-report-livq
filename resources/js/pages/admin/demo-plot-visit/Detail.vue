@@ -42,7 +42,7 @@ const showViewer = ref(false)
               <table class="detail">
                 <tbody>
                   <tr>
-                    <td>BS</td>
+                    <td style="width:120px">BS</td>
                     <td>:</td>
                     <td>
                       <template v-if="page.props.data.user">

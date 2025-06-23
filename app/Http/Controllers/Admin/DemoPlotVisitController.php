@@ -61,7 +61,6 @@ class DemoPlotVisitController extends Controller
     {
         $orderBy = $request->get('order_by', 'id');
         $orderType = $request->get('order_type', 'asc');
-
         $items = $this->createQuery($request)
             ->orderBy($orderBy, $orderType)
             ->paginate($request->get('per_page', 10))
@@ -165,6 +164,18 @@ class DemoPlotVisitController extends Controller
         $item->fill($validated);
         $item->save();
 
+        // Update kolom last_visit dan plant_status di demo_plots
+        $latestVisit = DemoPlotVisit::where('demo_plot_id', $item->demo_plot_id)
+            ->orderByDesc('visit_date')
+            ->first();
+
+        if ($latestVisit) {
+            $item->demo_plot->update([
+                'last_visit' => $latestVisit->visit_date,
+                'plant_status' => $latestVisit->plant_status,
+            ]);
+        }
+
         return redirect(route('admin.demo-plot-visit.detail', ['id' => $item->id]))
             ->with('success', "Kunjungan Demo Plot #$item->id - $item->visit_date telah disimpan.");
     }
@@ -256,6 +267,8 @@ class DemoPlotVisitController extends Controller
         $q = DemoPlotVisit::with([
             'user:id,username,name',
         ]);
+
+        $q->where('demo_plot_id', $request->get('demo_plot_id'));
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {

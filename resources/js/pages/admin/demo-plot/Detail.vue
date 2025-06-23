@@ -27,7 +27,7 @@ const tab = ref("main");
             <q-card-section class="q-pa-none">
               <q-tabs v-model="tab" align="left">
                 <q-tab name="main" label="Info Utama" />
-                <q-tab name="visit" label="Riwayat Visit" />
+                <q-tab name="visit" label="Kunjungan" />
               </q-tabs>
               <q-tab-panels v-model="tab">
                 <q-tab-panel name="main">

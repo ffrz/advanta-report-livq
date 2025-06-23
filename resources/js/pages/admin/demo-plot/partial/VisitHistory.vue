@@ -22,7 +22,6 @@ const pagination = ref({
   descending: true,
 });
 
-
 const PLANT_STATUS_COLORS = {
   not_yet_planted: 'grey',
   planted: "grey",
@@ -31,7 +30,6 @@ const PLANT_STATUS_COLORS = {
   failed: "black",
   completed: "blue",
 };
-
 
 const columns = [
   { name: "date", label: "Tanggal", field: "date", align: "left", sortable: true },
@@ -55,7 +53,7 @@ const fetchItems = (props = null) => handleFetchItems({
   filter,
   props,
   rows,
-  url: route("admin.demo-plot-visit.data"),
+  url: route("admin.demo-plot-visit.data", { demo_plot_id: page.props.data.id }),
   loading,
 });
 
@@ -70,6 +68,10 @@ const computedColumns = computed(() =>
 <template>
 
   <div class="q-pa-none">
+    <div class="q-pa-sm">
+      <q-btn label="Tambah&nbsp;&nbsp;" color="primary" size="sm" icon="add" dense
+        @click="router.get(route('admin.demo-plot-visit.add', { demo_plot_id: page.props.data.id }))" />
+    </div>
     <q-table flat bordered square color="primary" row-key="id" virtual-scroll v-model:pagination="pagination"
       :filter="filter.search" :loading="loading" :columns="computedColumns" :rows="rows"
       :rows-per-page-options="[10, 25, 50]" @request="fetchItems" binary-state-sort>

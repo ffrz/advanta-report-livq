@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams } from "@/helpers/utils";
+import { check_role, getQueryParams, plantAge } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from '@/helpers/usePageStorage'
 import dayjs from 'dayjs';
@@ -105,13 +105,6 @@ const onRowClicked = (row) => router.get(route("admin.demo-plot.detail", { id: r
 const computedColumns = computed(() =>
   $q.screen.gt.sm ? columns : columns.filter((col) => ["field", "action"].includes(col.name))
 );
-
-const plantAge = (row) => {
-  if (!row.active || !row.plant_date) return '-';
-  const today = dayjs();
-  const planted = dayjs(row.plant_date);
-  return `${today.diff(planted, 'day')} hari`;
-};
 
 watch(filter, () => storage.set('filter', filter), { deep: true })
 watch(pagination, () => storage.set('pagination', pagination.value), { deep: true })

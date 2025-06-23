@@ -182,8 +182,8 @@ onMounted(() => {
               <q-item-label>Demplot</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/customers')" @click="router.get(route('admin.customer.index'))">
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')"
+            @click="router.get(route('admin.customer.index'))">
             <q-item-section avatar>
               <q-icon name="storefront" />
             </q-item-section>
@@ -192,8 +192,8 @@ onMounted(() => {
             </q-item-section>
           </q-item>
           <q-separator />
-          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/products')" @click="router.get(route('admin.product.index'))">
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/products')"
+            @click="router.get(route('admin.product.index'))">
             <q-item-section avatar>
               <q-icon name="potted_plant" />
             </q-item-section>

@@ -9,8 +9,8 @@
         <th>No</th>
         <th>Kategori</th>
         <th>Nama</th>
-        <th>Harga Distributor (Rp)</th>
-        <th>Harga</th>
+        <th>Harga Distributor (Rp / sat)</th>
+        <th>Harga (Rp / sat)</th>
         <th>Status</th>
         <th>Catatan</th>
       </tr>
