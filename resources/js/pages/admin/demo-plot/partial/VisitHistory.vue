@@ -18,7 +18,7 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 10,
-  sortBy: "id",
+  sortBy: "visit_date",
   descending: true,
 });
 
@@ -32,7 +32,7 @@ const PLANT_STATUS_COLORS = {
 };
 
 const columns = [
-  { name: "date", label: "Tanggal", field: "date", align: "left", sortable: true },
+  { name: "visit_date", label: "Tanggal", field: "visit_date", align: "left", sortable: true },
   { name: "user", label: "BS", field: "user", align: "left" },
   { name: "status", label: "Status", field: "status", align: "left" },
   { name: "notes", label: "Catatan", field: "notes", align: "left" },
@@ -60,7 +60,7 @@ const fetchItems = (props = null) => handleFetchItems({
 const onRowClicked = (row) => router.get(route("admin.demo-plot-visit.detail", { id: row.id }));
 
 const computedColumns = computed(() =>
-  $q.screen.gt.sm ? columns : columns.filter((col) => ["date", "action"].includes(col.name))
+  $q.screen.gt.sm ? columns : columns.filter((col) => ["visit_date", "action"].includes(col.name))
 );
 
 </script>
@@ -91,7 +91,7 @@ const computedColumns = computed(() =>
       <template v-slot:body="props">
         <q-tr :props="props" :class="props.row.active == 'inactive' ? 'bg-red-1' : ''" class="cursor-pointer"
           @click="onRowClicked(props.row)">
-          <q-td key="date" :props="props" class="wrap-column">
+          <q-td key="visit_date" :props="props" class="wrap-column">
             <div v-if="!$q.screen.lt.md" class="row items-start q-gutter-sm">
               <q-img :src="`/${props.row.image_path}`" style="width: 64px; height: 64px; border: 1px solid #ddd"
                 spinner-color="grey" fit="cover" class="rounded-borders" />
