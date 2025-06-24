@@ -148,8 +148,7 @@ function removeLocation() {
                 <!-- Tombol buang -->
                 <q-btn class="q-ml-sm" size="sm" icon="close" label="Buang" :disable="form.processing || !imagePreview"
                   color="red" @click="clearImage" />
-                <input type="file" ref="fileInput" accept="image/*" capture="environment" style="display: none"
-                  @change="onFileChange" />
+                <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="onFileChange" />
                 <div>
                   <q-img v-if="imagePreview" :src="imagePreview" class="q-mt-md" style="max-width: 500px;"
                     :style="{ border: '1px solid #ddd' }">

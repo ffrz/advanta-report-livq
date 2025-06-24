@@ -36,7 +36,9 @@ const showViewer = ref(false)
         <td>
           {{ $dayjs(page.props.data.plant_date).fromNow() }} -
           {{ $dayjs(page.props.data.plant_date).format("DD MMMM YYYY") }}
-          <br> ({{ plantAge(page.props.data) }})
+          <template v-if="page.props.data.active">
+            <br> ({{ plantAge(page.props.data.plant_date) }} hari)
+          </template>
         </td>
       </tr>
       <tr>

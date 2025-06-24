@@ -24,20 +24,22 @@ class DemoPlot extends Model
         'last_visit',
     ];
 
-    const PlantStatus_NotYetPlanted  = 'not_yet_planted';
-    const PlantStatus_Planted        = 'planted';
-    const PlantStatus_Satisfactoy    = 'satisfactory';
-    const PlantStatus_Unsatisfactory = 'unsatisfactory';
-    const PlantStatus_Completed      = 'completed';
-    const PlantStatus_Failed         = 'failed';
+    const PlantStatus_NotYetPlanted   = 'not_yet_planted';
+    // const PlantStatus_Planted         = 'planted';
+    const PlantStatus_NotYetEvaluated = 'not_yet_evaluated';
+    const PlantStatus_Satisfactoy     = 'satisfactory';
+    const PlantStatus_Unsatisfactory  = 'unsatisfactory';
+    const PlantStatus_Completed       = 'completed';
+    const PlantStatus_Failed          = 'failed';
 
     const PlantStatuses = [
-        self::PlantStatus_NotYetPlanted  => 'Belum Ditanam',
-        self::PlantStatus_Planted        => 'Baru Ditanam',
-        self::PlantStatus_Satisfactoy    => 'Memuaskan',
-        self::PlantStatus_Unsatisfactory => 'Kurang Memuaskan',
-        self::PlantStatus_Completed      => 'Selesai',
-        self::PlantStatus_Failed         => 'Gagal',
+        self::PlantStatus_NotYetPlanted   => 'Belum Ditanam',
+        // self::PlantStatus_Planted         => 'Baru Ditanam',
+        self::PlantStatus_NotYetEvaluated => 'Belum Dievaluasi',
+        self::PlantStatus_Satisfactoy     => 'Memuaskan',
+        self::PlantStatus_Unsatisfactory  => 'Kurang Memuaskan',
+        self::PlantStatus_Completed       => 'Selesai',
+        self::PlantStatus_Failed          => 'Gagal',
     ];
 
     public function user()

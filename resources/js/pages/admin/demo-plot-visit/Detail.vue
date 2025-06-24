@@ -32,11 +32,10 @@ const showViewer = ref(false)
           <q-card square flat bordered class="col q-pa-none">
             <q-card-section class="q-pa-md">
               <div class="row items-center justify-between q-mb-md">
-                <q-btn icon="arrow_left" color="grey-8" flat label="Sebelumnya" :disabled="!page.props.prev_visit_id"
+                <q-btn icon="arrow_left" color="grey-8" flat :disabled="!page.props.prev_visit_id" dense rounded
                   @click="router.get(route('admin.demo-plot-visit.detail', { id: page.props.prev_visit_id }))" />
                 <div class="text-bold text-grey-7">Info Kunjungan</div>
-                <q-btn icon-right="arrow_right" color="grey-8" flat label="Selanjutnya"
-                  :disabled="!page.props.next_visit_id"
+                <q-btn icon-right="arrow_right" color="grey-8" flat :disabled="!page.props.next_visit_id" dense rounded
                   @click="router.get(route('admin.demo-plot-visit.detail', { id: page.props.next_visit_id }))" />
               </div>
               <table class="detail">

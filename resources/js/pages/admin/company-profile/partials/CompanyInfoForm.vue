@@ -73,8 +73,7 @@ const submit = () =>
           <!-- Tombol buang -->
           <q-btn class="q-ml-sm" size="sm" icon="close" label="Buang" :disable="form.processing || !imagePreview"
             color="red" @click="clearImage" />
-          <input type="file" ref="fileInput" accept="image/*" capture="environment" style="display: none"
-            @change="onFileChange" />
+          <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="onFileChange" />
           <div>
             <q-img :src="imagePreview" class="q-mt-md" :ratio="1" spinner-color="white"
               style="width: 240px; border: 1px solid #ddd;">

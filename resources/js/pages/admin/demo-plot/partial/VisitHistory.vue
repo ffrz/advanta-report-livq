@@ -24,7 +24,7 @@ const pagination = ref({
 
 const PLANT_STATUS_COLORS = {
   not_yet_planted: 'grey',
-  planted: "grey",
+  not_yet_evaluated: "grey",
   satisfactory: "green",
   unsatisfactory: "red",
   failed: "black",

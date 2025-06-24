@@ -48,11 +48,9 @@ export function create_month_options() {
   ];
 }
 
-export function plantAge(row) {
-  if (!row.active || !row.plant_date) return '-';
-  const today = dayjs();
-  const planted = dayjs(row.plant_date);
-  return `${today.diff(planted, 'day')} hari`;
+export function plantAge(plant_date, toDate) {
+  if (!plant_date) return 0;
+  return `${(toDate ? dayjs(toDate) : dayjs()).diff(dayjs(plant_date), 'day')}`;
 };
 
 export function create_options(data) {

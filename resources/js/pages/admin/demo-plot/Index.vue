@@ -63,7 +63,7 @@ const products = [
 
 const plant_status_colors = {
   not_yet_planted: 'grey',
-  planted: "grey",
+  not_yet_evaluated: "grey",
   satisfactory: "green",
   unsatisfactory: "red",
   failed: "black",
@@ -204,11 +204,13 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
               <template v-if="$q.screen.lt.md">
                 <div>
                   <q-icon name="edit_calendar" /> Tgl Tanam: {{ $dayjs(props.row.plant_date).format('DD MMMM YYYY') }}
-                  ({{ plantAge(props.row) }})
+                  <template v-if="props.row.active">
+                    <br> ({{ plantAge(props.row.plant_date) }} hari)
+                  </template>
                 </div>
                 <template v-if="props.row.active">
                   <div>
-                    <q-icon name="calendar_clock" /> Umur: {{ plantAge(props.row) }}
+                    <q-icon name="calendar_clock" /> Umur: {{ plantAge(props.row.plant_date) }} hari
                   </div>
                 </template>
                 <template v-if="props.row.last_visit">
@@ -232,7 +234,10 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
               {{ props.row.product.name }}
             </q-td>
             <q-td key="plant_date" :props="props">
-              {{ $dayjs(props.row.plant_date).format('YYYY-MM-DD') }} ({{ plantAge(props.row) }})
+              {{ $dayjs(props.row.plant_date).format('YYYY-MM-DD') }}
+              <template v-if="props.row.active">
+                ({{ plantAge(props.row.plant_date) }} hari)
+              </template>
             </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
