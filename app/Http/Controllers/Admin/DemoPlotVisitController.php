@@ -59,8 +59,8 @@ class DemoPlotVisitController extends Controller
 
     public function data(Request $request)
     {
-        $orderBy = $request->get('order_by', 'id');
-        $orderType = $request->get('order_type', 'asc');
+        $orderBy = $request->get('order_by', 'date');
+        $orderType = $request->get('order_type', 'desc');
         $items = $this->createQuery($request)
             ->orderBy($orderBy, $orderType)
             ->paginate($request->get('per_page', 10))
