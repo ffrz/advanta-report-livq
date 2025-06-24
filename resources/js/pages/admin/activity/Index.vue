@@ -277,8 +277,11 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
-                <q-btn :disabled="!check_role($CONSTANTS.USER_ROLE_ADMIN)" icon="more_vert" dense flat
-                  style="height: 40px; width: 30px" @click.stop>
+                <q-btn :disabled="!check_role([
+                  $CONSTANTS.USER_ROLE_AGRONOMIST,
+                  $CONSTANTS.USER_ROLE_ADMIN,
+                  $CONSTANTS.USER_ROLE_BS
+                ])" icon="more_vert" dense flat style="height: 40px; width: 30px" @click.stop>
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
                       <q-item
