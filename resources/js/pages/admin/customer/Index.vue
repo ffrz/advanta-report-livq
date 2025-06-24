@@ -80,8 +80,9 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.customer.add'))" />
-      <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
+      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.customer.add'))"
+        :disabled="!check_role([$CONSTANTS.USER_ROLE_AGRONOMIST, $CONSTANTS.USER_ROLE_ADMIN])" />
+      <q-btn class=" q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
       <q-btn icon="file_export" dense class="q-ml-sm" color="grey" style="" @click.stop>
         <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">

@@ -11,7 +11,6 @@ const title = "Rincian Pengguna";
     <template #title>{{ title }}</template>
     <template #right-button>
       <div class="q-gutter-sm">
-        <!-- <q-btn icon="arrow_back" dense color="grey-7" @click="$goBack()" /> -->
         <q-btn icon="edit" dense color="primary" :disable="$page.props.auth.user.role != $CONSTANTS.USER_ROLE_ADMIN"
           @click="router.get(route('admin.user.edit', { id: page.props.data.id }))" />
       </div>
