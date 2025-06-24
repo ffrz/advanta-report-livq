@@ -20,8 +20,18 @@ class ActivityController extends Controller
 {
     public function index()
     {
+        $users = [];
+        if (Auth::user()->role == User::Role_BS) {
+            $users = User::query()->where('role', User::Role_BS)->orderBy('name')->get();
+        } else if (Auth::user()->role == User::Role_Agronomist) {
+            $users = User::query()
+                ->where('role', User::Role_BS)
+                ->where('parent_id', Auth::user()->id)
+                ->orderBy('name')->get();
+        }
+
         return inertia('admin/activity/Index', [
-            'users' => User::query()->where('role', User::Role_BS)->orderBy('name')->get(),
+            'users' => $users,
             'types' => ActivityType::query()->where('active', true)->orderBy('name')->get(),
         ]);
     }

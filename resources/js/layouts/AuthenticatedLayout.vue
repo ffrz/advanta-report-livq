@@ -2,6 +2,7 @@
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
+import { check_role } from "@/helpers/utils.js";
 
 defineComponent({
   name: "AuthenticatedLayout",
@@ -193,8 +194,11 @@ onMounted(() => {
               <q-item-label>Demplot</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')"
-            @click="router.get(route('admin.customer.index'))">
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')" v-if="check_role([
+            $CONSTANTS.USER_ROLE_ADMIN,
+            $CONSTANTS.USER_ROLE_AGRONOMIST,
+            $CONSTANTS.USER_ROLE_ASM,
+          ])" @click="router.get(route('admin.customer.index'))">
             <q-item-section avatar>
               <q-icon name="storefront" />
             </q-item-section>

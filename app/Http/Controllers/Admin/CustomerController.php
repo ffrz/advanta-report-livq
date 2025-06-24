@@ -16,11 +16,15 @@ class CustomerController extends Controller
 {
     public function index()
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist, User::Role_ASM]);
+
         return inertia('admin/customer/Index');
     }
 
     public function detail($id = 0)
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist, User::Role_ASM]);
+
         return inertia('admin/customer/Detail', [
             'data' => Customer::with([
                 'assigned_user:id,username,name',
@@ -60,6 +64,8 @@ class CustomerController extends Controller
 
     public function duplicate($id)
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
+
         $item = Customer::findOrFail($id);
         $item->id = null;
         $item->created_at = null;
@@ -71,6 +77,8 @@ class CustomerController extends Controller
 
     public function editor($id = 0)
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
+
         $item = $id ? Customer::findOrFail($id) : new Customer(['active' => true]);
         return inertia('admin/customer/Editor', [
             'data' => $item,
@@ -80,6 +88,8 @@ class CustomerController extends Controller
 
     public function save(Request $request)
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist, User::Role_ASM]);
+
         $validated =  $request->validate([
             'name'           => 'required|string|max:255',
             'phone'          => 'nullable|string|max:50',
@@ -115,6 +125,8 @@ class CustomerController extends Controller
      */
     public function export(Request $request)
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist, User::Role_ASM]);
+
         $items = Customer::orderBy('name', 'asc')->get();
 
         $title = 'Daftar Client';

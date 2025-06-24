@@ -160,8 +160,8 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
-                <q-btn :disabled="!check_role($CONSTANTS.USER_ROLE_ADMIN)" icon="more_vert" dense flat
-                  style="height: 40px; width: 30px" @click.stop>
+                <q-btn :disabled="!check_role([$CONSTANTS.USER_ROLE_AGRONOMIST, $CONSTANTS.USER_ROLE_ADMIN])"
+                  icon="more_vert" dense flat style="height: 40px; width: 30px" @click.stop>
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
                       <q-item clickable v-ripple v-close-popup
@@ -169,16 +169,17 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
                         <q-item-section avatar>
                           <q-icon name="file_copy" />
                         </q-item-section>
-                        <q-item-section icon="copy"> Duplikat </q-item-section>
+                        <q-item-section> Duplikat </q-item-section>
                       </q-item>
                       <q-item clickable v-ripple v-close-popup
                         @click.stop="router.get(route('admin.customer.edit', props.row.id))">
                         <q-item-section avatar>
                           <q-icon name="edit" />
                         </q-item-section>
-                        <q-item-section icon="edit">Edit</q-item-section>
+                        <q-item-section>Edit</q-item-section>
                       </q-item>
-                      <q-item @click.stop="deleteItem(props.row)" clickable v-ripple v-close-popup>
+                      <q-item v-if="check_role([$CONSTANTS.USER_ROLE_ADMIN])" @click.stop="deleteItem(props.row)"
+                        clickable v-ripple v-close-popup>
                         <q-item-section avatar>
                           <q-icon name="delete_forever" />
                         </q-item-section>
