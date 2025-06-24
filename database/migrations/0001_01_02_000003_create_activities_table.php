@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\DemoPlot;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,21 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('demo_plots', function (Blueprint $table) {
+        Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('restrict');
-            $table->date('plant_date');
-            $table->string('owner_name', 100);
-            $table->string('owner_phone', 40)->nullable();
-            $table->string('field_location', 500)->nullable();
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
+            $table->foreignId('type_id')->constrained('activity_types')->restrictOnDelete();
+            $table->date('date');
             $table->string('latlong', 100)->nullable();
             $table->string('image_path', 500)->nullable();
-            $table->boolean('active')->default(true);
             $table->text('notes')->nullable();
 
-            $table->enum('plant_status', array_keys(DemoPlot::PlantStatuses))->default(DemoPlot::PlantStatus_NotYetPlanted);
-            $table->date('last_visit')->nullable();
+            $table->foreignId('responded_by_id')->nullable()->constrained('users')->restrictOnDelete();
+            $table->datetime('responded_datetime')->nullable();
+            $table->enum('status', ['approved', 'rejected', 'not_responded'])->default('not_responded');
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
@@ -36,12 +32,11 @@ return new class extends Migration
         });
     }
 
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('demo_plots');
+        Schema::dropIfExists('activities');
     }
 };

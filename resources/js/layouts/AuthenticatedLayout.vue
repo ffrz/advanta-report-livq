@@ -173,6 +173,17 @@ onMounted(() => {
             </q-item-section>
           </q-item> -->
           <q-separator />
+          <q-item
+            v-if="[$CONSTANTS.USER_ROLE_BS, $CONSTANTS.USER_ROLE_ADMIN, $CONSTANTS.USER_ROLE_AGRONOMIST].includes($page.props.auth.user.role)"
+            clickable v-ripple :active="$page.url.startsWith('/admin/activities')"
+            @click="router.get(route('admin.activity.index'))">
+            <q-item-section avatar>
+              <q-icon name="campaign" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Kegiatan</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/demo-plots')"
             @click="router.get(route('admin.demo-plot.index'))">
             <q-item-section avatar>
@@ -221,15 +232,6 @@ onMounted(() => {
               <q-item-label>Jenis Kegiatan (DGA)</q-item-label>
             </q-item-section>
           </q-item>
-          <!-- <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/activities')" @click="router.get(route('admin.activity.index'))">
-            <q-item-section avatar>
-              <q-icon name="campaign" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Jenis Aktifitas</q-item-label>
-            </q-item-section>
-          </q-item> -->
           <q-separator />
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/settings/users')"
             @click="router.get(route('admin.user.index'))">

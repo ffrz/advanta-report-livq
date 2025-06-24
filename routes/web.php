@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\ActivityTypeController;
 use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AuthController;
@@ -101,6 +102,19 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [TargetController::class, 'save'])->name('admin.target.save');
             Route::post('delete/{id}', [TargetController::class, 'delete'])->name('admin.target.delete');
             Route::get('export', [TargetController::class, 'export'])->name('admin.target.export');
+        });
+
+        Route::prefix('activities')->group(function () {
+            Route::get('', [ActivityController::class, 'index'])->name('admin.activity.index');
+            Route::get('data', [ActivityController::class, 'data'])->name('admin.activity.data');
+            Route::get('duplicate/{id}', [ActivityController::class, 'duplicate'])->name('admin.activity.duplicate');
+            Route::get('add', [ActivityController::class, 'editor'])->name('admin.activity.add');
+            Route::get('edit/{id}', [ActivityController::class, 'editor'])->name('admin.activity.edit');
+            Route::get('detail/{id}', [ActivityController::class, 'detail'])->name('admin.activity.detail');
+            Route::post('respond/{id}', [ActivityController::class, 'respond'])->name('admin.activity.respond');
+            Route::post('save', [ActivityController::class, 'save'])->name('admin.activity.save');
+            Route::post('delete/{id}', [ActivityController::class, 'delete'])->name('admin.activity.delete');
+            Route::get('export', [ActivityController::class, 'export'])->name('admin.activity.export');
         });
 
         Route::prefix('demo-plots')->group(function () {
