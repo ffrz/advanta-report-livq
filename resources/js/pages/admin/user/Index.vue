@@ -48,7 +48,7 @@ const columns = [
   { name: "name", label: "Nama", field: "name", align: "left", sortable: true },
   { name: "role", label: "Role", field: "role", align: "center" },
   { name: "work_area", label: "Area Kerja", field: "work_area", align: "center", },
-  { name: "parent", label: "Atasan", field: "parent", align: "center" },
+  { name: "parent", label: "Supervisor", field: "parent", align: "center" },
   { name: "action", align: "right" },
 ];
 
@@ -91,7 +91,8 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.user.add'))" />
+      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.user.add'))"
+        :disable="$page.props.auth.user.role != $CONSTANTS.USER_ROLE_ADMIN" />
       <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
       <q-btn icon="file_export" dense class="q-ml-sm" color="grey" style="" @click.stop>
@@ -154,13 +155,14 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
                 {{ props.row.name }} ({{ props.row.username }})
               </div>
               <template v-if="!$q.screen.gt.sm">
-                <div class="elipsis" style="max-width: 200px;"><q-icon name="assignment_ind" /> <span>{{
-                  $CONSTANTS.USER_ROLES[props.row.role] }}</span></div>
+                <div class="elipsis" style="max-width: 200px;"><q-icon name="assignment_ind" />
+                  Role: <span>{{ $CONSTANTS.USER_ROLES[props.row.role] }}</span>
+                </div>
                 <div v-if="props.row.parent">
-                  <q-icon name="supervisor_account" /> {{ props.row.parent.name }}
+                  <q-icon name="supervisor_account" /> Supervisor: {{ props.row.parent.name }}
                 </div>
                 <div v-if="props.row.work_area">
-                  <q-icon name="explore" /> {{ props.row.work_area }}
+                  <q-icon name="explore" /> Area Kerja: {{ props.row.work_area }}
                 </div>
               </template>
             </q-td>
@@ -178,8 +180,9 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
-                <q-btn :disable="props.row.id == currentUser.id || props.row.username == 'admin'" icon="more_vert" dense
-                  flat style="height: 40px; width: 30px" @click.stop>
+                <q-btn
+                  :disable="props.row.id == currentUser.id || props.row.username == 'admin' || $page.props.auth.user.role != $CONSTANTS.USER_ROLE_ADMIN"
+                  icon="more_vert" dense flat style="height: 40px; width: 30px" @click.stop>
                   <q-menu anchor="bottom right" self="top right" transition-show="scale" transition-hide="scale">
                     <q-list style="width: 200px">
                       <q-item clickable v-ripple v-close-popup

@@ -69,7 +69,7 @@ const submit = () =>
                 :disable="form.processing" transition-show="jump-up" transition-hide="jump-up"
                 :error="!!form.errors.role" :error-message="form.errors.role">
               </q-select>
-              <q-select v-model="form.parent_id" label="Bawahan Dari" :options="computedUsers" map-options emit-value
+              <q-select v-model="form.parent_id" label="Supervisor" :options="computedUsers" map-options emit-value
                 :error="!!form.errors.parent_id" :disable="form.processing" />
               <q-input v-model="form.work_area" type="text" label="Area Kerja" lazy-rules :disable="form.processing"
                 :error="!!form.errors.work_area" :error-message="form.errors.work_area" />

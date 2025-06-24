@@ -231,8 +231,8 @@ onMounted(() => {
             </q-item-section>
           </q-item> -->
           <q-separator />
-          <q-item v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN" clickable v-ripple
-            :active="$page.url.startsWith('/admin/settings/users')" @click="router.get(route('admin.user.index'))">
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/settings/users')"
+            @click="router.get(route('admin.user.index'))">
             <q-item-section avatar>
               <q-icon name="group" />
             </q-item-section>

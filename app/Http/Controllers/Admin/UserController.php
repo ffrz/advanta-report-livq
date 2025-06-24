@@ -15,11 +15,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        allowed_roles(User::Role_Admin);
-    }
-
     public function index()
     {
         return inertia('admin/user/Index');
@@ -66,6 +61,8 @@ class UserController extends Controller
 
     public function duplicate($id)
     {
+        allowed_roles(User::Role_Admin);
+
         $user = User::findOrFail($id);
         $user->id = null;
         $user->created_at = null;
@@ -78,6 +75,8 @@ class UserController extends Controller
 
     public function editor($id = 0)
     {
+        allowed_roles(User::Role_Admin);
+
         $user = $id ? User::findOrFail($id) : new User();
 
         if (!$id) {
@@ -96,6 +95,8 @@ class UserController extends Controller
 
     public function save(Request $request)
     {
+        allowed_roles(User::Role_Admin);
+
         $rules = [
             'name' => 'required|max:255',
             'password' => 'required|min:5|max:40',
@@ -138,6 +139,8 @@ class UserController extends Controller
 
     public function delete($id)
     {
+        allowed_roles(User::Role_Admin);
+
         $user = User::findOrFail($id);
 
         if ($user->id == Auth::user()->id) {
