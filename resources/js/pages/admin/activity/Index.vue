@@ -18,8 +18,8 @@ const loading = ref(true);
 
 const filter = reactive(storage.get('filter', {
   search: "",
-  user_id: "all",
-  type_id: page.props.auth.user.role == 'bs' ? page.props.auth.user.id : 'all',
+  user_id: page.props.auth.user.role == 'bs' ? page.props.auth.user.id : 'all',
+  type_id: "all",
   status: "all",
   ...getQueryParams(),
 }));
@@ -177,7 +177,7 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
           <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.status"
             :options="statuses" label="Status" dense map-options emit-value outlined
             @update:model-value="onFilterChange" />
-          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.plant_status"
+          <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.type_id"
             :options="types" label="Jenis Kegiatan" dense map-options emit-value outlined
             @update:model-value="onFilterChange" />
           <q-select class="custom-select col-xs-12 col-sm-2" style="min-width: 150px" v-model="filter.user_id"
