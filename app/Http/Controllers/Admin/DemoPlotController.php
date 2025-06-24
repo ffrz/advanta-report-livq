@@ -73,7 +73,7 @@ class DemoPlotController extends Controller
             'user_id' => $user->role == User::Role_BS ? $user->id : null,
             'plant_date' => Carbon::now(),
             'active' => true,
-            'plant_status' => DemoPlot::PlantStatus_Planted,
+            'plant_status' => DemoPlot::PlantStatus_NotYetPlanted,
         ]);
 
         return inertia('admin/demo-plot/Editor', [
