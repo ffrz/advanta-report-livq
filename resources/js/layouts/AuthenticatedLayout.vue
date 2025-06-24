@@ -178,7 +178,7 @@ onMounted(() => {
             clickable v-ripple :active="$page.url.startsWith('/admin/activities')"
             @click="router.get(route('admin.activity.index'))">
             <q-item-section avatar>
-              <q-icon name="campaign" />
+              <q-icon name="overview" />
             </q-item-section>
             <q-item-section>
               <q-item-label>Kegiatan</q-item-label>

@@ -35,7 +35,7 @@ const pagination = ref(storage.get('pagination', {
 const statuses = [
   { value: "all", label: "Semua" },
   { value: "approved", label: "Disetujui" },
-  { value: "not_approved", label: "Belum Disetujui" },
+  { value: "rejected", label: "Ditolak" },
 ];
 
 const users = [
@@ -133,7 +133,7 @@ const onFilterChange = () => fetchItems();
 const onRowClicked = (row) => router.get(route("admin.activity.detail", { id: row.id }));
 
 const computedColumns = computed(() =>
-  $q.screen.gt.sm ? columns : columns.filter((col) => ["field", "action"].includes(col.name))
+  $q.screen.gt.sm ? columns : columns.filter((col) => ["date", "action"].includes(col.name))
 );
 
 watch(filter, () => storage.set('filter', filter), { deep: true })
@@ -229,37 +229,32 @@ watch(showFilter, () => storage.set('show-filter', showFilter.value), { deep: tr
                 <div class="text-caption"><q-icon name="distance" /> Lokasi: {{ props.row.field_location }}</div>
               </template>
 
-              <template v-if="$q.screen.lt.md">
-                <div>
-                  <q-icon name="edit_calendar" /> Tgl Tanam: {{ $dayjs(props.row.plant_date).format('DD MMMM YYYY') }}
-                  <template v-if="props.row.active">
-                    <br> ({{ plantAge(props.row.plant_date) }} hari)
-                  </template>
-                </div>
-                <template v-if="props.row.active">
-                  <div>
-                    <q-icon name="calendar_clock" /> Umur: {{ plantAge(props.row.plant_date) }} hari
-                  </div>
-                </template>
-                <template v-if="props.row.last_visit">
-                  <div>
-                    <q-icon name="calendar_clock" /> Last Visit:
-                    {{ $dayjs(props.row.last_visit).format('DD MMMM YYYY') }} /
-                    {{ $dayjs(props.row.last_visit).fromNow() }}
-                  </div>
-                </template>
-              </template>
-              <template v-if="$q.screen.lt.md">
-                <div class="flex items-center q-gutter-sm">
-                  <q-badge :color="plant_status_colors[props.row.plant_status]">
-                    Status: {{ $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[props.row.plant_status] }}
-                  </q-badge>
-                </div>
-                <div v-if="props.row.notes"><q-icon name="notes" /> {{ props.row.notes }}</div>
-              </template>
+
             </q-td>
             <q-td key="date" :props="props">
-              {{ $dayjs(props.row.date).format('YYYY-MM-DD') }}
+              <q-icon name="edit_calendar" /> {{ $dayjs(props.row.date).format('DD MMMM YYYY') }}
+
+              <template v-if="$q.screen.lt.md">
+                <div>
+                  <q-icon name="overview" />
+                  {{ props.row.type.name }}
+                </div>
+                <div>
+                  <q-icon name="person" />
+                  {{ props.row.user.name }} ({{ props.row.user.username }})
+                </div>
+                <div>
+                  <template v-if="props.row.status == 'approved'">
+                    <q-badge label="Disetujui" color="green" />
+                  </template>
+                  <template v-else-if="props.row.status == 'rejected'">
+                    <q-badge label="Ditolak" color="red" />
+                  </template>
+                  <template v-else>
+                    <q-badge label="Belum Direspon" color="grey" />
+                  </template>
+                </div>
+              </template>
             </q-td>
             <q-td key="type" :props="props">
               {{ props.row.type.name }}

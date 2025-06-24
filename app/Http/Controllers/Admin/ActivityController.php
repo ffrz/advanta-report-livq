@@ -22,7 +22,7 @@ class ActivityController extends Controller
     {
         return inertia('admin/activity/Index', [
             'users' => User::query()->where('role', User::Role_BS)->orderBy('name')->get(),
-            'types' => User::query()->where('active', true)->orderBy('name')->get(),
+            'types' => ActivityType::query()->where('active', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -286,7 +286,7 @@ class ActivityController extends Controller
         }
 
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {
-            $q->where('approved', '=', $filter['status'] == 'approved');
+            $q->where('status', '=', $filter['status']);
         }
 
         // if (!empty($filter['period']) && ($filter['period'] != 'all')) {
