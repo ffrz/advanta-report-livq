@@ -16,8 +16,7 @@ const tab = ref('main')
     <template #title>{{ title }}</template>
     <template #left-button>
       <div class="q-gutter-sm">
-        <q-btn icon="arrow_back" dense color="grey-7" flat rounded
-          @click="router.get(route('admin.customer.index', { id: page.props.data.demo_plot_id }))" />
+        <q-btn icon="arrow_back" dense color="grey-7" flat rounded @click="router.get(route('admin.customer.index'))" />
       </div>
     </template>
     <template #right-button>

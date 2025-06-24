@@ -13,6 +13,7 @@ class ProductCategoryController extends Controller
 {
     public function index()
     {
+        allowed_roles([User::Role_Admin]);
         return inertia('admin/product-category/Index');
     }
 

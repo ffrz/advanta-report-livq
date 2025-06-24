@@ -33,13 +33,23 @@ const pagination = ref(storage.get('pagination', {
   sortBy: "name",
   descending: false,
 }));
-let columns = [
-  { name: "category", label: "Kategori", field: "category", align: "left" },
-  { name: "name", label: "Brand", field: "name", align: "left", sortable: true },
-  { name: "price_1", label: "Harga Distributor (Rp)", field: "price_1", align: "right", sortable: true },
-  { name: "price_2", label: "Harga (Rp)", field: "price_2", align: "right", sortable: true },
-  { name: "action", align: "right" },
-];
+let columns;
+if (page.props.auth.user.role != 'bs') {
+  columns = [
+    { name: "category", label: "Kategori", field: "category", align: "left" },
+    { name: "name", label: "Brand", field: "name", align: "left", sortable: true },
+    { name: "price_1", label: "Harga Distributor (Rp)", field: "price_1", align: "right", sortable: true },
+    { name: "price_2", label: "Harga (Rp)", field: "price_2", align: "right", sortable: true },
+    { name: "action", align: "right" },
+  ];
+}
+else {
+  columns = [
+    { name: "category", label: "Kategori", field: "category", align: "left" },
+    { name: "name", label: "Brand", field: "name", align: "left", sortable: true },
+    { name: "action", align: "right" },
+  ];
+}
 
 onMounted(() => {
   fetchItems();
@@ -84,7 +94,8 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <template #right-button>
-      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.product.add'))" />
+      <q-btn icon="add" dense color="primary" @click="router.get(route('admin.product.add'))"
+        :disabled="!check_role($CONSTANTS.USER_ROLE_ADMIN)" />
       <q-btn class="q-ml-sm" :icon="!showFilter ? 'filter_alt' : 'filter_alt_off'" color="grey" dense
         @click="showFilter = !showFilter" />
       <q-btn icon="file_export" dense class="q-ml-sm" color="grey" style="" @click.stop>
@@ -146,13 +157,15 @@ watch(pagination, () => storage.set('pagination', pagination.value), { deep: tru
                 <div v-if="props.row.category_id" class="text-grey-8">
                   <q-icon name="category" /> {{ props.row.category.name }}
                 </div>
-                <div>
-                  <q-icon name="sell" /> Harga: Rp. {{ formatNumber(props.row.price_2) }} / {{ props.row.uom_2 }}
-                </div>
-                <div>
-                  <q-icon name="sell" /> Harga Distributor: Rp. {{ formatNumber(props.row.price_1) }} / {{
-                    props.row.uom_1 }}
-                </div>
+                <template v-if="$page.props.auth.user.role != 'bs'">
+                  <div>
+                    <q-icon name="sell" /> Harga: Rp. {{ formatNumber(props.row.price_2) }} / {{ props.row.uom_2 }}
+                  </div>
+                  <div>
+                    <q-icon name="sell" /> Harga Distributor: Rp. {{ formatNumber(props.row.price_1) }} / {{
+                      props.row.uom_1 }}
+                  </div>
+                </template>
               </template>
             </q-td>
             <q-td key="price_1" :props="props" class="wrap-column">

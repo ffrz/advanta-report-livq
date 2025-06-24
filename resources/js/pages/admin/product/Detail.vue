@@ -1,5 +1,5 @@
 <script setup>
-import { formatNumber } from "@/helpers/utils";
+import { formatNumber, check_role } from "@/helpers/utils";
 import { router, usePage } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
 
@@ -13,10 +13,14 @@ const $q = useQuasar();
   <i-head :title="title" />
   <authenticated-layout>
     <template #title>{{ title }}</template>
+    <template #left-button>
+      <div class="q-gutter-sm">
+        <q-btn icon="arrow_back" dense color="grey-7" flat rounded @click="router.get(route('admin.product.index'))" />
+      </div>
+    </template>
     <template #right-button>
       <div class="q-gutter-sm">
-        <q-btn icon="arrow_back" dense color="grey-7" @click="$goBack()" />
-        <q-btn icon="edit" dense color="primary"
+        <q-btn icon="edit" dense color="primary" :disabled="!check_role($CONSTANTS.USER_ROLE_ADMIN)"
           @click="router.get(route('admin.product.edit', { id: page.props.data.id }))" />
       </div>
     </template>
@@ -41,16 +45,18 @@ const $q = useQuasar();
                       {{ page.props.data.category ? page.props.data.category.name : '--Tidak memiliki kategori--' }}
                     </td>
                   </tr>
-                  <tr>
-                    <td>Harga</td>
-                    <td>:</td>
-                    <td>Rp. {{ formatNumber(page.props.data.price_2) }} / {{ page.props.data.uom_2 }}</td>
-                  </tr>
-                  <tr>
-                    <td>Harga Distributor</td>
-                    <td>:</td>
-                    <td>Rp. {{ formatNumber(page.props.data.price_1) }} / {{ page.props.data.uom_1 }}</td>
-                  </tr>
+                  <template v-if="$page.props.auth.user.role != 'bs'">
+                    <tr>
+                      <td>Harga</td>
+                      <td>:</td>
+                      <td>Rp. {{ formatNumber(page.props.data.price_2) }} / {{ page.props.data.uom_2 }}</td>
+                    </tr>
+                    <tr>
+                      <td>Harga Distributor</td>
+                      <td>:</td>
+                      <td>Rp. {{ formatNumber(page.props.data.price_1) }} / {{ page.props.data.uom_1 }}</td>
+                    </tr>
+                  </template>
                   <tr>
                     <td>Catatan</td>
                     <td>:</td>
