@@ -31,6 +31,15 @@ export function create_year_options(startYear, endYear) {
   return years;
 }
 
+export function create_quarter_options() {
+  return [
+    { value: "Q1", label: "Q1" },
+    { value: "Q2", label: "Q2" },
+    { value: "Q3", label: "Q3" },
+    { value: "Q4", label: "Q4" },
+  ]
+}
+
 export function create_month_options() {
   return [
     { value: 1, label: "Januari" },

@@ -16,14 +16,15 @@ return new class extends Migration
         Schema::create('activity_targets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('type_id')->on('activity_types')->restrictOnDelete();
-            $table->foreignId('bs_id')->on('users')->restrictOnDelete();
+            $table->foreignId('user_id')->on('users')->restrictOnDelete();
             $table->enum('period_type', ['month', 'quarter']);
             $table->unsignedSmallInteger('year');
             $table->unsignedTinyInteger('month')->nullable();
             $table->unsignedTinyInteger('quarter')->nullable();
             $table->unsignedTinyInteger('qty')->default(0);
-            $table->date('period_start_date');
-            $table->date('period_end_date');
+            $table->date('period_start_date')->nullable();
+            $table->date('period_end_date')->nullable();
+            $table->date('notes');
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
