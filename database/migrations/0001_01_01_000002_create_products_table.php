@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id')->nullable();
+            $table->foreignId('category_id')->on('product_categories')->onullOnDelete();
             $table->string('name', 100);
             $table->decimal('price_1', 10, 2)->default(0);
             $table->string('uom_1')->default('');
@@ -24,12 +24,9 @@ return new class extends Migration
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
-            $table->unsignedBigInteger('created_by_uid')->nullable();
-            $table->unsignedBigInteger('updated_by_uid')->nullable();
-            $table->foreign('created_by_uid')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by_uid')->references('id')->on('users')->onDelete('set null');
 
-            $table->foreign('category_id')->references('id')->on('product_categories')->onDelete('set null');
+            $table->foreignId('created_by_uid')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by_uid')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 

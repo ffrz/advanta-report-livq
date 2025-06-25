@@ -13,14 +13,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_types', function (Blueprint $table) {
+        Schema::create('activity_targets', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 40);
-            $table->string('description', 500);
-            $table->boolean('active')->default(true);
-            $table->enum('target_period', array_keys(ActivityType::TargetPeriods));
-            $table->unsignedInteger('default_target')->default(0);
-            $table->unsignedInteger('weight')->default(0);
+            $table->foreignId('type_id')->on('activity_types')->restrictOnDelete();
+            $table->foreignId('bs_id')->on('users')->restrictOnDelete();
+            $table->enum('period_type', ['month', 'quarter']);
+            $table->unsignedSmallInteger('year');
+            $table->unsignedTinyInteger('month')->nullable();
+            $table->unsignedTinyInteger('quarter')->nullable();
+            $table->unsignedTinyInteger('qty')->default(0);
+            $table->date('period_start_date');
+            $table->date('period_end_date');
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
@@ -35,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activity_types');
+        Schema::dropIfExists('activity_targets');
     }
 };

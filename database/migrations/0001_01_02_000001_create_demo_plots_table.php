@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('demo_plots', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('restrict');
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->date('plant_date');
             $table->string('owner_name', 100);
             $table->string('owner_phone', 40)->nullable();

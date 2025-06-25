@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('demo_plot_visits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('restrict');
-            $table->foreignId('demo_plot_id')->constrained()->onDelete('restrict');
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
+            $table->foreignId('demo_plot_id')->constrained()->restrictOnDelete();
             $table->date('visit_date');
             $table->enum('plant_status', array_keys(DemoPlot::PlantStatuses))->default(DemoPlot::PlantStatus_Satisfactoy);
             $table->string('latlong', 100)->nullable();

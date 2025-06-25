@@ -143,15 +143,7 @@ onMounted(() => {
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/targets')"
-            @click="router.get(route('admin.target.index'))">
-            <q-item-section avatar>
-              <q-icon name="target" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Target</q-item-label>
-            </q-item-section>
-          </q-item> -->
+          -->
           <!-- <q-item clickable v-ripple :active="$page.url.startsWith('/admin/closings')"
             @click="router.get(route('admin.closing.index'))">
             <q-item-section avatar>
@@ -192,6 +184,15 @@ onMounted(() => {
             </q-item-section>
             <q-item-section>
               <q-item-label>Demplot</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple :active="$page.url.startsWith('/admin/activity-targets')"
+            @click="router.get(route('admin.activity-target.index'))">
+            <q-item-section avatar>
+              <q-icon name="target" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Target Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
           <q-item clickable v-ripple :active="$page.url.startsWith('/admin/customers')" v-if="check_role([
