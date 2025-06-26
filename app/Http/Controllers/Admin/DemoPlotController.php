@@ -57,6 +57,8 @@ class DemoPlotController extends Controller
         $item = DemoPlot::findOrFail($id);
         $item->id = 0;
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
+        $item->image_path = null;
+
         return inertia('admin/demo-plot/Editor', [
             'data' => $item,
             'users' => User::where('active', true)

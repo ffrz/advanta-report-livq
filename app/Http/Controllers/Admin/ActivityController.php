@@ -68,6 +68,8 @@ class ActivityController extends Controller
         $item = Activity::findOrFail($id);
         $item->id = 0;
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
+        $item->image_path = null;
+
         return inertia('admin/activity/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
