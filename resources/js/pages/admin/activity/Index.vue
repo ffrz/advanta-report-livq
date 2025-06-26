@@ -60,7 +60,14 @@ const types = [
 ];
 
 const columns = [
-  { name: "date", label: "Tanggal", field: "date", align: "left" },
+  { name: "photo", label: "Foto", field: "photo", align: "left" },
+  {
+    name: "date",
+    label: "Tanggal",
+    field: "date",
+    align: "left",
+    sortable: true,
+  },
   { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
   { name: "status", label: "Status", field: "status", align: "left" },
@@ -321,50 +328,33 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             class="cursor-pointer"
             @click="onRowClicked(props.row)"
           >
-            <q-td key="field" :props="props">
-              <template v-if="!$q.screen.lt.md">
-                <div class="row items-start q-gutter-sm">
-                  <q-img
-                    :src="`/${props.row.image_path}`"
-                    style="width: 64px; height: 64px; border: 1px solid #ddd"
-                    spinner-color="grey"
-                    fit="cover"
-                    class="rounded-borders"
-                  />
-                  <div class="column">
-                    <div class="text-subtitle2">
-                      {{ props.row.owner_name }} -
-                      {{ props.row.user.owner_phone }}
-                    </div>
-                    <div class="text-caption">
-                      {{ props.row.field_location }}
-                    </div>
-                  </div>
-                </div>
-              </template>
-              <template v-else>
-                <q-img
-                  :src="`/${props.row.image_path}`"
-                  style="border: 1px solid #ddd; max-height: 150px"
-                  spinner-color="grey"
-                  fit="scale-down"
-                  class="rounded-borders bg-light-green-2"
-                />
-                <div class="text-subtitle2">
-                  <q-icon name="person" /> {{ props.row.owner_name }} -
-                  {{ props.row.user.owner_phone }}
-                </div>
-                <div class="text-caption">
-                  <q-icon name="distance" /> Lokasi:
-                  {{ props.row.field_location }}
-                </div>
-              </template>
+            <q-td key="photo" :props="props">
+              <q-img
+                :src="`/${props.row.image_path}`"
+                style="width: 64px; height: 64px; border: 1px solid #ddd"
+                spinner-color="grey"
+                fit="cover"
+                class="rounded-borders"
+              />
             </q-td>
             <q-td key="date" :props="props">
-              <q-icon name="edit_calendar" />
-              {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
-
-              <template v-if="$q.screen.lt.md">
+              <template v-if="!$q.screen.lt.md">
+                {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
+              </template>
+              <template v-else>
+                <div class="q-pb-xs">
+                  <q-img
+                    :src="`/${props.row.image_path}`"
+                    style="border: 1px solid #ddd; max-height: 150px"
+                    spinner-color="grey"
+                    fit="scale-down"
+                    class="rounded-borders bg-light-green-2"
+                  />
+                </div>
+                <div>
+                  <q-icon name="edit_calendar" />
+                  {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
+                </div>
                 <div>
                   <q-icon name="overview" />
                   {{ props.row.type.name }}
