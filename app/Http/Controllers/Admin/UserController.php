@@ -101,13 +101,13 @@ class UserController extends Controller
             'name' => 'required|max:255',
             'password' => 'required|min:5|max:40',
             'role' => 'required',
-            'parent_id' => 'required|exists:users,id',
+            'parent_id' => 'nullable|exists:users,id',
             'work_area' => 'nullable|string|max:100',
         ];
 
         $user = null;
         $message = '';
-        $fields = ['name', 'username', 'role', 'active'];
+        $fields = ['name', 'username', 'role', 'active', 'work_area', 'parent_id'];
         $password = $request->get('password');
         if (!$request->id) {
             // username harus unik
