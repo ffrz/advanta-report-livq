@@ -18,9 +18,12 @@ return new class extends Migration
             $table->string('name', 40);
             $table->string('description', 500);
             $table->boolean('active')->default(true);
-            $table->enum('target_period', array_keys(ActivityType::TargetPeriods));
-            $table->unsignedInteger('default_target')->default(0);
-            $table->unsignedInteger('weight')->default(0);
+
+            $table->unsignedTinyInteger('default_quarter_target')->default(0);
+            $table->unsignedTinyInteger('default_month1_target')->default(0);
+            $table->unsignedTinyInteger('default_month2_target')->default(0);
+            $table->unsignedTinyInteger('default_month3_target')->default(0);
+            $table->unsignedTinyInteger('weight')->default(0);
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();

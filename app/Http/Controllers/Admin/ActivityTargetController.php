@@ -83,7 +83,10 @@ class ActivityTargetController extends Controller
     {
         $user = Auth::user();
         $item = $id ? ActivityTarget::findOrFail($id) : new ActivityTarget([
-            'year' => date('Y'),
+            'year' => intval(date('Y')),
+            'month' => intval(date('m')),
+            'period_type' => 'month',
+            'qty' => 1,
         ]);
 
         return inertia('admin/activity-target/Editor', [

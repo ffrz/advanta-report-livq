@@ -39,12 +39,13 @@ const quarters = create_quarter_options();
 
 const form = useForm({
   id: page.props.data.id,
-  user_id: page.props.data.user_id ? Number(page.props.data.user_id) : null,
+  user_id: page.props.data.user_id ? Number(page.props.data.user_id) : [],
   type_id: page.props.data.type_id ? Number(page.props.data.type_id) : null,
   year: page.props.data.year,
   month: page.props.data.month,
   quarter: page.props.data.quarter,
   period_type: page.props.data.period_type,
+  qty: page.props.data.qty,
   notes: page.props.data.notes,
 });
 
@@ -87,6 +88,7 @@ const submit = () =>
                 v-model="form.user_id"
                 label="BS"
                 :options="users"
+                multiple
                 map-options
                 emit-value
                 :error="!!form.errors.user_id"

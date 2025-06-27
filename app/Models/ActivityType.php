@@ -12,18 +12,10 @@ class ActivityType extends Model
         'name',
         'description',
         'active',
-        'target_period',
-        'default_target',
+        'default_quarter_target',
+        'default_month1_target',
+        'default_month2_target',
+        'default_month3_target',
         'weight'
-    ];
-
-    const TargetPeriod_Yearly = 'tahunan';
-    const TargetPeriod_Quarterly = 'quarterly';
-    const TargetPeriod_Monthly = 'monthly';
-
-    const TargetPeriods = [
-        self::TargetPeriod_Monthly => 'Bulanan',
-        self::TargetPeriod_Quarterly => 'Kwartal',
-        self::TargetPeriod_Yearly => 'Tahunan',
     ];
 }

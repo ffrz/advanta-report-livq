@@ -12,6 +12,7 @@ class ActivityTypeController extends Controller
 {
     public function index()
     {
+        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
         return inertia('admin/activity-type/Index');
     }
 
@@ -43,7 +44,7 @@ class ActivityTypeController extends Controller
 
     public function duplicate($id)
     {
-        allowed_roles([User::Role_Admin]);
+        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
         $item = ActivityType::findOrFail($id);
         $item->id = null;
         return inertia('admin/activity-type/Editor', [
@@ -53,9 +54,12 @@ class ActivityTypeController extends Controller
 
     public function editor($id = 0)
     {
-        allowed_roles([User::Role_Admin]);
+        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
         $item = $id ? ActivityType::findOrFail($id) : new ActivityType([
-            'default_target' => 0,
+            'default_quearter_target' => 0,
+            'default_month1_target' => 0,
+            'default_month2_target' => 0,
+            'default_month3_target' => 0,
             'weight' => 0,
             'active' => true,
         ]);
@@ -74,8 +78,10 @@ class ActivityTypeController extends Controller
                 'max:255',
                 Rule::unique('activity_types', 'name')->ignore($item->id),
             ],
-            'target_period' => 'required|in:' . implode(',', array_keys(ActivityType::TargetPeriods)),
-            'default_target' => 'required|numeric',
+            'default_quarter_target' => 'required|numeric',
+            'default_month1_target' => 'required|numeric',
+            'default_month2_target' => 'required|numeric',
+            'default_month3_target' => 'required|numeric',
             'weight' => 'required|numeric',
             'active' => 'nullable|boolean',
             'description' => 'nullable|max:1000',
