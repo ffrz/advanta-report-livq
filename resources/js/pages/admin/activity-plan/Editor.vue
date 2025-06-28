@@ -108,7 +108,7 @@ function removeLocation() {
 
 const showProductField = computed(() => {
   const selectedType = types.find((t) => t.value === form.type_id);
-  return !!selectedType?.require_product;
+  return Number(selectedType?.require_product) === 1;
 });
 </script>
 

@@ -286,6 +286,7 @@ onMounted(() => {
             </q-item-section>
           </q-item>
           <q-item
+            v-if="false"
             clickable
             v-ripple
             :active="$page.url.startsWith('/admin/activity-targets')"
