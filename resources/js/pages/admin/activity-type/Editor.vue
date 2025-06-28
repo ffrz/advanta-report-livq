@@ -66,7 +66,7 @@ const updateBreakdown = () => {
               <q-input
                 autofocus
                 v-model.trim="form.name"
-                label="Nama Kegiatan"
+                label="Nama Kegiatan *"
                 lazy-rules
                 :error="!!form.errors.name"
                 :disable="form.processing"
@@ -75,42 +75,60 @@ const updateBreakdown = () => {
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]"
               />
+              <q-input
+                autofocus
+                v-model.trim="form.description"
+                label=" Deskripsi"
+                lazy-rules
+                :error="!!form.errors.description"
+                :disable="form.processing"
+                :error-message="form.errors.description"
+                :rules="[]"
+              />
               <LocaleNumberInput
                 v-model:modelValue="form.default_quarter_target"
-                label="Default Target Kuartal"
+                label="Default Target Kuartal *"
                 lazyRules
                 :disable="form.processing"
                 :error="!!form.errors.default_quarter_target"
                 :errorMessage="form.errors.default_quarter_target"
                 @change="updateBreakdown()"
               />
-              <LocaleNumberInput
-                v-model:modelValue="form.default_month1_target"
-                label="Default Target Bulan 1 (Break down)"
-                lazyRules
-                :disable="form.processing"
-                :error="!!form.errors.default_month1_target"
-                :errorMessage="form.errors.default_month1_target"
-              />
-              <LocaleNumberInput
-                v-model:modelValue="form.default_month2_target"
-                label="Default Target Bulan 2 (Break down)"
-                lazyRules
-                :disable="form.processing"
-                :error="!!form.errors.default_month2_target"
-                :errorMessage="form.errors.default_month2_target"
-              />
-              <LocaleNumberInput
-                v-model:modelValue="form.default_month3_target"
-                label="Default Target Bulan 3 (Break down)"
-                lazyRules
-                :disable="form.processing"
-                :error="!!form.errors.default_month3_target"
-                :errorMessage="form.errors.default_month3_target"
-              />
+              <div class="text-subtitile2 text-bold text-grey-6">
+                Default Target (Monthly Breakdown)
+              </div>
+              <div class="row q-gutter-md">
+                <LocaleNumberInput
+                  class="col"
+                  v-model:modelValue="form.default_month1_target"
+                  label="Bulan 1"
+                  lazyRules
+                  :disable="form.processing"
+                  :error="!!form.errors.default_month1_target"
+                  :errorMessage="form.errors.default_month1_target"
+                />
+                <LocaleNumberInput
+                  class="col"
+                  v-model:modelValue="form.default_month2_target"
+                  label="Bulan 2"
+                  lazyRules
+                  :disable="form.processing"
+                  :error="!!form.errors.default_month2_target"
+                  :errorMessage="form.errors.default_month2_target"
+                />
+                <LocaleNumberInput
+                  class="col"
+                  v-model:modelValue="form.default_month3_target"
+                  label="Bulan 3"
+                  lazyRules
+                  :disable="form.processing"
+                  :error="!!form.errors.default_month3_target"
+                  :errorMessage="form.errors.default_month3_target"
+                />
+              </div>
               <LocaleNumberInput
                 v-model:modelValue="form.weight"
-                label="Bobot"
+                label="Bobot *"
                 lazyRules
                 :disable="form.processing"
                 :error="!!form.errors.weight"

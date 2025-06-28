@@ -3,16 +3,14 @@ import { handleSubmit } from "@/helpers/client-req-handler";
 import { useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 
-
 let form = useForm({
   username: window.CONFIG.APP_DEMO ? "admin" : "",
   password: window.CONFIG.APP_DEMO ? "12345" : "",
   remember: true,
 });
 
-const submit = () => handleSubmit({ form, url: route('admin.auth.login') });
+const submit = () => handleSubmit({ form, url: route("admin.auth.login") });
 const showPassword = ref(false);
-
 </script>
 
 <template>
@@ -26,36 +24,70 @@ const showPassword = ref(false);
               <q-card-section class="text-center">
                 <div class="flex justify-center">
                   <q-avatar size="80px">
-                    <img src="/assets/img/app-logo.png">
+                    <img src="/assets/img/app-logo.png" />
                   </q-avatar>
                 </div>
                 <h5 class="q-my-sm">Login</h5>
               </q-card-section>
               <q-card-section>
-                <q-input v-model.trim="form.username" label="Username" lazy-rules :error="!!form.errors.username"
-                  autocomplete="username" :error-message="form.errors.username" :disable="form.processing"
-                  :rules="[(val) => (val && val.length > 0) || 'Masukkan Username',]">
+                <q-input
+                  v-model.trim="form.username"
+                  label="Username"
+                  lazy-rules
+                  :error="!!form.errors.username"
+                  autocomplete="username"
+                  :error-message="form.errors.username"
+                  :disable="form.processing"
+                  :rules="[
+                    (val) => (val && val.length > 0) || 'Masukkan Username',
+                  ]"
+                >
                   <template v-slot:append>
                     <q-icon name="person" />
                   </template>
                 </q-input>
-                <q-input v-model="form.password" :type="showPassword ? 'text' : 'password'" label="Kata Sandi"
-                  :error="!!form.errors.password" autocomplete="current-password" :error-message="form.errors.password"
-                  lazy-rules :disable="form.processing"
-                  :rules="[(val) => (val && val.length > 0) || 'Masukkan kata sandi',]">
+                <q-input
+                  v-model="form.password"
+                  :type="showPassword ? 'text' : 'password'"
+                  label="Kata Sandi"
+                  :error="!!form.errors.password"
+                  autocomplete="current-password"
+                  :error-message="form.errors.password"
+                  lazy-rules
+                  :disable="form.processing"
+                  :rules="[
+                    (val) => (val && val.length > 0) || 'Masukkan kata sandi',
+                  ]"
+                >
                   <template v-slot:append>
-                    <q-btn dense flat round @click="showPassword = !showPassword"><q-icon
-                        :name="showPassword ? 'key_off' : 'key'" /></q-btn>
+                    <q-btn
+                      dense
+                      flat
+                      round
+                      @click="showPassword = !showPassword"
+                    >
+                      <q-icon :name="showPassword ? 'key_off' : 'key'" />
+                    </q-btn>
                   </template>
                 </q-input>
-                <q-checkbox class="q-mt-sm q-pl-none" style="margin-left: -10px;" v-model="form.remember"
-                  :disable="form.processing" label="Ingat saya di perangkat ini" />
+                <q-checkbox
+                  class="q-mt-sm q-pl-none"
+                  style="margin-left: -10px"
+                  v-model="form.remember"
+                  :disable="form.processing"
+                  label="Ingat saya di perangkat ini"
+                />
               </q-card-section>
               <q-card-actions>
-                <q-btn icon="login" type="submit" color="primary" class="full-width" label="Login"
-                  :disable="form.processing" />
+                <q-btn
+                  icon="login"
+                  type="submit"
+                  color="primary"
+                  class="full-width"
+                  label="Login"
+                  :disable="form.processing"
+                />
               </q-card-actions>
-
             </q-card>
           </q-form>
         </div>
