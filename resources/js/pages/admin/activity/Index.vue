@@ -39,6 +39,7 @@ const pagination = ref(
 
 const statuses = [
   { value: "all", label: "Semua" },
+  { value: "not_responded", label: "Belum Direspon" },
   { value: "approved", label: "Disetujui" },
   { value: "rejected", label: "Ditolak" },
 ];
