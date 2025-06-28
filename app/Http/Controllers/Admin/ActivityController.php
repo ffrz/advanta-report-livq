@@ -27,7 +27,11 @@ class ActivityController extends Controller
         } else if (Auth::user()->role == User::Role_Agronomist) {
             $users = User::query()
                 ->where('role', User::Role_BS)
-                ->where('parent_id', Auth::user()->id)
+                ->where('parent_id', Auth::user()->role == User::Role_Agronomist ? Auth::user()->id : null)
+                ->orderBy('name')->get();
+        } else {
+            $users = User::query()
+                ->where('role', User::Role_BS)
                 ->orderBy('name')->get();
         }
 

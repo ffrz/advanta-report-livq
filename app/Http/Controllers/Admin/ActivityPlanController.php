@@ -29,6 +29,10 @@ class ActivityPlanController extends Controller
                 ->where('role', User::Role_BS)
                 ->where('parent_id', Auth::user()->id)
                 ->orderBy('name')->get();
+        } else {
+            $users = User::query()
+                ->where('role', User::Role_BS)
+                ->orderBy('name')->get();
         }
 
         return inertia('admin/activity-plan/Index', [
