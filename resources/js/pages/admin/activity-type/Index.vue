@@ -180,7 +180,7 @@ const computedColumns = computed(() =>
                   }}
                 </div>
                 <div>
-                  <q-icon name="weight" /> Bobot: {{ props.row.weight }}
+                  <q-icon name="weight" /> Bobot: {{ props.row.weight }} %
                 </div>
               </template>
             </q-td>
@@ -201,7 +201,7 @@ const computedColumns = computed(() =>
               {{ props.row.weight }}
             </q-td>
             <q-td key="options" :props="props" class="wrap-column">
-              {{ props.row.require_product ? "Field produk" : "-" }}
+              {{ Boolean(props.row.require_product) ? "Field produk" : "-" }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">
