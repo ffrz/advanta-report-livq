@@ -330,6 +330,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
           >
             <q-td key="photo" :props="props">
               <q-img
+                v-if="props.row.image_path"
                 :src="`/${props.row.image_path}`"
                 style="width: 64px; height: 64px; border: 1px solid #ddd"
                 spinner-color="grey"
@@ -342,7 +343,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
               </template>
               <template v-else>
-                <div class="q-pb-xs">
+                <div class="q-pb-xs" v-if="props.row.image_path">
                   <q-img
                     :src="`/${props.row.image_path}`"
                     style="border: 1px solid #ddd; max-height: 150px"

@@ -11,11 +11,6 @@ const showViewer = ref(false);
   <table class="detail">
     <tbody>
       <tr>
-        <td style="width: 125px">ID Kegiatan</td>
-        <td>:</td>
-        <td>{{ page.props.data.formatted_id }}</td>
-      </tr>
-      <tr>
         <td>Tanggal</td>
         <td>:</td>
         <td>
@@ -139,7 +134,7 @@ const showViewer = ref(false);
         </td>
       </tr>
       <tr>
-        <td style="width: 125px">Kegiatan ID</td>
+        <td style="width: 125px">ID Rencana Kegiatan</td>
         <td style="width: 1px">:</td>
         <td>#{{ page.props.data.id }}</td>
       </tr>

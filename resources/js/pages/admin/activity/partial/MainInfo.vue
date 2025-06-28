@@ -2,6 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import ImageViewer from "@/components/ImageViewer.vue";
+import { formatNumber } from "@/helpers/utils";
 const page = usePage();
 const showViewer = ref(false);
 </script>
@@ -133,7 +134,7 @@ const showViewer = ref(false);
         </td>
       </tr>
       <tr>
-        <td style="width: 125px">Kegiatan ID</td>
+        <td style="width: 125px">ID Kegiatan</td>
         <td style="width: 1px">:</td>
         <td>#{{ page.props.data.id }}</td>
       </tr>
