@@ -24,6 +24,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('default_month2_target')->default(0);
             $table->unsignedTinyInteger('default_month3_target')->default(0);
             $table->unsignedTinyInteger('weight')->default(0);
+            $table->boolean('require_product')->default(false);
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();

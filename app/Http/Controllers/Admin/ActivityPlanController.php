@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activity;
+use App\Models\ActivityPlan;
 use App\Models\ActivityType;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -30,7 +30,7 @@ class ActivityPlanController extends Controller
                 ->orderBy('name')->get();
         }
 
-        return inertia('admin/activity/Index', [
+        return inertia('admin/activity-plan/Index', [
             'users' => $users,
             'types' => ActivityType::query()->where('active', true)->orderBy('name')->get(),
         ]);
@@ -38,8 +38,8 @@ class ActivityPlanController extends Controller
 
     public function detail($id = 0)
     {
-        return inertia('admin/activity/Detail', [
-            'data' => Activity::with([
+        return inertia('admin/activity-plan/Detail', [
+            'data' => ActivityPlan::with([
                 'user',
                 'type:id,name',
                 'responded_by:id,username,name',
@@ -65,12 +65,12 @@ class ActivityPlanController extends Controller
     public function duplicate(Request $request, $id)
     {
         $user = Auth::user();
-        $item = Activity::findOrFail($id);
+        $item = ActivityPlan::findOrFail($id);
         $item->id = 0;
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
         $item->image_path = null;
 
-        return inertia('admin/activity/Editor', [
+        return inertia('admin/activity-plan/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
                 ->orderBy('name', 'asc')
@@ -84,11 +84,11 @@ class ActivityPlanController extends Controller
     public function editor(Request $request, $id = 0)
     {
         $user = Auth::user();
-        $item = $id ? Activity::findOrFail($id) : new Activity([
+        $item = $id ? ActivityPlan::findOrFail($id) : new ActivityPlan([
             'user_id' => $user->role == User::Role_BS ? $user->id : null,
         ]);
 
-        return inertia('admin/activity/Editor', [
+        return inertia('admin/activity-plan/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
                 ->orderBy('name', 'asc')
@@ -112,8 +112,8 @@ class ActivityPlanController extends Controller
         ]);
 
         $item = !$request->id
-            ? new Activity()
-            : Activity::findOrFail($request->post('id', 0));
+            ? new ActivityPlan()
+            : ActivityPlan::findOrFail($request->post('id', 0));
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
@@ -160,14 +160,14 @@ class ActivityPlanController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.activity.detail', ['id' => $item->id]))
+        return redirect(route('admin.activity-plan.detail', ['id' => $item->id]))
             ->with('success', "Kegiatan #$item->id telah disimpan.");
     }
 
     public function respond(Request $request, $id)
     {
         $current_user = Auth::user();
-        $item = Activity::findOrFail($id);
+        $item = ActivityPlan::findOrFail($id);
         $supervisor_account = $item->user->parent;
 
         if (!($current_user->role == User::Role_Admin || $current_user->role == User::Role_Agronomist)) {
@@ -197,7 +197,7 @@ class ActivityPlanController extends Controller
     {
         allowed_roles([User::Role_Admin]);
 
-        $item = Activity::findOrFail($id);
+        $item = ActivityPlan::findOrFail($id);
         $item->delete();
 
         return response()->json([
@@ -216,7 +216,7 @@ class ActivityPlanController extends Controller
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            $pdf = Pdf::loadView('export.activity-list-pdf', compact('items', 'title'))
+            $pdf = Pdf::loadView('export.activity-plan-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
         }
@@ -245,12 +245,12 @@ class ActivityPlanController extends Controller
             // foreach ($items as $item) {
             //     $sheet->setCellValue('A' . $row, $item->id);
             //     $sheet->setCellValue('B' . $row, $item->date);
-            //     $sheet->setCellValue('C' . $row, Activity::Types[$item->type]);
-            //     $sheet->setCellValue('D' . $row, Activity::Statuses[$item->status]);
+            //     $sheet->setCellValue('C' . $row, ActivityPlan::Types[$item->type]);
+            //     $sheet->setCellValue('D' . $row, ActivityPlan::Statuses[$item->status]);
             //     $sheet->setCellValue('E' . $row, $item->user->name .  ' (' . $item->user->username . ')');
             //     $sheet->setCellValue('F' . $row, $item->customer->name . ' - ' . $item->customer->company . ' - ' . $item->customer->address);
             //     $sheet->setCellValue('I' . $row, $item->service->name);
-            //     $sheet->setCellValue('G' . $row, Activity::EngagementLevels[$item->engagement_level]);
+            //     $sheet->setCellValue('G' . $row, ActivityPlan::EngagementLevels[$item->engagement_level]);
             //     $sheet->setCellValue('H' . $row, $item->subject);
             //     $sheet->setCellValue('J' . $row, $item->summary);
             //     $sheet->setCellValue('K' . $row, $item->notes);
@@ -277,7 +277,7 @@ class ActivityPlanController extends Controller
     {
         $filter = $request->get('filter', []);
 
-        $q = Activity::with([
+        $q = ActivityPlan::with([
             'user:id,username,name',
             'responded_by:id,username,name',
             'type:id,name',

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityController;
+use App\Http\Controllers\Admin\ActivityPlanController;
 use App\Http\Controllers\Admin\ActivityTargetController;
 use App\Http\Controllers\Admin\ActivityTypeController;
 use App\Http\Controllers\Admin\AuthController;
@@ -115,6 +116,19 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('save', [ActivityController::class, 'save'])->name('admin.activity.save');
             Route::post('delete/{id}', [ActivityController::class, 'delete'])->name('admin.activity.delete');
             Route::get('export', [ActivityController::class, 'export'])->name('admin.activity.export');
+        });
+
+        Route::prefix('activity-plans')->group(function () {
+            Route::get('', [ActivityPlanController::class, 'index'])->name('admin.activity-plan.index');
+            Route::get('data', [ActivityPlanController::class, 'data'])->name('admin.activity-plan.data');
+            Route::get('duplicate/{id}', [ActivityPlanController::class, 'duplicate'])->name('admin.activity-plan.duplicate');
+            Route::get('add', [ActivityPlanController::class, 'editor'])->name('admin.activity-plan.add');
+            Route::get('edit/{id}', [ActivityPlanController::class, 'editor'])->name('admin.activity-plan.edit');
+            Route::get('detail/{id}', [ActivityPlanController::class, 'detail'])->name('admin.activity-plan.detail');
+            Route::post('respond/{id}', [ActivityPlanController::class, 'respond'])->name('admin.activity-plan.respond');
+            Route::post('save', [ActivityPlanController::class, 'save'])->name('admin.activity-plan.save');
+            Route::post('delete/{id}', [ActivityPlanController::class, 'delete'])->name('admin.activity-plan.delete');
+            Route::get('export', [ActivityPlanController::class, 'export'])->name('admin.activity-plan.export');
         });
 
         Route::prefix('activity-targets')->group(function () {

@@ -246,10 +246,30 @@ onMounted(() => {
             @click="router.get(route('admin.activity.index'))"
           >
             <q-item-section avatar>
-              <q-icon name="overview" />
+              <q-icon name="event" />
             </q-item-section>
             <q-item-section>
               <q-item-label>Kegiatan</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item
+            v-if="
+              [
+                $CONSTANTS.USER_ROLE_BS,
+                $CONSTANTS.USER_ROLE_ADMIN,
+                $CONSTANTS.USER_ROLE_AGRONOMIST,
+              ].includes($page.props.auth.user.role)
+            "
+            clickable
+            v-ripple
+            :active="$page.url.startsWith('/admin/activity-plans')"
+            @click="router.get(route('admin.activity-plan.index'))"
+          >
+            <q-item-section avatar>
+              <q-icon name="event_upcoming" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Plan Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
           <q-item

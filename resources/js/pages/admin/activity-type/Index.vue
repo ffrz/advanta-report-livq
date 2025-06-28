@@ -50,6 +50,7 @@ const columns = [
     align: "right",
   },
   { name: "weight", label: "Bobot", field: "weight", align: "right" },
+  { name: "options", label: "Opsi", field: "options", align: "left" },
   { name: "action", align: "right" },
 ];
 
@@ -198,6 +199,9 @@ const computedColumns = computed(() =>
             </q-td>
             <q-td key="weight" :props="props" class="wrap-column">
               {{ props.row.weight }}
+            </q-td>
+            <q-td key="options" :props="props" class="wrap-column">
+              {{ props.row.require_product ? "Field produk" : "-" }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">

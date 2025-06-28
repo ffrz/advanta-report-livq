@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Activity extends Model
+class ActivityPlan extends Model
 {
     use HasFactory;
 

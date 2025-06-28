@@ -60,6 +60,7 @@ class ActivityTypeController extends Controller
             'default_month1_target' => 0,
             'default_month2_target' => 0,
             'default_month3_target' => 0,
+            'require_product' => false,
             'weight' => 0,
             'active' => true,
         ]);
@@ -78,13 +79,14 @@ class ActivityTypeController extends Controller
                 'max:255',
                 Rule::unique('activity_types', 'name')->ignore($item->id),
             ],
+            'description' => 'nullable|max:1000',
             'default_quarter_target' => 'required|numeric',
             'default_month1_target' => 'required|numeric',
             'default_month2_target' => 'required|numeric',
             'default_month3_target' => 'required|numeric',
             'weight' => 'required|numeric',
             'active' => 'nullable|boolean',
-            'description' => 'nullable|max:1000',
+            'require_product' => 'nullable|boolean',
         ]);
 
         $item->fill($validated);

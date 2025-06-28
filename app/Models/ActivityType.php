@@ -16,6 +16,7 @@ class ActivityType extends Model
         'default_month1_target',
         'default_month2_target',
         'default_month3_target',
-        'weight'
+        'weight',
+        'require_product'
     ];
 }

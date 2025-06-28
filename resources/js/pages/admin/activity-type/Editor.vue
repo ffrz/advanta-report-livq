@@ -17,6 +17,7 @@ const form = useForm({
   weight: Number(page.props.data.weight),
   description: page.props.data.description,
   active: !!page.props.data.active,
+  require_product: !!page.props.data.require_product,
 });
 
 const submit = () =>
@@ -134,6 +135,14 @@ const updateBreakdown = () => {
                 :error="!!form.errors.weight"
                 :errorMessage="form.errors.weight"
               />
+              <div style="margin-left: -10px">
+                <q-checkbox
+                  class="full-width q-pl-none"
+                  v-model="form.require_product"
+                  :disable="form.processing"
+                  label="Tampilkan field produk"
+                />
+              </div>
               <div style="margin-left: -10px">
                 <q-checkbox
                   class="full-width q-pl-none"
