@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('plan_id')->constrained('activity_plans')->restrictOnDelete();
+            $table->foreignId('plan_id')->nullable()->constrained('activity_plans')->restrictOnDelete();
             $table->foreignId('user_id')->constrained()->restrictOnDelete();
             $table->foreignId('type_id')->constrained('activity_types')->restrictOnDelete();
             $table->foreignId('product_id')->nullable()->constrained('products')->restrictOnDelete();
