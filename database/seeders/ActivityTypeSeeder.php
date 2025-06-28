@@ -21,6 +21,7 @@ class ActivityTypeSeeder extends Seeder
                 'default_month2_target' => 1,
                 'default_month3_target' => 1,
                 'weight' => 0,
+                'require_product' => false,
                 'active' => true,
             ],
             [
@@ -31,6 +32,7 @@ class ActivityTypeSeeder extends Seeder
                 'default_month2_target' => 3,
                 'default_month3_target' => 3,
                 'weight' => 0,
+                'require_product' => false,
                 'active' => true,
             ],
             [
@@ -41,6 +43,7 @@ class ActivityTypeSeeder extends Seeder
                 'default_month2_target' => 1,
                 'default_month3_target' => 1,
                 'weight' => 0,
+                'require_product' => false,
                 'active' => true,
             ],
             [
@@ -49,8 +52,9 @@ class ActivityTypeSeeder extends Seeder
                 'default_quarter_target' => 1,
                 'default_month1_target' => 0,
                 'default_month2_target' => 0,
-                'default_month3_target' => 0,
+                'default_month3_target' => 1,
                 'weight' => 0,
+                'require_product' => true,
                 'active' => true,
             ],
         ]);

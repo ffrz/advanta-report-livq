@@ -10,7 +10,7 @@ import { Notify, Dialog } from "quasar";
 
 const page = usePage();
 const storage = usePageStorage("activity");
-const title = "Kegiatan";
+const title = "Realisasi Kegiatan";
 const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products')->restrictOnDelete();
             $table->date('date');
             $table->decimal('cost', 10, 2)->default(0);
+            $table->string('location', 500)->nullable();
             $table->string('latlong', 100)->nullable();
             $table->string('image_path', 500)->nullable();
             $table->text('notes')->nullable();

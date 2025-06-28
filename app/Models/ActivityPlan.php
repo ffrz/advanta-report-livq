@@ -14,6 +14,7 @@ class ActivityPlan extends Model
         'product_id',
         'date',
         'cost',
+        'location',
         'latlong',
         'image_path',
         'responded_by_id',
@@ -22,9 +23,19 @@ class ActivityPlan extends Model
         'notes',
     ];
 
+    public function getFormattedIdAttribute(): string
+    {
+        return '#RK-' . str_pad($this->id, 5, '0', STR_PAD_LEFT);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     public function responded_by()

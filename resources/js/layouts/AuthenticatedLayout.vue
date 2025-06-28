@@ -249,7 +249,7 @@ onMounted(() => {
               <q-icon name="event" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Kegiatan</q-item-label>
+              <q-item-label>Realisasi Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
           <q-item
@@ -269,7 +269,7 @@ onMounted(() => {
               <q-icon name="event_upcoming" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>Plan Kegiatan</q-item-label>
+              <q-item-label>Rencana Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
           <q-item

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\ActivityType;
+use App\Models\Product;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -42,6 +43,7 @@ class ActivityController extends Controller
             'data' => Activity::with([
                 'user',
                 'type:id,name',
+                'product:id,name',
                 'responded_by:id,username,name',
                 'created_by_user:id,username,name',
                 'updated_by_user:id,username,name',
@@ -75,6 +77,9 @@ class ActivityController extends Controller
             'types' => ActivityType::where('active', true)
                 ->orderBy('name', 'asc')
                 ->get(),
+            'products' => Product::where('active', true)
+                ->orderBy('name', 'asc')
+                ->get(),
             'users' => User::where('active', true)
                 ->where('role', User::Role_BS)
                 ->orderBy('username', 'asc')->get(),
@@ -93,6 +98,9 @@ class ActivityController extends Controller
             'types' => ActivityType::where('active', true)
                 ->orderBy('name', 'asc')
                 ->get(),
+            'products' => Product::where('active', true)
+                ->orderBy('name', 'asc')
+                ->get(),
             'users' => User::where('active', true)
                 ->where('role', User::Role_BS)
                 ->orderBy('username', 'asc')->get(),
@@ -104,7 +112,10 @@ class ActivityController extends Controller
         $validated =  $request->validate([
             'user_id'          => 'required|exists:users,id',
             'type_id'          => 'required|exists:activity_types,id',
+            'product_id'       => 'nullable|exists:products,id',
             'date'             => 'required|date',
+            'cost'             => 'nullable|numeric',
+            'location'         => 'nullable|string|max:500',
             'notes'            => 'nullable|string|max:500',
             'latlong'          => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',

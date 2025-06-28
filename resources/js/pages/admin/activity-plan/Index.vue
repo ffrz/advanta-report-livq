@@ -9,8 +9,8 @@ import dayjs from "dayjs";
 import { Notify, Dialog } from "quasar";
 
 const page = usePage();
-const storage = usePageStorage("activity");
-const title = "Plan Kegiatan";
+const storage = usePageStorage("activity-plan");
+const title = "Rencana Kegiatan";
 const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
@@ -84,7 +84,7 @@ const deleteItem = (row) =>
     message: `Hapus Kegiatan ${row.type.name} tanggal ${dayjs(row.date).format(
       "DD MMMM YYYY"
     )}?`,
-    url: route("admin.activity.delete", row.id),
+    url: route("admin.activity-plan.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
   });
@@ -113,7 +113,7 @@ const responActivity = (row, status) => {
   }).onOk(() => {
     loading.value = true;
     axios
-      .post(route("admin.activity.respond", row.id) + "?action=" + status)
+      .post(route("admin.activity-plan.respond", row.id) + "?action=" + status)
       .then((response) => {
         Notify.create(response.data.message);
         fetchItems();
@@ -143,14 +143,14 @@ const fetchItems = (props = null) =>
     filter,
     props,
     rows,
-    url: route("admin.activity.data"),
+    url: route("admin.activity-plan.data"),
     loading,
   });
 
 const onFilterChange = () => fetchItems();
 
 const onRowClicked = (row) =>
-  router.get(route("admin.activity.detail", { id: row.id }));
+  router.get(route("admin.activity-plan.detail", { id: row.id }));
 
 const computedColumns = computed(() =>
   $q.screen.gt.sm
@@ -176,7 +176,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
         icon="add"
         dense
         color="primary"
-        @click="router.get(route('admin.activity.add'))"
+        @click="router.get(route('admin.activity-plan.add'))"
       />
       <q-btn
         class="q-ml-sm"
@@ -205,7 +205,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               v-ripple
               v-close-popup
               :href="
-                route('admin.activity.export', {
+                route('admin.activity-plan.export', {
                   format: 'pdf',
                   filter: filter,
                 })
@@ -221,7 +221,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               v-ripple
               v-close-popup
               :href="
-                route('admin.activity.export', {
+                route('admin.activity-plan.export', {
                   format: 'excel',
                   filter: filter,
                 })
@@ -491,7 +491,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         v-close-popup
                         @click.stop="
                           router.get(
-                            route('admin.activity.duplicate', props.row.id)
+                            route('admin.activity-plan.duplicate', props.row.id)
                           )
                         "
                       >
@@ -508,7 +508,9 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         v-ripple
                         v-close-popup
                         @click.stop="
-                          router.get(route('admin.activity.edit', props.row.id))
+                          router.get(
+                            route('admin.activity-plan.edit', props.row.id)
+                          )
                         "
                       >
                         <q-item-section avatar>
