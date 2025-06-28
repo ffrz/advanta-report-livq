@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activities', function (Blueprint $table) {
+        Schema::create('activity_plans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->restrictOnDelete();
             $table->foreignId('type_id')->constrained('activity_types')->restrictOnDelete();
+            $table->foreignId('product_id')->nullable()->constrained('products')->restrictOnDelete();
             $table->date('date');
+            $table->decimal('cost', 10, 2)->default(0);
             $table->string('latlong', 100)->nullable();
             $table->string('image_path', 500)->nullable();
             $table->text('notes')->nullable();
@@ -37,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activities');
+        Schema::dropIfExists('activity_plans');
     }
 };

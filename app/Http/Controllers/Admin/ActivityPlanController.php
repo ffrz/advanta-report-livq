@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ActivityTarget;
+use App\Models\Activity;
 use App\Models\ActivityType;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,10 +16,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-// TODO: Controller dan view pada modul ini belum disesuaikan dengan perubahan database ActivityTarget,
-// perlu diperbaiki!!
-
-class ActivityTargetController extends Controller
+class ActivityPlanController extends Controller
 {
     public function index()
     {
@@ -33,7 +30,7 @@ class ActivityTargetController extends Controller
                 ->orderBy('name')->get();
         }
 
-        return inertia('admin/activity-target/Index', [
+        return inertia('admin/activity/Index', [
             'users' => $users,
             'types' => ActivityType::query()->where('active', true)->orderBy('name')->get(),
         ]);
@@ -41,8 +38,8 @@ class ActivityTargetController extends Controller
 
     public function detail($id = 0)
     {
-        return inertia('admin/activity-target/Detail', [
-            'data' => ActivityTarget::with([
+        return inertia('admin/activity/Detail', [
+            'data' => Activity::with([
                 'user',
                 'type:id,name',
                 'responded_by:id,username,name',
@@ -68,10 +65,12 @@ class ActivityTargetController extends Controller
     public function duplicate(Request $request, $id)
     {
         $user = Auth::user();
-        $item = ActivityTarget::findOrFail($id);
+        $item = Activity::findOrFail($id);
         $item->id = 0;
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
-        return inertia('admin/activity-target/Editor', [
+        $item->image_path = null;
+
+        return inertia('admin/activity/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
                 ->orderBy('name', 'asc')
@@ -85,14 +84,11 @@ class ActivityTargetController extends Controller
     public function editor(Request $request, $id = 0)
     {
         $user = Auth::user();
-        $item = $id ? ActivityTarget::findOrFail($id) : new ActivityTarget([
-            'year' => intval(date('Y')),
-            'month' => intval(date('m')),
-            'period_type' => 'month',
-            'qty' => 1,
+        $item = $id ? Activity::findOrFail($id) : new Activity([
+            'user_id' => $user->role == User::Role_BS ? $user->id : null,
         ]);
 
-        return inertia('admin/activity-target/Editor', [
+        return inertia('admin/activity/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
                 ->orderBy('name', 'asc')
@@ -116,8 +112,8 @@ class ActivityTargetController extends Controller
         ]);
 
         $item = !$request->id
-            ? new ActivityTarget()
-            : ActivityTarget::findOrFail($request->post('id', 0));
+            ? new Activity()
+            : Activity::findOrFail($request->post('id', 0));
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
@@ -164,14 +160,14 @@ class ActivityTargetController extends Controller
         $item->fill($validated);
         $item->save();
 
-        return redirect(route('admin.activity-target.detail', ['id' => $item->id]))
+        return redirect(route('admin.activity.detail', ['id' => $item->id]))
             ->with('success', "Kegiatan #$item->id telah disimpan.");
     }
 
     public function respond(Request $request, $id)
     {
         $current_user = Auth::user();
-        $item = ActivityTarget::findOrFail($id);
+        $item = Activity::findOrFail($id);
         $supervisor_account = $item->user->parent;
 
         if (!($current_user->role == User::Role_Admin || $current_user->role == User::Role_Agronomist)) {
@@ -201,7 +197,7 @@ class ActivityTargetController extends Controller
     {
         allowed_roles([User::Role_Admin]);
 
-        $item = ActivityTarget::findOrFail($id);
+        $item = Activity::findOrFail($id);
         $item->delete();
 
         return response()->json([
@@ -220,7 +216,7 @@ class ActivityTargetController extends Controller
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            $pdf = Pdf::loadView('export.activity-target-list-pdf', compact('items', 'title'))
+            $pdf = Pdf::loadView('export.activity-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
         }
@@ -249,12 +245,12 @@ class ActivityTargetController extends Controller
             // foreach ($items as $item) {
             //     $sheet->setCellValue('A' . $row, $item->id);
             //     $sheet->setCellValue('B' . $row, $item->date);
-            //     $sheet->setCellValue('C' . $row, ActivityTarget::Types[$item->type]);
-            //     $sheet->setCellValue('D' . $row, ActivityTarget::Statuses[$item->status]);
+            //     $sheet->setCellValue('C' . $row, Activity::Types[$item->type]);
+            //     $sheet->setCellValue('D' . $row, Activity::Statuses[$item->status]);
             //     $sheet->setCellValue('E' . $row, $item->user->name .  ' (' . $item->user->username . ')');
             //     $sheet->setCellValue('F' . $row, $item->customer->name . ' - ' . $item->customer->company . ' - ' . $item->customer->address);
             //     $sheet->setCellValue('I' . $row, $item->service->name);
-            //     $sheet->setCellValue('G' . $row, ActivityTarget::EngagementLevels[$item->engagement_level]);
+            //     $sheet->setCellValue('G' . $row, Activity::EngagementLevels[$item->engagement_level]);
             //     $sheet->setCellValue('H' . $row, $item->subject);
             //     $sheet->setCellValue('J' . $row, $item->summary);
             //     $sheet->setCellValue('K' . $row, $item->notes);
@@ -281,7 +277,7 @@ class ActivityTargetController extends Controller
     {
         $filter = $request->get('filter', []);
 
-        $q = ActivityTarget::with([
+        $q = Activity::with([
             'user:id,username,name',
             'responded_by:id,username,name',
             'type:id,name',

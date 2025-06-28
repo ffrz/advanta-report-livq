@@ -17,13 +17,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('type_id')->on('activity_types')->restrictOnDelete();
             $table->foreignId('user_id')->on('users')->restrictOnDelete();
-            $table->enum('period_type', ['month', 'quarter']);
             $table->unsignedSmallInteger('year');
-            $table->unsignedTinyInteger('month')->nullable();
             $table->unsignedTinyInteger('quarter')->nullable();
-            $table->unsignedTinyInteger('qty')->default(0);
-            $table->date('period_start_date')->nullable();
-            $table->date('period_end_date')->nullable();
+            $table->unsignedTinyInteger('quarter_qty')->default(0);
+            $table->unsignedTinyInteger('month1_qty')->default(0);
+            $table->unsignedTinyInteger('month2_qty')->default(0);
+            $table->unsignedTinyInteger('month3_qty')->default(0);
             $table->date('notes');
 
             $table->datetime('created_datetime')->nullable();

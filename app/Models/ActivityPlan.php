@@ -9,7 +9,6 @@ class Activity extends Model
     use HasFactory;
 
     protected $fillable = [
-        'plan_id',
         'user_id',
         'type_id',
         'product_id',
