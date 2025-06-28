@@ -201,7 +201,9 @@ const computedColumns = computed(() =>
               {{ props.row.weight }}
             </q-td>
             <q-td key="options" :props="props" class="wrap-column">
-              {{ Boolean(props.row.require_product) ? "Field produk" : "-" }}
+              {{
+                Number(props.row.require_product) === 1 ? "Field produk" : "-"
+              }}
             </q-td>
             <q-td key="action" :props="props">
               <div class="flex justify-end">

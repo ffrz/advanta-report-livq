@@ -16,8 +16,8 @@ const form = useForm({
   default_month3_target: Number(page.props.data.default_month3_target),
   weight: Number(page.props.data.weight),
   description: page.props.data.description,
-  active: !!page.props.data.active,
-  require_product: !!page.props.data.require_product,
+  active: Number(page.props.data.active) === 1,
+  require_product: Number(page.props.data.require_product) === 1,
 });
 
 const submit = () =>
