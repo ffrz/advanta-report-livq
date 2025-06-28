@@ -18,7 +18,7 @@ const users = page.props.users.map((u) => ({
 const types = page.props.types.map((t) => ({
   value: t.id,
   label: `${t.name}`,
-  require_product: t.require_product,
+  require_product: Number(t.require_product) === 1,
 }));
 
 const products = page.props.products.map((p) => ({
