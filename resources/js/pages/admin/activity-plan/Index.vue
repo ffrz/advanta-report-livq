@@ -77,7 +77,7 @@ const columns = [
   { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
   { name: "location", label: "Lokasi", field: "location", align: "left" },
-  { name: "cost", label: "Biaya (Rp)", field: "cost", align: "left" },
+  { name: "cost", label: "Biaya (Rp)", field: "cost", align: "right" },
   { name: "notes", label: "Catatan", field: "notes", align: "left" },
   { name: "status", label: "Status", field: "status", align: "left" },
   { name: "action", align: "right" },
