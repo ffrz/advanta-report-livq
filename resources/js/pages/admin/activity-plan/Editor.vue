@@ -175,8 +175,7 @@ const showProductField = computed(() => {
                 :disable="form.processing"
                 :error-message="form.errors.date"
               />
-              <!-- <div class="row items-center q-gutter-sm">
-                <div class="col"> -->
+
               <LocaleNumberInput
                 v-model:modelValue="form.cost"
                 label="Anggaran Biaya (Rp)"
@@ -186,17 +185,7 @@ const showProductField = computed(() => {
                 :errorMessage="form.errors.cost"
                 :rules="[]"
               />
-              <!-- </div>
-                <q-btn
-                  flat
-                  dense
-                  round
-                  icon="tune"
-                  color="primary"
-                  @click="showBreakdown = true"
-                  aria-label="Breakdown"
-                />
-              </div> -->
+
               <q-input
                 v-model.trim="form.location"
                 type="textarea"
@@ -223,49 +212,6 @@ const showProductField = computed(() => {
                 :error-message="form.errors.notes"
                 :rules="[]"
               />
-              <div class="q-pt-md">
-                <div class="text-subtitle2 text-bold text-grey-9">Foto:</div>
-                <q-btn
-                  label="Ambil Foto"
-                  size="sm"
-                  @click="triggerInput"
-                  color="secondary"
-                  icon="add_a_photo"
-                  :disable="form.processing"
-                />
-
-                <q-btn
-                  class="q-ml-sm"
-                  size="sm"
-                  icon="close"
-                  label="Buang"
-                  :disable="form.processing || !imagePreview"
-                  color="red"
-                  @click="clearImage"
-                />
-                <input
-                  type="file"
-                  ref="fileInput"
-                  accept="image/*"
-                  style="display: none"
-                  @change="onFileChange"
-                />
-                <div>
-                  <q-img
-                    v-if="imagePreview"
-                    :src="imagePreview"
-                    class="q-mt-md"
-                    style="max-width: 500px"
-                    :style="{ border: '1px solid #ddd' }"
-                  >
-                    <template v-slot:error>
-                      <div class="text-negative text-center q-pa-md">
-                        Gambar tidak tersedia
-                      </div>
-                    </template>
-                  </q-img>
-                </div>
-              </div>
               <!-- Ini akan diganti dengan pin lokasi manual -->
               <div class="q-my-md" v-if="false">
                 <div>

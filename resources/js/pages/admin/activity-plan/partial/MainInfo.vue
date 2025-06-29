@@ -134,7 +134,7 @@ const showViewer = ref(false);
         </td>
       </tr>
       <tr>
-        <td style="width: 125px">ID Rencana Kegiatan</td>
+        <td style="width: 125px">ID</td>
         <td style="width: 1px">:</td>
         <td>#{{ page.props.data.id }}</td>
       </tr>

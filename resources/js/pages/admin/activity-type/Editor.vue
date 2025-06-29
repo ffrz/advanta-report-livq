@@ -140,7 +140,7 @@ const updateBreakdown = () => {
                   class="full-width q-pl-none"
                   v-model="form.require_product"
                   :disable="form.processing"
-                  label="Tampilkan field produk"
+                  label="Tampilkan varietas"
                 />
               </div>
               <div style="margin-left: -10px">

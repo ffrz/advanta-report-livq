@@ -2,7 +2,12 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams, plantAge } from "@/helpers/utils";
+import {
+  check_role,
+  formatNumber,
+  getQueryParams,
+  plantAge,
+} from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import dayjs from "dayjs";
@@ -61,7 +66,7 @@ const types = [
 ];
 
 const columns = [
-  { name: "photo", label: "Foto", field: "photo", align: "left" },
+  // { name: "photo", label: "Foto", field: "photo", align: "left" },
   {
     name: "date",
     label: "Tanggal",
@@ -71,8 +76,10 @@ const columns = [
   },
   { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
-  { name: "status", label: "Status", field: "status", align: "left" },
+  { name: "location", label: "Lokasi", field: "location", align: "left" },
+  { name: "cost", label: "Biaya (Rp)", field: "cost", align: "left" },
   { name: "notes", label: "Catatan", field: "notes", align: "left" },
+  { name: "status", label: "Status", field: "status", align: "left" },
   { name: "action", align: "right" },
 ];
 
@@ -329,7 +336,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             class="cursor-pointer"
             @click="onRowClicked(props.row)"
           >
-            <q-td key="photo" :props="props">
+            <!-- <q-td key="photo" :props="props" >
               <q-img
                 v-if="props.row.image_path"
                 :src="`/${props.row.image_path}`"
@@ -338,13 +345,13 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 fit="cover"
                 class="rounded-borders"
               />
-            </q-td>
+            </q-td> -->
             <q-td key="date" :props="props">
               <template v-if="!$q.screen.lt.md">
                 {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
               </template>
               <template v-else>
-                <div class="q-pb-xs" v-if="props.row.image_path">
+                <!-- <div class="q-pb-xs" v-if="props.row.image_path">
                   <q-img
                     :src="`/${props.row.image_path}`"
                     style="border: 1px solid #ddd; max-height: 150px"
@@ -352,7 +359,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                     fit="scale-down"
                     class="rounded-borders bg-light-green-2"
                   />
-                </div>
+                </div> -->
                 <div>
                   <q-icon name="edit_calendar" />
                   {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
@@ -376,6 +383,12 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                     <q-badge label="Belum Direspon" color="grey" />
                   </template>
                 </div>
+                <div v-if="props.row.location">
+                  <q-icon name="home_pin" /> {{ props.row.location }}
+                </div>
+                <div>
+                  <q-icon name="sell" /> Rp. {{ formatNumber(props.row.cost) }}
+                </div>
                 <div v-if="props.row.notes">
                   <q-icon name="notes" /> {{ props.row.notes }}
                 </div>
@@ -386,6 +399,12 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
+            </q-td>
+            <q-td key="location" :props="props">
+              {{ props.row.location }}
+            </q-td>
+            <q-td key="cost" :props="props">
+              {{ formatNumber(props.row.cost) }}
             </q-td>
             <q-td key="status" :props="props">
               <template v-if="props.row.status == 'approved'">

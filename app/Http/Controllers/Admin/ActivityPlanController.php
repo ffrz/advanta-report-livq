@@ -227,10 +227,11 @@ class ActivityPlanController extends Controller
     {
         $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
 
-        $title = 'Laporan Kegiatan';
+        $title = 'Daftar Rencana Kegiatan';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
+            return view('export.activity-plan-list-pdf', compact('items', 'title'));
             $pdf = Pdf::loadView('export.activity-plan-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
@@ -295,12 +296,14 @@ class ActivityPlanController extends Controller
         $q = ActivityPlan::with([
             'user:id,username,name',
             'responded_by:id,username,name',
+            'product:id,name',
             'type:id,name',
         ]);
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('notes', 'like', '%' . $filter['search'] . '%');
+                $q->where('notes', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('location', 'like', '%' . $filter['search'] . '%');
             });
         }
 
