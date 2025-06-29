@@ -24,6 +24,16 @@ class Activity extends Model
         'notes',
     ];
 
+    public const Status_NotResponded = 'not_responded';
+    public const Status_Approved = 'approved';
+    public const Status_Rejected = 'rejected';
+
+    public const Statuses = [
+        self::Status_NotResponded => 'Belum Direspon',
+        self::Status_Approved => 'Disetujui',
+        self::Status_Rejected => 'Ditolak',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

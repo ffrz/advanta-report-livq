@@ -16,11 +16,21 @@ class ActivityPlan extends Model
         'cost',
         'location',
         'latlong',
-        'image_path',
+        'image_path', // tidak dibutuhkan
         'responded_by_id',
         'responded_datetime',
         'status',
         'notes',
+    ];
+
+    public const Status_NotResponded = 'not_responded';
+    public const Status_Approved = 'approved';
+    public const Status_Rejected = 'rejected';
+
+    public const Statuses = [
+        self::Status_NotResponded => 'Belum Direspon',
+        self::Status_Approved => 'Disetujui',
+        self::Status_Rejected => 'Ditolak',
     ];
 
     public function getFormattedIdAttribute(): string

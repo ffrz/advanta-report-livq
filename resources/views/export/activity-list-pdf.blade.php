@@ -7,11 +7,11 @@
     <thead>
       <tr>
         <th>No</th>
+        <th>Tanggal</th>
         <th>Jenis</th>
-        <th>Nama</th>
-        <th>Telepon</th>
-        <th>Alamat</th>
-        <th>Assigned To</th>
+        <th>BS</th>
+        <th>Lokasi</th>
+        <th>Biaya (Rp)</th>
         <th>Status</th>
         <th>Catatan</th>
       </tr>
@@ -20,12 +20,12 @@
       @forelse ($items as $index => $item)
         <tr>
           <td align="right">{{ $index + 1 }}</td>
-          <td>{{ $item->type }}</td>
-          <td>{{ $item->name }}</td>
-          <td>{{ $item->phone }}</td>
-          <td>{{ $item->address }}</td>
-          <td>{{ $item->assigned_user ? $item->assigned_user->name : '-' }}</td>
-          <td>{{ $item->active ? 'Aktif' : 'Non Aktif' }}</td>
+          <td>{{ \Carbon\Carbon::parse($item['created_at'])->format('d F Y') }}</td>
+          <td>{{ $item->type->name }}</td>
+          <td>{{ $item->user->name }}</td>
+          <td>{{ $item->location }}</td>
+          <td align="right">{{ format_number($item->cost) }}</td>
+          <td>{{ \App\Models\Activity::Statuses[$item->status] }}</td>
           <td>{{ $item->notes }}</td>
         </tr>
       @empty

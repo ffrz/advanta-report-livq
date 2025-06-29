@@ -227,63 +227,54 @@ class ActivityPlanController extends Controller
     {
         $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
 
-        $title = 'Daftar Rencana Kegiatan';
+        $title = 'Rencana Kegiatan';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            return view('export.activity-plan-list-pdf', compact('items', 'title'));
             $pdf = Pdf::loadView('export.activity-plan-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
         }
 
         if ($request->get('format') == 'excel') {
-            throw new NotImplementedException('Belum diimplementasikan');
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-            // $spreadsheet = new Spreadsheet();
-            // $sheet = $spreadsheet->getActiveSheet();
+            // Tambahkan header
+            $sheet->setCellValue('A1', 'ID');
+            $sheet->setCellValue('B1', 'Tanggal');
+            $sheet->setCellValue('C1', 'Jenis');
+            $sheet->setCellValue('D1', 'BS');
+            $sheet->setCellValue('E1', 'Lokasi');
+            $sheet->setCellValue('F1', 'Biaya (Rp)');
+            $sheet->setCellValue('G1', 'Status');
+            $sheet->setCellValue('H1', 'Catatan');
 
-            // // Tambahkan header
-            // $sheet->setCellValue('A1', 'ID');
-            // $sheet->setCellValue('B1', 'Tanggal');
-            // $sheet->setCellValue('C1', 'Jenis');
-            // $sheet->setCellValue('D1', 'Status');
-            // $sheet->setCellValue('E1', 'Sales');
-            // $sheet->setCellValue('F1', 'Client');
-            // $sheet->setCellValue('G1', 'Layanan');
-            // $sheet->setCellValue('H1', 'Engagement');
-            // $sheet->setCellValue('I1', 'Subjek');
-            // $sheet->setCellValue('J1', 'Summary');
-            // $sheet->setCellValue('K1', 'Catatan');
+            // Tambahkan data ke Excel
+            $row = 2;
+            foreach ($items as $item) {
+                $sheet->setCellValue('A' . $row, $item->id);
+                $sheet->setCellValue('B' . $row, $item->date);
+                $sheet->setCellValue('C' . $row, $item->type->name);
+                $sheet->setCellValue('D' . $row, $item->user->name);
+                $sheet->setCellValue('E' . $row, $item->location);
+                $sheet->setCellValue('F' . $row, $item->cost);
+                $sheet->setCellValue('G' . $row, ActivityPlan::Statuses[$item->status]);
+                $sheet->setCellValue('H' . $row, $item->notes);
+                $row++;
+            }
 
-            // // Tambahkan data ke Excel
-            // $row = 2;
-            // foreach ($items as $item) {
-            //     $sheet->setCellValue('A' . $row, $item->id);
-            //     $sheet->setCellValue('B' . $row, $item->date);
-            //     $sheet->setCellValue('C' . $row, ActivityPlan::Types[$item->type]);
-            //     $sheet->setCellValue('D' . $row, ActivityPlan::Statuses[$item->status]);
-            //     $sheet->setCellValue('E' . $row, $item->user->name .  ' (' . $item->user->username . ')');
-            //     $sheet->setCellValue('F' . $row, $item->customer->name . ' - ' . $item->customer->company . ' - ' . $item->customer->address);
-            //     $sheet->setCellValue('I' . $row, $item->service->name);
-            //     $sheet->setCellValue('G' . $row, ActivityPlan::EngagementLevels[$item->engagement_level]);
-            //     $sheet->setCellValue('H' . $row, $item->subject);
-            //     $sheet->setCellValue('J' . $row, $item->summary);
-            //     $sheet->setCellValue('K' . $row, $item->notes);
-            //     $row++;
-            // }
+            // Kirim ke memori tanpa menyimpan file
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
 
-            // // Kirim ke memori tanpa menyimpan file
-            // $response = new StreamedResponse(function () use ($spreadsheet) {
-            //     $writer = new Xlsx($spreadsheet);
-            //     $writer->save('php://output');
-            // });
+            // Atur header response untuk download
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
 
-            // // Atur header response untuk download
-            // $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            // $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
-
-            // return $response;
+            return $response;
         }
 
         return abort(400, 'Format tidak didukung');

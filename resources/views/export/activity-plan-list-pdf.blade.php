@@ -25,7 +25,7 @@
           <td>{{ $item->user->name }}</td>
           <td>{{ $item->location }}</td>
           <td align="right">{{ format_number($item->cost) }}</td>
-          <td>{{ $item->status == 'not_responded' ? 'Belum Direspon' : ($item->status == 'approved' ? 'Disetujui' : 'Ditolak') }}</td>
+          <td>{{ \App\Models\ActivityPlan::Statuses[$item->status] }}</td>
           <td>{{ $item->notes }}</td>
         </tr>
       @empty
