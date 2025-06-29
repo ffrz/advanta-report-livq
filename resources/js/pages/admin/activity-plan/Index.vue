@@ -372,6 +372,10 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   <q-icon name="person" />
                   {{ props.row.user.name }} ({{ props.row.user.username }})
                 </div>
+                <div v-if="props.row.product_id">
+                  <q-icon name="potted_plant" />
+                  {{ props.row.product.name }}
+                </div>
                 <div>
                   <template v-if="props.row.status == 'approved'">
                     <q-badge label="Disetujui" color="green" />

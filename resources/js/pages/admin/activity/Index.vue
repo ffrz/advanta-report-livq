@@ -2,7 +2,12 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams, plantAge } from "@/helpers/utils";
+import {
+  check_role,
+  formatNumber,
+  getQueryParams,
+  plantAge,
+} from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import dayjs from "dayjs";
@@ -71,6 +76,8 @@ const columns = [
   },
   { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
+  { name: "location", label: "Lokasi", field: "location", align: "left" },
+  { name: "cost", label: "Biaya (Rp)", field: "cost", align: "right" },
   { name: "status", label: "Status", field: "status", align: "left" },
   { name: "notes", label: "Catatan", field: "notes", align: "left" },
   { name: "action", align: "right" },
@@ -365,6 +372,18 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   <q-icon name="person" />
                   {{ props.row.user.name }} ({{ props.row.user.username }})
                 </div>
+                <div v-if="props.row.product_id">
+                  <q-icon name="potted_plant" />
+                  {{ props.row.product.name }}
+                </div>
+                <div>
+                  <q-icon name="home_pin" />
+                  {{ props.row.location }}
+                </div>
+                <div>
+                  <q-icon name="sell" />
+                  Rp. {{ formatNumber(props.row.cost) }}
+                </div>
                 <div>
                   <template v-if="props.row.status == 'approved'">
                     <q-badge label="Disetujui" color="green" />
@@ -386,6 +405,12 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
+            </q-td>
+            <q-td key="location" :props="props">
+              {{ props.row.location }}
+            </q-td>
+            <q-td key="cost" :props="props">
+              {{ formatNumber(props.row.cost) }}
             </q-td>
             <q-td key="status" :props="props">
               <template v-if="props.row.status == 'approved'">

@@ -185,7 +185,7 @@ const showProductField = computed(() => {
               />
               <LocaleNumberInput
                 v-model:modelValue="form.cost"
-                label="Anggaran Biaya (Rp)"
+                label="Biaya (Rp)"
                 lazyRules
                 :disable="form.processing"
                 :error="!!form.errors.cost"
