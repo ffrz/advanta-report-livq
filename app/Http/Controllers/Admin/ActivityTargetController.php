@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManager;
 use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -45,7 +46,6 @@ class ActivityTargetController extends Controller
             'data' => ActivityTarget::with([
                 'user',
                 'type:id,name',
-                'responded_by:id,username,name',
                 'created_by_user:id,username,name',
                 'updated_by_user:id,username,name',
             ])->findOrFail($id),
@@ -105,96 +105,71 @@ class ActivityTargetController extends Controller
 
     public function save(Request $request)
     {
-        $validated =  $request->validate([
-            'user_id'          => 'required|exists:users,id',
-            'type_id'          => 'required|exists:activity_types,id',
-            'date'             => 'required|date',
-            'notes'            => 'nullable|string|max:500',
-            'latlong'          => 'nullable|string|max:100',
-            'image'            => 'nullable|image|max:5120',
-            'image_path'       => 'nullable|string',
+        $validated = $request->validate([
+            'user_id'     => 'required|exists:users,id',
+            'quarter'     => ['required', 'regex:/^\d{4}-q[1-4]$/i'],
+            'targets'     => 'required|array',
+            'targets.*.q'  => 'required|numeric',
+            'targets.*.m1' => 'required|numeric',
+            'targets.*.m2' => 'required|numeric',
+            'targets.*.m3' => 'required|numeric',
         ]);
 
-        $item = !$request->id
-            ? new ActivityTarget()
-            : ActivityTarget::findOrFail($request->post('id', 0));
+        DB::beginTransaction();
+        try {
+            foreach ($request->targets as $typeId => $target) {
+                // Optional: validasi penjumlahan q == m1+m2+m3
+                if (intval($target['m1'] + $target['m2'] + $target['m3']) != intval($target['q'])) {
+                    DB::rollBack();
+                    return back()->withInput()->withErrors([
+                        'message.' => "Jumlah bulan tidak sama dengan target kuartal untuk tipe $typeId"
+                    ]);
+                }
 
-        // Handle image upload jika ada
-        if ($request->hasFile('image')) {
-            // Hapus file lama jika ada
-            if ($item->image_path && file_exists(public_path($item->image_path))) {
-                @unlink(public_path($item->image_path)); // pakai @ untuk suppress error jika file tidak ada
+                $quarterTextArr = explode('-', $validated['quarter']);
+                $year = intval($quarterTextArr[0]);
+                $quarter = intval($quarterTextArr[1][1]);
+
+                // Cek apakah record sudah ada
+                $existing = ActivityTarget::where('user_id', $request->user_id)
+                    ->where('type_id', $typeId)
+                    ->where('year', $year)
+                    ->where('quarter', $quarter)
+                    ->when($request->id, fn($q) => $q->where('id', '!=', $request->id)) // abaikan jika sedang update
+                    ->exists();
+
+                if ($existing) {
+                    DB::rollBack();
+                    return back()->withInput()->withErrors([
+                        "message" => "Target untuk jenis kegiatan ini pada tahun $year kuartal $quarter sudah ada.",
+                    ]);
+                }
+
+                $item = ActivityTarget::updateOrCreate(
+                    [
+                        'user_id' => $request->user_id,
+                        'type_id' => $typeId,
+                        'year'    => $year,
+                        'quarter' => $quarter,
+                    ],
+                    [
+                        'quarter_qty'    => $target['q'],
+                        'month1_qty'     => $target['m1'],
+                        'month2_qty'     => $target['m2'],
+                        'month3_qty'     => $target['m3'],
+                    ]
+                );
+
+                $item->save();
             }
 
-            // Simpan file baru
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $validated['image_path'] = 'uploads/' . $filename; // timpah dengan path yang digenerate
-
-            // Resize dan simpan dengan Intervention Image v3
-            $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-            $image = $manager->read($file);
-
-            // Hitung sisi panjang
-            $width = $image->width();
-            $height = $image->height();
-
-            // Hitung rasio
-            $ratio = max($width / 1024, $height / 1024);
-
-            if ($ratio > 1) {
-                // Jika lebih besar dari batas, resize berdasarkan rasio terbesar
-                $newWidth = (int) round($width / $ratio);
-                $newHeight = (int) round($height / $ratio);
-
-                $image->resize($newWidth, $newHeight, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-            }
-
-            $image->save(public_path($validated['image_path']));
-        } else if (empty($validated['image_path'])) {
-            // Hapus file lama jika ada
-            if ($item->image_path && file_exists(public_path($item->image_path))) {
-                @unlink(public_path($item->image_path)); // pakai @ untuk suppress error jika file tidak ada
-            }
+            DB::commit();
+            return redirect()->route('admin.activity-target.index')
+                ->with('success', 'Seluruh target berhasil disimpan.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['error' => 'Gagal menyimpan data: ' . $e->getMessage()]);
         }
-
-        $item->fill($validated);
-        $item->save();
-
-        return redirect(route('admin.activity-target.detail', ['id' => $item->id]))
-            ->with('success', "Kegiatan #$item->id telah disimpan.");
-    }
-
-    public function respond(Request $request, $id)
-    {
-        $current_user = Auth::user();
-        $item = ActivityTarget::findOrFail($id);
-        $supervisor_account = $item->user->parent;
-
-        if (!($current_user->role == User::Role_Admin || $current_user->role == User::Role_Agronomist)) {
-            abort(403, 'Akses ditolak, hanya supervisor yang bisa menyetujui.');
-        }
-
-        $action = $request->get('action');
-        if ($action == 'approve') {
-            $item->status = 'approved';
-        } else if ($action == 'reject') {
-            $item->status = 'rejected';
-        } else if ($action == 'reset') {
-            $item->status = 'not_responded';
-        }
-
-        $item->responded_datetime = $action == 'reset' ? null : Carbon::now();
-        $item->responded_by_id = $action == 'reset' ? null : $current_user->id;
-        $item->save();
-
-        return response()->json([
-            'message' => "Kegiatan #$item->id telah direspon.",
-            'data' => $item
-        ]);
     }
 
     public function delete($id)
@@ -283,15 +258,8 @@ class ActivityTargetController extends Controller
 
         $q = ActivityTarget::with([
             'user:id,username,name',
-            'responded_by:id,username,name',
             'type:id,name',
         ]);
-
-        if (!empty($filter['search'])) {
-            $q->where(function ($q) use ($filter) {
-                $q->where('notes', 'like', '%' . $filter['search'] . '%');
-            });
-        }
 
         if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
             $q->where('user_id', '=', $filter['user_id']);
@@ -301,37 +269,13 @@ class ActivityTargetController extends Controller
             $q->where('type_id', '=', $filter['type_id']);
         }
 
-        if (!empty($filter['status']) && ($filter['status'] != 'all')) {
-            $q->where('status', '=', $filter['status']);
+        if (!empty($filter['year']) && ($filter['year'] != 'all')) {
+            $q->where('year', $filter['year']);
         }
 
-        // if (!empty($filter['period']) && ($filter['period'] != 'all')) {
-        //     if ($filter['period'] == 'this_month') {
-        //         $start = Carbon::now()->startOfMonth();
-        //         $end = Carbon::now()->endOfMonth();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'last_month') {
-        //         $start = Carbon::now()->subMonthNoOverflow()->startOfMonth();
-        //         $end = Carbon::now()->subMonthNoOverflow()->endOfMonth();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'this_year') {
-        //         $start = Carbon::now()->startOfYear();
-        //         $end = Carbon::now()->endOfYear();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'last_year') {
-        //         $start = Carbon::now()->subYear()->startOfYear();
-        //         $end = Carbon::now()->subYear()->endOfYear();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } else {
-        //         // Asumsikan filter['period'] dalam format YYYY-MM-DD
-        //         try {
-        //             $date = Carbon::parse($filter['period']);
-        //             $q->whereDate('date', $date);
-        //         } catch (\Exception $e) {
-        //             // Handle kesalahan parsing tanggal jika perlu
-        //         }
-        //     }
-        // }
+        if (!empty($filter['quarter']) && ($filter['quarter'] != 'all')) {
+            $q->where('quarter', $filter['quarter']);
+        }
 
         return $q;
     }

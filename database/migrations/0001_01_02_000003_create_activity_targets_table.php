@@ -30,6 +30,8 @@ return new class extends Migration
 
             $table->foreignId('created_by_uid')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by_uid')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->unique(['user_id', 'type_id', 'year', 'quarter']);
         });
     }
 

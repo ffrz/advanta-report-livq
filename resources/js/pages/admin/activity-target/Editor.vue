@@ -30,23 +30,39 @@ const years = create_year_options(
   String(currentYear - 1),
   String(currentYear + 1)
 );
-const period_types = [
-  { value: "month", label: "Bulanan" },
-  { value: "quarter", label: "Kwartal" },
-];
-const months = create_month_options();
-const quarters = create_quarter_options();
+
+const quarters = create_quarter_options(dayjs().format("YYYY"));
+
+const defaultTargets = {};
+page.props.types.forEach((type) => {
+  const id = type.id;
+  defaultTargets[id] = {
+    q: type.default_quarter_target ?? 0,
+    m1: type.default_month1_target ?? 0,
+    m2: type.default_month2_target ?? 0,
+    m3: type.default_month3_target ?? 0,
+  };
+});
+
+// Gabungkan data dari page.props.data.targets jika ada
+if (page.props.data.targets) {
+  page.props.data.targets.forEach((target) => {
+    if (defaultTargets[target.type_id]) {
+      defaultTargets[target.type_id] = {
+        q: target.q ?? 0,
+        m1: target.m1 ?? 0,
+        m2: target.m2 ?? 0,
+        m3: target.m3 ?? 0,
+      };
+    }
+  });
+}
 
 const form = useForm({
   id: page.props.data.id,
   user_id: page.props.data.user_id ? Number(page.props.data.user_id) : [],
-  type_id: page.props.data.type_id ? Number(page.props.data.type_id) : null,
-  year: page.props.data.year,
-  month: page.props.data.month,
   quarter: page.props.data.quarter,
-  period_type: page.props.data.period_type,
-  qty: page.props.data.qty,
-  notes: page.props.data.notes,
+  targets: defaultTargets,
 });
 
 const submit = () =>
@@ -55,6 +71,18 @@ const submit = () =>
     forceFormData: true,
     url: route("admin.activity-target.save"),
   });
+
+function getQuarterError(typeId) {
+  const target = form.targets[typeId];
+  if (!target) return false;
+
+  const q = Number(target.q) || 0;
+  const m1 = Number(target.m1) || 0;
+  const m2 = Number(target.m2) || 0;
+  const m3 = Number(target.m3) || 0;
+
+  return q !== m1 + m2 + m3;
+}
 </script>
 
 <template>
@@ -75,20 +103,9 @@ const submit = () =>
             <q-card-section class="q-pt-md">
               <input type="hidden" name="id" v-model="form.id" />
               <q-select
-                v-model="form.type_id"
-                label="Kegiatan"
-                :options="types"
-                map-options
-                emit-value
-                :error="!!form.errors.type_id"
-                :disable="form.processing"
-                :error-message="form.errors.type_id"
-              />
-              <q-select
                 v-model="form.user_id"
                 label="BS"
                 :options="users"
-                multiple
                 map-options
                 emit-value
                 :error="!!form.errors.user_id"
@@ -96,27 +113,6 @@ const submit = () =>
                 :error-message="form.errors.user_id"
               />
               <q-select
-                v-model="form.period_type"
-                label="Periode"
-                :options="period_types"
-                map-options
-                emit-value
-                :error="!!form.errors.period_type"
-                :disable="form.processing"
-                :error-message="form.errors.period_type"
-              />
-              <q-select
-                v-model="form.year"
-                label="Tahun"
-                :options="years"
-                map-options
-                emit-value
-                :error="!!form.errors.year"
-                :disable="form.processing"
-                :error-message="form.errors.year"
-              />
-              <q-select
-                v-if="form.period_type == 'quarter'"
                 v-model="form.quarter"
                 label="Kwartal"
                 :options="quarters"
@@ -126,42 +122,64 @@ const submit = () =>
                 :disable="form.processing"
                 :error-message="form.errors.quarter"
               />
-              <q-select
-                v-if="form.period_type == 'month'"
-                v-model="form.month"
-                label="Bulan"
-                :options="months"
-                map-options
-                emit-value
-                :error="!!form.errors.month"
-                :disable="form.processing"
-                :error-message="form.errors.month"
-              />
-              <q-input
-                v-model.trim="form.qty"
-                type="number"
-                autogrow
-                counter
-                maxlength="2"
-                label="Jumlah"
-                lazy-rules
-                :disable="form.processing"
-                :error="!!form.errors.qty"
-                :error-message="form.errors.qty"
-              />
-              <q-input
-                v-model.trim="form.notes"
-                type="textarea"
-                autogrow
-                counter
-                maxlength="255"
-                label="Catatan"
-                lazy-rules
-                :disable="form.processing"
-                :error="!!form.errors.notes"
-                :error-message="form.errors.notes"
-                :rules="[]"
-              />
+              <div
+                v-for="(type, index) in types"
+                :key="type.id || index"
+                class="q-mb-md"
+              >
+                <div class="text-subtitle2 q-mb-xs">
+                  {{ `Target ${type.label}` }}
+                </div>
+                <div class="row q-col-gutter-sm">
+                  <div class="col-3">
+                    <q-input
+                      v-model.number="form.targets[type.value].q"
+                      type="number"
+                      label="Kuartal"
+                      dense
+                      outlined
+                      :disable="form.processing"
+                    />
+                  </div>
+                  <div class="col-3">
+                    <q-input
+                      v-model.number="form.targets[type.value].m1"
+                      type="number"
+                      label="Bulan 1"
+                      dense
+                      outlined
+                      :disable="form.processing"
+                    />
+                  </div>
+                  <div class="col-3">
+                    <q-input
+                      v-model.number="form.targets[type.value].m2"
+                      type="number"
+                      label="Bulan 2"
+                      dense
+                      outlined
+                      :disable="form.processing"
+                    />
+                  </div>
+                  <div class="col-3">
+                    <q-input
+                      v-model.number="form.targets[type.value].m3"
+                      type="number"
+                      label="Bulan 3"
+                      dense
+                      outlined
+                      :disable="form.processing"
+                    />
+                  </div>
+                </div>
+                <!-- Pesan Error Jika q ≠ m1 + m2 + m3 -->
+                <div
+                  v-if="getQuarterError(type.value)"
+                  class="text-negative text-caption q-mt-xs"
+                >
+                  Jumlah bulan tidak sama dengan target kuartal
+                </div>
+              </div>
             </q-card-section>
             <q-card-section class="q-gutter-sm">
               <q-btn

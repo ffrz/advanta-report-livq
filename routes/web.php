@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\DemoPlotVisitController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\TargetController;
 use App\Http\Controllers\Admin\UserController;
 
 use App\Http\Middleware\Auth;
@@ -91,18 +90,6 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('edit/{id}', [ActivityTypeController::class, 'editor'])->name('admin.activity-type.edit');
             Route::post('save', [ActivityTypeController::class, 'save'])->name('admin.activity-type.save');
             Route::post('delete/{id}', [ActivityTypeController::class, 'delete'])->name('admin.activity-type.delete');
-        });
-
-        Route::prefix('targets')->group(function () {
-            Route::get('', [TargetController::class, 'index'])->name('admin.target.index');
-            Route::get('data', [TargetController::class, 'data'])->name('admin.target.data');
-            Route::get('add', [TargetController::class, 'editor'])->name('admin.target.add');
-            Route::get('duplicate/{id}', [TargetController::class, 'duplicate'])->name('admin.target.duplicate');
-            Route::get('edit/{id}', [TargetController::class, 'editor'])->name('admin.target.edit');
-            Route::get('detail/{id}', [TargetController::class, 'detail'])->name('admin.target.detail');
-            Route::post('save', [TargetController::class, 'save'])->name('admin.target.save');
-            Route::post('delete/{id}', [TargetController::class, 'delete'])->name('admin.target.delete');
-            Route::get('export', [TargetController::class, 'export'])->name('admin.target.export');
         });
 
         Route::prefix('activities')->group(function () {

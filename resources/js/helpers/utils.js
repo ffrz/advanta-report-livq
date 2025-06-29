@@ -31,12 +31,14 @@ export function create_year_options(startYear, endYear) {
   return years;
 }
 
-export function create_quarter_options() {
+export function create_quarter_options(year) {
+  const nextYear = Number(year) + 1;
   return [
-    { value: "Q1", label: "Q1" },
-    { value: "Q2", label: "Q2" },
-    { value: "Q3", label: "Q3" },
-    { value: "Q4", label: "Q4" },
+    { value: `${year}-q1`, label: `${year}-Q1` },
+    { value: `${year}-q2`, label: `${year}-Q2` },
+    { value: `${year}-q3`, label: `${year}-Q3` },
+    { value: `${year}-q4`, label: `${year}-Q4` },
+    { value: `${nextYear}-q1`, label: `${nextYear}-Q1` },
   ]
 }
 
