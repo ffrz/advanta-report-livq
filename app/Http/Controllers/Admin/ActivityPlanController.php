@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
-use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -36,8 +35,7 @@ class ActivityPlanController extends Controller
         }
 
         return inertia('admin/activity-plan/Index', [
-            'users' => $users,
-            'types' => ActivityType::query()->where('active', true)->orderBy('name')->get(),
+            'users' => $users
         ]);
     }
 
@@ -115,68 +113,18 @@ class ActivityPlanController extends Controller
     {
         $validated =  $request->validate([
             'user_id'          => 'required|exists:users,id',
-            'type_id'          => 'required|exists:activity_types,id',
-            'product_id'       => 'nullable|exists:products,id',
             'date'             => 'required|date',
-            'cost'             => 'nullable|numeric',
-            'location'         => 'nullable|string|max:500',
             'notes'            => 'nullable|string|max:500',
-            'latlong'          => 'nullable|string|max:100',
-            'image'            => 'nullable|image|max:5120',
-            'image_path'       => 'nullable|string',
         ]);
 
         $item = !$request->id
             ? new ActivityPlan()
             : ActivityPlan::findOrFail($request->post('id', 0));
-
-        // Handle image upload jika ada
-        if ($request->hasFile('image')) {
-            // Hapus file lama jika ada
-            if ($item->image_path && file_exists(public_path($item->image_path))) {
-                @unlink(public_path($item->image_path)); // pakai @ untuk suppress error jika file tidak ada
-            }
-
-            // Simpan file baru
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $validated['image_path'] = 'uploads/' . $filename; // timpah dengan path yang digenerate
-
-            // Resize dan simpan dengan Intervention Image v3
-            $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-            $image = $manager->read($file);
-
-            // Hitung sisi panjang
-            $width = $image->width();
-            $height = $image->height();
-
-            // Hitung rasio
-            $ratio = max($width / 1024, $height / 1024);
-
-            if ($ratio > 1) {
-                // Jika lebih besar dari batas, resize berdasarkan rasio terbesar
-                $newWidth = (int) round($width / $ratio);
-                $newHeight = (int) round($height / $ratio);
-
-                $image->resize($newWidth, $newHeight, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-            }
-
-            $image->save(public_path($validated['image_path']));
-        } else if (empty($validated['image_path'])) {
-            // Hapus file lama jika ada
-            if ($item->image_path && file_exists(public_path($item->image_path))) {
-                @unlink(public_path($item->image_path)); // pakai @ untuk suppress error jika file tidak ada
-            }
-        }
-
         $item->fill($validated);
         $item->save();
 
         return redirect(route('admin.activity-plan.detail', ['id' => $item->id]))
-            ->with('success', "Kegiatan #$item->id telah disimpan.");
+            ->with('success', "Rencana Kegiatan #$item->id telah disimpan.");
     }
 
     public function respond(Request $request, $id)
@@ -214,7 +162,7 @@ class ActivityPlanController extends Controller
         $item->delete();
 
         return response()->json([
-            'message' => "Kegiatan #$item->id telah dihapus."
+            'message' => "Rencana Kegiatan #$item->id telah dihapus."
         ]);
     }
 
@@ -285,23 +233,16 @@ class ActivityPlanController extends Controller
         $q = ActivityPlan::with([
             'user:id,username,name',
             'responded_by:id,username,name',
-            'product:id,name',
-            'type:id,name',
         ]);
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('notes', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('location', 'like', '%' . $filter['search'] . '%');
+                $q->where('notes', 'like', '%' . $filter['search'] . '%');
             });
         }
 
         if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
             $q->where('user_id', '=', $filter['user_id']);
-        }
-
-        if (!empty($filter['type_id']) && ($filter['type_id'] != 'all')) {
-            $q->where('type_id', '=', $filter['type_id']);
         }
 
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {

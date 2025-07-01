@@ -58,6 +58,12 @@ return [
 
         'admin.activity-type.index',
         'admin.activity-type.data',
+
+        'admin.activity-plan.index',
+        'admin.activity-plan.data',
+        'admin.activity-plan.add',
+        'admin.activity-plan.edit',
+        'admin.activity-plan.delete',
     ],
     User::Role_ASM => [
         'admin.user.index',

@@ -3,7 +3,6 @@ import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
 import VisitHistory from "./partial/VisitHistory.vue";
-import { check_role } from "@/helpers/utils";
 
 const page = usePage();
 const title = "Rincian Demo Plot";

@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_plans', function (Blueprint $table) {
+        Schema::create('activity_plan_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->restrictOnDelete();
-            $table->date('date');
-            $table->decimal('total_cost', 10, 2)->default(0);
-            $table->text('notes')->nullable();
-
-            $table->foreignId('responded_by_id')->nullable()->constrained('users')->restrictOnDelete();
-            $table->datetime('responded_datetime')->nullable();
-            $table->enum('status', ['approved', 'rejected', 'not_responded'])->default('not_responded');
+            $table->foreignId('parent_id')->constrained('activity_plans')->cascadeOnDelete();
+            $table->foreignId('product_id')->nullable()->constrained('products')->restrictOnDelete();
+            $table->decimal('cost', 10, 2)->default(0);
+            $table->string('location', 500)->nullable();
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
@@ -35,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activity_plans');
+        Schema::dropIfExists('activity_plan_details');
     }
 };

@@ -2,12 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import {
-  check_role,
-  formatNumber,
-  getQueryParams,
-  plantAge,
-} from "@/helpers/utils";
+import { check_role, formatNumber, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import dayjs from "dayjs";

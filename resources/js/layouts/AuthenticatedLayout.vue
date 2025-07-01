@@ -1,8 +1,7 @@
 <script setup>
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
-import { check_role } from "@/helpers/utils.js";
 
 defineComponent({
   name: "AuthenticatedLayout",
@@ -202,7 +201,7 @@ onMounted(() => {
             </q-item-section>
           </q-item>
           <q-item
-            v-if="$can('admin.activity-plans.index')"
+            v-if="$can('admin.activity-plan.index')"
             clickable
             v-ripple
             :active="$page.url.startsWith('/admin/activity-plans')"

@@ -57,27 +57,21 @@ const users = [
   })),
 ];
 
-const types = [
-  { value: "all", label: "Semua" },
-  ...page.props.types.map((type) => ({
-    value: type.id,
-    label: `${type.name}`,
-  })),
-];
-
 const columns = [
-  // { name: "photo", label: "Foto", field: "photo", align: "left" },
   {
-    name: "date",
-    label: "Tanggal",
-    field: "date",
+    name: "period",
+    label: "Periode",
+    field: "period",
     align: "left",
     sortable: true,
   },
-  { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
-  { name: "location", label: "Lokasi", field: "location", align: "left" },
-  { name: "cost", label: "Biaya (Rp)", field: "cost", align: "right" },
+  {
+    name: "total_cost",
+    label: "Total Biaya (Rp)",
+    field: "total_cost",
+    align: "right",
+  },
   { name: "status", label: "Status", field: "status", align: "left" },
   { name: "notes", label: "Catatan", field: "notes", align: "left" },
   { name: "action", align: "right" },
@@ -262,18 +256,6 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
           <q-select
             class="custom-select col-xs-12 col-sm-2"
             style="min-width: 150px"
-            v-model="filter.type_id"
-            :options="types"
-            label="Jenis Kegiatan"
-            dense
-            map-options
-            emit-value
-            outlined
-            @update:model-value="onFilterChange"
-          />
-          <q-select
-            class="custom-select col-xs-12 col-sm-2"
-            style="min-width: 150px"
             v-model="filter.user_id"
             v-show="$page.props.auth.user.role != 'bs'"
             :options="users"
@@ -336,30 +318,11 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             class="cursor-pointer"
             @click="onRowClicked(props.row)"
           >
-            <!-- <q-td key="photo" :props="props" >
-              <q-img
-                v-if="props.row.image_path"
-                :src="`/${props.row.image_path}`"
-                style="width: 64px; height: 64px; border: 1px solid #ddd"
-                spinner-color="grey"
-                fit="cover"
-                class="rounded-borders"
-              />
-            </q-td> -->
             <q-td key="date" :props="props">
               <template v-if="!$q.screen.lt.md">
                 {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
               </template>
               <template v-else>
-                <!-- <div class="q-pb-xs" v-if="props.row.image_path">
-                  <q-img
-                    :src="`/${props.row.image_path}`"
-                    style="border: 1px solid #ddd; max-height: 150px"
-                    spinner-color="grey"
-                    fit="scale-down"
-                    class="rounded-borders bg-light-green-2"
-                  />
-                </div> -->
                 <div>
                   <q-icon name="edit_calendar" />
                   {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
