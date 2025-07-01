@@ -3,21 +3,44 @@ import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
 import VisitHistory from "./partial/VisitHistory.vue";
+import { check_role } from "@/helpers/utils";
+
 const page = usePage();
 const title = "Rincian Demo Plot";
 const tab = ref("main");
-
 </script>
 
 <template>
   <i-head :title="title" />
   <authenticated-layout>
+    <template #left-button>
+      <div class="q-gutter-sm">
+        <q-btn
+          icon="arrow_back"
+          dense
+          color="grey-7"
+          flat
+          rounded
+          @click="router.get(route('admin.demo-plot.index'))"
+        />
+      </div>
+    </template>
     <template #title>{{ title }}</template>
     <template #right-button>
       <div class="q-gutter-sm">
-        <q-btn icon="arrow_back" dense color="grey-7" @click="$goBack()" />
-        <q-btn icon="edit" dense color="primary"
-          @click="router.get(route('admin.demo-plot.edit', { id: page.props.data.id }))" />
+        <q-btn
+          v-if="
+            check_role([$CONSTANTS.USER_ROLE_ADMIN, $CONSTANTS.USER_ROLE_BS])
+          "
+          icon="edit"
+          dense
+          color="primary"
+          @click="
+            router.get(
+              route('admin.demo-plot.edit', { id: page.props.data.id })
+            )
+          "
+        />
       </div>
     </template>
     <q-page class="row justify-center">

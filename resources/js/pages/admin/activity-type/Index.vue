@@ -182,6 +182,14 @@ const computedColumns = computed(() =>
                 <div>
                   <q-icon name="weight" /> Bobot: {{ props.row.weight }} %
                 </div>
+                <div v-if="props.row.require_product">
+                  <q-icon name="workspaces" />
+                  {{
+                    Number(props.row.require_product) === 1
+                      ? "Tampilkan field varietas"
+                      : "-"
+                  }}
+                </div>
               </template>
             </q-td>
             <q-td key="description" :props="props" class="wrap-column">
@@ -202,7 +210,9 @@ const computedColumns = computed(() =>
             </q-td>
             <q-td key="options" :props="props" class="wrap-column">
               {{
-                Number(props.row.require_product) === 1 ? "Field produk" : "-"
+                Number(props.row.require_product) === 1
+                  ? "Tampilkan field varietas"
+                  : "-"
               }}
             </q-td>
             <q-td key="action" :props="props">

@@ -175,8 +175,12 @@ class DemoPlotController extends Controller
     {
         $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
 
-        $title = 'Laporan Demo Plot';
+        $title = 'Daftar Demo Plot';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
+
+        if ($request->get('format') == 'html') {
+            return view('export.demo-plot-list-pdf', compact('items', 'title'));
+        }
 
         if ($request->get('format') == 'pdf') {
             $pdf = Pdf::loadView('export.demo-plot-list-pdf', compact('items', 'title'))
@@ -185,52 +189,51 @@ class DemoPlotController extends Controller
         }
 
         if ($request->get('format') == 'excel') {
-            throw new NotImplementedException('Belum diimplementasikan');
 
-            // $spreadsheet = new Spreadsheet();
-            // $sheet = $spreadsheet->getActiveSheet();
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-            // // Tambahkan header
-            // $sheet->setCellValue('A1', 'ID');
-            // $sheet->setCellValue('B1', 'Tanggal');
-            // $sheet->setCellValue('C1', 'Jenis');
-            // $sheet->setCellValue('D1', 'Status');
-            // $sheet->setCellValue('E1', 'Sales');
-            // $sheet->setCellValue('F1', 'Client');
-            // $sheet->setCellValue('G1', 'Layanan');
-            // $sheet->setCellValue('H1', 'Engagement');
-            // $sheet->setCellValue('I1', 'Subjek');
-            // $sheet->setCellValue('J1', 'Summary');
-            // $sheet->setCellValue('K1', 'Catatan');
+            // Tambahkan header
+            $sheet->setCellValue('A1', 'No');
+            $sheet->setCellValue('B1', 'BS');
+            $sheet->setCellValue('C1', 'Pemilik');
+            $sheet->setCellValue('D1', 'No HP');
+            $sheet->setCellValue('E1', 'Lokasi');
+            $sheet->setCellValue('F1', 'Tgl Tanam');
+            $sheet->setCellValue('G1', 'Umur');
+            $sheet->setCellValue('H1', 'Last Visit');
+            $sheet->setCellValue('I1', 'Status Tanaman');
+            $sheet->setCellValue('J1', 'Status Demplot');
+            $sheet->setCellValue('K1', 'Catatan');
 
-            // // Tambahkan data ke Excel
-            // $row = 2;
-            // foreach ($items as $item) {
-            //     $sheet->setCellValue('A' . $row, $item->id);
-            //     $sheet->setCellValue('B' . $row, $item->date);
-            //     $sheet->setCellValue('C' . $row, DemoPlot::Types[$item->type]);
-            //     $sheet->setCellValue('D' . $row, DemoPlot::Statuses[$item->status]);
-            //     $sheet->setCellValue('E' . $row, $item->user->name .  ' (' . $item->user->username . ')');
-            //     $sheet->setCellValue('F' . $row, $item->customer->name . ' - ' . $item->customer->company . ' - ' . $item->customer->address);
-            //     $sheet->setCellValue('I' . $row, $item->service->name);
-            //     $sheet->setCellValue('G' . $row, DemoPlot::EngagementLevels[$item->engagement_level]);
-            //     $sheet->setCellValue('H' . $row, $item->subject);
-            //     $sheet->setCellValue('J' . $row, $item->summary);
-            //     $sheet->setCellValue('K' . $row, $item->notes);
-            //     $row++;
-            // }
+            // Tambahkan data ke Excel
+            $row = 2;
+            foreach ($items as $i => $item) {
+                $sheet->setCellValue('A' . $row, $i + 1);
+                $sheet->setCellValue('B' . $row, optional($item->user)->name);
+                $sheet->setCellValue('C' . $row, $item->owner_name);
+                $sheet->setCellValue('D' . $row, $item->owner_phone);
+                $sheet->setCellValue('E' . $row, $item->field_location);
+                $sheet->setCellValue('F' . $row, Carbon::parse($item->plant_date)->format('d-m-Y'));
+                $sheet->setCellValue('G' . $row, $item->plant_date && $item->active ? (int) \Carbon\Carbon::parse($item->plant_date)->diffInDays(\Carbon\Carbon::now()) : '');
+                $sheet->setCellValue('H' . $row, $item->last_visit ? Carbon::parse($item->last_visit)->format('d-m-Y') : '');
+                $sheet->setCellValue('I' . $row, DemoPlot::PlantStatuses[$item->plant_status]);
+                $sheet->setCellValue('J' . $row, $item->activ ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('K' . $row, $item->notes);
+                $row++;
+            }
 
-            // // Kirim ke memori tanpa menyimpan file
-            // $response = new StreamedResponse(function () use ($spreadsheet) {
-            //     $writer = new Xlsx($spreadsheet);
-            //     $writer->save('php://output');
-            // });
+            // Kirim ke memori tanpa menyimpan file
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
 
-            // // Atur header response untuk download
-            // $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            // $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+            // Atur header response untuk download
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
 
-            // return $response;
+            return $response;
         }
 
         return abort(400, 'Format tidak didukung');

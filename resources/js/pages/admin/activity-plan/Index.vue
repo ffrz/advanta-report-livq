@@ -78,8 +78,8 @@ const columns = [
   { name: "bs", label: "BS", field: "bs", align: "left" },
   { name: "location", label: "Lokasi", field: "location", align: "left" },
   { name: "cost", label: "Biaya (Rp)", field: "cost", align: "right" },
-  { name: "notes", label: "Catatan", field: "notes", align: "left" },
   { name: "status", label: "Status", field: "status", align: "left" },
+  { name: "notes", label: "Catatan", field: "notes", align: "left" },
   { name: "action", align: "right" },
 ];
 
