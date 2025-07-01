@@ -142,7 +142,7 @@ const computedColumns = computed(() =>
                 class="rounded-borders"
               />
               <div class="column">
-                {{ $dayjs(props.row.visit_date).format("DD MMMM YYYY") }}
+                {{ $dayjs(props.row.visit_date).format("D MMMM YYYY") }}
                 <div class="text-caption text-italic text-grey-8">
                   {{ $dayjs(props.row.visit_date).fromNow() }}
                 </div>
@@ -152,7 +152,7 @@ const computedColumns = computed(() =>
               <template v-if="$q.screen.lt.md">
                 <q-icon name="history" />
               </template>
-              {{ $dayjs(props.row.visit_date).format("DD MMMM YYYY") }}
+              {{ $dayjs(props.row.visit_date).format("D MMMM YYYY") }}
               <div class="text-caption text-italic text-grey-8">
                 {{ $dayjs(props.row.visit_date).fromNow() }}
               </div>

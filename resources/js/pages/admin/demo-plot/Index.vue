@@ -18,8 +18,12 @@ const loading = ref(true);
 const filter = reactive(
   storage.get("filter", {
     search: "",
-    user_id: "all",
+    user_id:
+      page.props.auth.user.role == "bs"
+        ? Number(page.props.auth.user.id)
+        : "all",
     plant_status: "all",
+    product_id: "all",
     status: "all",
     ...getQueryParams(),
   })
@@ -243,6 +247,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             class="custom-select col-xs-12 col-sm-2"
             style="min-width: 150px"
             v-model="filter.user_id"
+            v-show="check_role(['admin', 'agronomist'])"
             :options="users"
             label="BS"
             dense
@@ -350,13 +355,11 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   fit="scale-down"
                   class="rounded-borders bg-light-green-2"
                 />
-                <div class="text-subtitle2">
-                  <q-icon name="person" /> {{ props.row.owner_name }}
-                  {{
-                    props.row.owner_phone ? ` - ${props.row.owner_phone}` : ""
-                  }}
+                <div><q-icon name="person" /> {{ props.row.owner_name }}</div>
+                <div v-if="props.row.owner_phone">
+                  <q-icon name="phone" /> {{ props.row.owner_phone }}
                 </div>
-                <div class="text-caption">
+                <div v-if="props.row.field_location">
                   <q-icon name="distance" /> Lokasi:
                   {{ props.row.field_location }}
                 </div>
@@ -365,11 +368,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               <template v-if="$q.screen.lt.md">
                 <div>
                   <q-icon name="edit_calendar" /> Tgl Tanam:
-                  {{ $dayjs(props.row.plant_date).format("DD MMMM YYYY") }}
-                  <template v-if="props.row.active">
-                    <br />
-                    ({{ plantAge(props.row.plant_date) }} hari)
-                  </template>
+                  {{ $dayjs(props.row.plant_date).format("D MMMM YYYY") }}
                 </div>
                 <template v-if="props.row.active">
                   <div>
@@ -380,7 +379,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 <template v-if="props.row.last_visit">
                   <div>
                     <q-icon name="calendar_clock" /> Last Visit:
-                    {{ $dayjs(props.row.last_visit).format("DD MMMM YYYY") }} /
+                    {{ $dayjs(props.row.last_visit).format("D MMMM YYYY") }} /
                     {{ $dayjs(props.row.last_visit).fromNow() }}
                   </div>
                 </template>
@@ -405,7 +404,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               {{ props.row.product.name }}
             </q-td>
             <q-td key="plant_date" :props="props">
-              {{ $dayjs(props.row.plant_date).format("YYYY-MM-DD") }}
+              {{ $dayjs(props.row.plant_date).format("D MMMM YYYY") }}
               <template v-if="props.row.active">
                 ({{ plantAge(props.row.plant_date) }} hari)
               </template>
@@ -415,7 +414,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             </q-td>
             <q-td key="last_visit" :props="props">
               <template v-if="props.row.last_visit">
-                {{ $dayjs(props.row.last_visit).format("DD MMMM YYYY") }} /
+                {{ $dayjs(props.row.last_visit).format("D MMMM YYYY") }} /
                 {{ $dayjs(props.row.last_visit).fromNow() }}
               </template>
             </q-td>

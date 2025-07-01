@@ -16,9 +16,12 @@ use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DemoPlotVisitController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         return inertia('admin/demo-plot-visit/Index', [
@@ -36,6 +39,8 @@ class DemoPlotVisitController extends Controller
             'created_by_user:id,username',
             'updated_by_user:id,username',
         ])->findOrFail($id);
+
+        $this->authorize('view', $visit);
 
         $demoPlotId = $visit->demo_plot_id;
         $currentDate = $visit->visit_date;
@@ -77,6 +82,8 @@ class DemoPlotVisitController extends Controller
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
         $item->image_path = null;
 
+        $this->authorize('view', $item);
+
         return inertia('admin/demo-plot-visit/Editor', [
             'data' => $item,
             'users' => User::where('active', true)
@@ -95,6 +102,10 @@ class DemoPlotVisitController extends Controller
             'plant_status' => DemoPlot::PlantStatus_Satisfactoy,
             'demo_plot_id' => $request->get('demo_plot_id')
         ]);
+
+        if ($id) {
+            $this->authorize('update', $item);
+        }
 
         return inertia('admin/demo-plot-visit/Editor', [
             'data' => $item,
@@ -120,6 +131,10 @@ class DemoPlotVisitController extends Controller
         $item = !$request->id
             ? new DemoPlotVisit()
             : DemoPlotVisit::findOrFail($request->post('id', 0));
+
+        if ($request->id) {
+            $this->authorize('update', $item);
+        }
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
@@ -184,8 +199,6 @@ class DemoPlotVisitController extends Controller
 
     public function delete($id)
     {
-        allowed_roles([User::Role_Admin]);
-
         $item = DemoPlotVisit::findOrFail($id);
         $item->delete();
 

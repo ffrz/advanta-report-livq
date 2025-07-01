@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\Auth;
 use App\Http\Middleware\NonAuthenticated;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth as AppAuth;
 
 Route::get('/', function () {
     return view('homepage-new');
@@ -43,10 +44,6 @@ Route::middleware([Auth::class])->group(function () {
         Route::redirect('', 'admin/dashboard', 301);
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('test', [DashboardController::class, 'test'])->name('admin.test');
-        Route::get('about', function () {
-            return inertia('admin/About');
-        })->name('admin.about');
 
         Route::prefix('products')->group(function () {
             Route::get('', [ProductController::class, 'index'])->name('admin.product.index');
@@ -118,7 +115,8 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('export', [ActivityPlanController::class, 'export'])->name('admin.activity-plan.export');
         });
 
-        Route::prefix('activity-targets')->group(function () {
+
+        Route::middleware(['role:admin,agronomist'])->prefix('activity-targets')->group(function () {
             Route::get('', [ActivityTargetController::class, 'index'])->name('admin.activity-target.index');
             Route::get('data', [ActivityTargetController::class, 'data'])->name('admin.activity-target.data');
             Route::get('duplicate/{id}', [ActivityTargetController::class, 'duplicate'])->name('admin.activity-target.duplicate');
@@ -131,26 +129,38 @@ Route::middleware([Auth::class])->group(function () {
         });
 
         Route::prefix('demo-plots')->group(function () {
-            Route::get('', [DemoPlotController::class, 'index'])->name('admin.demo-plot.index');
-            Route::get('data', [DemoPlotController::class, 'data'])->name('admin.demo-plot.data');
-            Route::get('duplicate/{id}', [DemoPlotController::class, 'duplicate'])->name('admin.demo-plot.duplicate');
-            Route::get('add', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.add');
-            Route::get('edit/{id}', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.edit');
-            Route::get('detail/{id}', [DemoPlotController::class, 'detail'])->name('admin.demo-plot.detail');
-            Route::post('save', [DemoPlotController::class, 'save'])->name('admin.demo-plot.save');
-            Route::post('delete/{id}', [DemoPlotController::class, 'delete'])->name('admin.demo-plot.delete');
-            Route::get('export', [DemoPlotController::class, 'export'])->name('admin.demo-plot.export');
+            Route::middleware(['role:admin,agronomist,bs'])->group(function () {
+                Route::get('', [DemoPlotController::class, 'index'])->name('admin.demo-plot.index');
+                Route::get('data', [DemoPlotController::class, 'data'])->name('admin.demo-plot.data');
+                Route::get('export', [DemoPlotController::class, 'export'])->name('admin.demo-plot.export');
+                Route::get('detail/{id}', [DemoPlotController::class, 'detail'])->name('admin.demo-plot.detail');
+            });
+
+            Route::middleware(['role:admin,bs'])->group(function () {
+                Route::get('duplicate/{id}', [DemoPlotController::class, 'duplicate'])->name('admin.demo-plot.duplicate');
+                Route::get('add', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.add');
+                Route::get('edit/{id}', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.edit');
+                Route::post('save', [DemoPlotController::class, 'save'])->name('admin.demo-plot.save');
+            });
+
+            Route::post('delete/{id}', [DemoPlotController::class, 'delete'])->name('admin.demo-plot.delete')->middleware('role:admin');
         });
 
         Route::prefix('demo-plot-vistis')->group(function () {
-            Route::get('', [DemoPlotVisitController::class, 'index'])->name('admin.demo-plot-visit.index');
-            Route::get('data', [DemoPlotVisitController::class, 'data'])->name('admin.demo-plot-visit.data');
-            Route::get('add', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.add');
-            Route::get('edit/{id}', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.edit');
-            Route::get('detail/{id}', [DemoPlotVisitController::class, 'detail'])->name('admin.demo-plot-visit.detail');
-            Route::post('save', [DemoPlotVisitController::class, 'save'])->name('admin.demo-plot-visit.save');
-            Route::post('delete/{id}', [DemoPlotVisitController::class, 'delete'])->name('admin.demo-plot-visit.delete');
-            Route::get('export', [DemoPlotVisitController::class, 'export'])->name('admin.demo-plot-visit.export');
+            Route::middleware(['role:admin,agronomist,bs'])->group(function () {
+                Route::get('', [DemoPlotVisitController::class, 'index'])->name('admin.demo-plot-visit.index');
+                Route::get('data', [DemoPlotVisitController::class, 'data'])->name('admin.demo-plot-visit.data');
+                Route::get('detail/{id}', [DemoPlotVisitController::class, 'detail'])->name('admin.demo-plot-visit.detail');
+                Route::get('export', [DemoPlotVisitController::class, 'export'])->name('admin.demo-plot-visit.export');
+            });
+
+            Route::middleware(['role:admin,bs'])->group(function () {
+                Route::get('add', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.add');
+                Route::get('edit/{id}', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.edit');
+                Route::post('save', [DemoPlotVisitController::class, 'save'])->name('admin.demo-plot-visit.save');
+            });
+
+            Route::post('delete/{id}', [DemoPlotVisitController::class, 'delete'])->name('admin.demo-plot-visit.delete')->middleware('role:admin');
         });
 
         Route::prefix('settings')->group(function () {

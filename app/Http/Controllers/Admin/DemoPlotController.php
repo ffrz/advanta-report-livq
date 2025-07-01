@@ -11,13 +11,15 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
-use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DemoPlotController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         return inertia('admin/demo-plot/Index', [
@@ -28,13 +30,17 @@ class DemoPlotController extends Controller
 
     public function detail($id = 0)
     {
+        $data = DemoPlot::with([
+            'user',
+            'product',
+            'created_by_user:id,username',
+            'updated_by_user:id,username',
+        ])->findOrFail($id);
+
+        $this->authorize('view', $data);
+
         return inertia('admin/demo-plot/Detail', [
-            'data' => DemoPlot::with([
-                'user',
-                'product',
-                'created_by_user:id,username',
-                'updated_by_user:id,username',
-            ])->findOrFail($id),
+            'data' => $data,
         ]);
     }
 
@@ -59,6 +65,8 @@ class DemoPlotController extends Controller
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
         $item->image_path = null;
 
+        $this->authorize('update', $item);
+
         return inertia('admin/demo-plot/Editor', [
             'data' => $item,
             'users' => User::where('active', true)
@@ -78,6 +86,10 @@ class DemoPlotController extends Controller
             'plant_status' => DemoPlot::PlantStatus_NotYetPlanted,
         ]);
 
+        if ($id) {
+            $this->authorize('update', $item);
+        }
+
         return inertia('admin/demo-plot/Editor', [
             'data' => $item,
             'users' => User::where('active', true)
@@ -93,7 +105,6 @@ class DemoPlotController extends Controller
             'user_id'          => 'required|exists:users,id',
             'product_id'       => 'required|exists:products,id',
             'plant_date'       => 'required|date',
-            'plant_status'     => 'required|in:' . implode(',', array_keys(DemoPlot::PlantStatuses)),
             'owner_name'       => 'required|string|max:100',
             'owner_phone'      => 'nullable|string|max:30',
             'notes'            => 'nullable|string|max:500',
@@ -104,8 +115,14 @@ class DemoPlotController extends Controller
         ]);
 
         $item = !$request->id
-            ? new DemoPlot()
+            ? new DemoPlot([
+                'plant_status' => DemoPlot::PlantStatus_NotYetPlanted,
+            ])
             : DemoPlot::findOrFail($request->post('id', 0));
+
+        if ($request->id) {
+            $this->authorize('update', $item);
+        }
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
@@ -158,8 +175,6 @@ class DemoPlotController extends Controller
 
     public function delete($id)
     {
-        allowed_roles([User::Role_Admin]);
-
         $item = DemoPlot::findOrFail($id);
         $item->delete();
 

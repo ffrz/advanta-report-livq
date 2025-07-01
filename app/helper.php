@@ -3,6 +3,19 @@
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
+function check_ownership($data, $user_field = 'user', $id_field = 'id')
+{
+    if ($user = Auth::user()) {
+        if ($data->$user_field && $user->id != $data->$user_field->$id_field) {
+            abort(403, 'Anda tidak memiliki akses ke sumberdaya ini');
+        }
+
+        return true;
+    }
+
+    throw new Exception('Gagal memeriksa ownership resource!');
+}
+
 function allowed_roles($roles, $msg = 'FORBIDDEN', $code = 403)
 {
     if ($user = Auth::user()) {
@@ -13,7 +26,11 @@ function allowed_roles($roles, $msg = 'FORBIDDEN', $code = 403)
         if (!in_array($user->role, $roles)) {
             abort($code, $msg);
         }
+
+        return true;
     }
+
+    throw new Exception('Gagal memeriksa role!');
 }
 
 function encrypt_id($string)
