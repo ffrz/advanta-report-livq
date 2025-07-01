@@ -190,7 +190,7 @@ class DemoPlotVisitController extends Controller
             ]);
         }
 
-        return redirect(route('admin.demo-plot-visit.detail', ['id' => $item->id]))
+        return redirect(route('admin.demo-plot.detail', ['id' => $item->demo_plot_id, 'tab' => 'visit']))
             ->with('success', "Kunjungan Demo Plot #$item->id - $item->visit_date telah disimpan.");
     }
 

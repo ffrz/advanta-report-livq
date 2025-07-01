@@ -1,12 +1,16 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
 import VisitHistory from "./partial/VisitHistory.vue";
 
 const page = usePage();
 const title = "Rincian Demo Plot";
 const tab = ref("main");
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search);
+  tab.value = params.get("tab") || "main";
+});
 </script>
 
 <template>

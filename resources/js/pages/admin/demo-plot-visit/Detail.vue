@@ -25,6 +25,7 @@ const showViewer = ref(false);
             router.get(
               route('admin.demo-plot.detail', {
                 id: page.props.data.demo_plot_id,
+                tab: 'visit',
               })
             )
           "

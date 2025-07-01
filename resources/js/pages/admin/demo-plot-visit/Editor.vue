@@ -25,7 +25,9 @@ const form = useForm({
   demo_plot_id: page.props.data.demo_plot_id,
   user_id: page.props.data.user_id
     ? Number(page.props.data.user_id)
-    : Number(page.props.auth.user.id),
+    : page.props.auth.user.role == "bs"
+    ? Number(page.props.auth.user.id)
+    : null,
   visit_date: dayjs(page.props.data.visit_date).format("YYYY-MM-DD"),
   plant_status: page.props.data.plant_status,
   notes: page.props.data.notes,
