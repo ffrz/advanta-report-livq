@@ -68,7 +68,6 @@ class ProductController extends Controller
 
     public function duplicate($id)
     {
-        allowed_roles([User::Role_Admin]);
         $item = Product::findOrFail($id);
         $item->id = null;
         return inertia('admin/product/Editor', [
@@ -79,7 +78,6 @@ class ProductController extends Controller
 
     public function editor($id = 0)
     {
-        allowed_roles([User::Role_Admin]);
         $item = $id ? Product::findOrFail($id) : new Product(
             ['active' => 1]
         );
@@ -120,8 +118,6 @@ class ProductController extends Controller
 
     public function delete($id)
     {
-        allowed_roles([User::Role_Admin]);
-
         $item = Product::findOrFail($id);
         $item->delete();
 

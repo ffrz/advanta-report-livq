@@ -13,7 +13,6 @@ class ProductCategoryController extends Controller
 {
     public function index()
     {
-        allowed_roles([User::Role_Admin]);
         return inertia('admin/product-category/Index');
     }
 
@@ -40,7 +39,6 @@ class ProductCategoryController extends Controller
 
     public function duplicate($id)
     {
-        allowed_roles([User::Role_Admin]);
         $item = ProductCategory::findOrFail($id);
         $item->id = null;
         return inertia('admin/product-category/Editor', [
@@ -50,7 +48,6 @@ class ProductCategoryController extends Controller
 
     public function editor($id = 0)
     {
-        allowed_roles([User::Role_Admin]);
         $item = $id ? ProductCategory::findOrFail($id) : new ProductCategory();
         return inertia('admin/product-category/Editor', [
             'data' => $item,
@@ -86,8 +83,6 @@ class ProductCategoryController extends Controller
 
     public function delete($id)
     {
-        allowed_roles([User::Role_Admin]);
-
         $item = ProductCategory::findOrFail($id);
         $item->delete();
 
