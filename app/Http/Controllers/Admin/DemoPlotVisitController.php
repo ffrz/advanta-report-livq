@@ -24,10 +24,7 @@ class DemoPlotVisitController extends Controller
 
     public function index()
     {
-        return inertia('admin/demo-plot-visit/Index', [
-            'products' => Product::query()->orderBy('name')->get(),
-            'users' => User::query()->where('role', User::Role_BS)->orderBy('name')->get(),
-        ]);
+        return inertia('admin/demo-plot-visit/Index');
     }
 
     public function detail($id = 0)

@@ -3,36 +3,6 @@
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
-function check_ownership($data, $user_field = 'user', $id_field = 'id')
-{
-    if ($user = Auth::user()) {
-        if ($data->$user_field && $user->id != $data->$user_field->$id_field) {
-            abort(403, 'Anda tidak memiliki akses ke sumberdaya ini');
-        }
-
-        return true;
-    }
-
-    throw new Exception('Gagal memeriksa ownership resource!');
-}
-
-function allowed_roles($roles, $msg = 'FORBIDDEN', $code = 403)
-{
-    if ($user = Auth::user()) {
-        if (!is_array($roles)) {
-            $roles = [$roles];
-        }
-
-        if (!in_array($user->role, $roles)) {
-            abort($code, $msg);
-        }
-
-        return true;
-    }
-
-    throw new Exception('Gagal memeriksa role!');
-}
-
 function encrypt_id($string)
 {
     return base64_encode($string);
@@ -175,13 +145,6 @@ function number_from_input($input)
 {
     return floatval(str_replace(',', '.', str_replace('.', '', $input)));
 }
-
-// function ensure_user_can_access($resource, $message = 'ACCESS DENIED', $code = 403)
-// {
-//     /** @disregard P1009 */
-//     if (!Auth::user()->canAccess($resource))
-//         abort($code, $message);
-// }
 
 function datetime_from_input($str)
 {

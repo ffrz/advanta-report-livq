@@ -5,7 +5,6 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams, plantAge } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
-import dayjs from "dayjs";
 
 const page = usePage();
 const storage = usePageStorage("demo-plots");
@@ -152,7 +151,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #title>{{ title }}</template>
     <template #right-button>
       <q-btn
-        v-if="check_role([$CONSTANTS.USER_ROLE_ADMIN, $CONSTANTS.USER_ROLE_BS])"
+        v-if="$can('admin.demo-plot.add')"
         icon="add"
         dense
         color="primary"
@@ -166,6 +165,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
         @click="showFilter = !showFilter"
       />
       <q-btn
+        v-if="$can('admin.demo-plot.export')"
         icon="file_export"
         dense
         class="q-ml-sm"
@@ -425,19 +425,12 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               <div
                 class="flex justify-end"
                 v-if="
-                  check_role([
-                    $CONSTANTS.USER_ROLE_ADMIN,
-                    $CONSTANTS.USER_ROLE_BS,
-                  ])
+                  $can('admin.demo-plot.duplicate') ||
+                  $can('admin.demo-plot.edit') ||
+                  $can('admin.demo-plot.delete')
                 "
               >
                 <q-btn
-                  :disabled="
-                    !check_role([
-                      $CONSTANTS.USER_ROLE_ADMIN,
-                      $CONSTANTS.USER_ROLE_BS,
-                    ])
-                  "
                   icon="more_vert"
                   dense
                   flat
@@ -452,6 +445,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   >
                     <q-list style="width: 200px">
                       <q-item
+                        v-if="$can('admin.demo-plot.duplicate')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -469,6 +463,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         >
                       </q-item>
                       <q-item
+                        v-if="$can('admin.demo-plot.edit')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -484,6 +479,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section icon="edit">Edit</q-item-section>
                       </q-item>
                       <q-item
+                        v-if="$can('admin.demo-plot.delete')"
                         @click.stop="deleteItem(props.row)"
                         clickable
                         v-ripple

@@ -22,9 +22,22 @@ class DemoPlotController extends Controller
 
     public function index()
     {
+        $current_user = Auth::user();
+        $q = User::query();
+        if ($current_user->role == User::Role_BS) {
+            $q->where('id', $current_user->id);
+        } else if ($current_user->role == User::Role_Agronomist) {
+            $q->where('parent_id', $current_user->id);
+        }
+
+        $users = $q->where('role', User::Role_BS)
+            ->where('active', true)
+            ->orderBy('name')
+            ->get();
+
         return inertia('admin/demo-plot/Index', [
             'products' => Product::query()->orderBy('name')->get(),
-            'users' => User::query()->where('role', User::Role_BS)->orderBy('name')->get(),
+            'users' => $users,
         ]);
     }
 
@@ -122,6 +135,12 @@ class DemoPlotController extends Controller
 
         if ($request->id) {
             $this->authorize('update', $item);
+        }
+
+        // Force current user id
+        $current_user = Auth::user();
+        if ($current_user->role == User::Role_BS) {
+            $validated['user_id'] = $current_user->id;
         }
 
         // Handle image upload jika ada

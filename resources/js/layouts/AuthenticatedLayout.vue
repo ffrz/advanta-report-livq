@@ -243,6 +243,7 @@ onMounted(() => {
               <q-item-label>Target Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
+          <q-separator />
           <q-item
             clickable
             v-ripple
@@ -257,7 +258,6 @@ onMounted(() => {
               <q-item-label>Client</q-item-label>
             </q-item-section>
           </q-item>
-          <q-separator />
           <q-item
             clickable
             v-if="$can('admin.product.index')"

@@ -4,6 +4,7 @@ import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
+import dayjs from "dayjs";
 
 const $q = useQuasar();
 const rows = ref([]);
@@ -48,7 +49,9 @@ onMounted(() => fetchItems());
 
 const deleteItem = (row) =>
   handleDelete({
-    message: `Hapus kunjungan #${row.id} - ${row.visit_date}?`,
+    message: `Hapus kunjungan #${row.id} - ${dayjs(row.visit_date).format(
+      "D MMMM YYYY"
+    )}?`,
     url: route("admin.demo-plot-visit.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
@@ -85,7 +88,7 @@ const computedColumns = computed(() =>
         size="sm"
         icon="add"
         dense
-        v-if="check_role([$CONSTANTS.USER_ROLE_ADMIN, $CONSTANTS.USER_ROLE_BS])"
+        v-if="$can('admin.demo-plot-visit.add')"
         @click="
           router.get(
             route('admin.demo-plot-visit.add', {
@@ -197,19 +200,11 @@ const computedColumns = computed(() =>
             <div
               class="flex justify-end"
               v-if="
-                check_role([
-                  $CONSTANTS.USER_ROLE_ADMIN,
-                  $CONSTANTS.USER_ROLE_BS,
-                ])
+                $can('admin.demo-plot-visit.edit') ||
+                $can('admin.demo-plot-visit.delete')
               "
             >
               <q-btn
-                :disabled="
-                  !check_role([
-                    $CONSTANTS.USER_ROLE_ADMIN,
-                    $CONSTANTS.USER_ROLE_BS,
-                  ])
-                "
                 icon="more_vert"
                 dense
                 flat
@@ -224,6 +219,7 @@ const computedColumns = computed(() =>
                 >
                   <q-list style="width: 200px">
                     <q-item
+                      v-if="$can('admin.demo-plot-visit.edit')"
                       clickable
                       v-ripple
                       v-close-popup
@@ -239,6 +235,7 @@ const computedColumns = computed(() =>
                       <q-item-section icon="edit">Edit</q-item-section>
                     </q-item>
                     <q-item
+                      v-if="$can('admin.demo-plot-visit.delete')"
                       @click.stop="deleteItem(props.row)"
                       clickable
                       v-ripple

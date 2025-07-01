@@ -6,7 +6,7 @@ import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 
-const storage = usePageStorage("customers");
+const storage = usePageStorage("customer");
 const title = "Client";
 const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));

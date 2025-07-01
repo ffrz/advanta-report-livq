@@ -12,11 +12,6 @@ use Intervention\Image\ImageManager;
 
 class CompanyProfileController extends Controller
 {
-    public function __construct()
-    {
-        allowed_roles(User::Role_Admin);
-    }
-
     /**
      * Display the company's profile form.
      */

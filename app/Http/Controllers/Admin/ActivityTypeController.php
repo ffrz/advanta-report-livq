@@ -12,7 +12,6 @@ class ActivityTypeController extends Controller
 {
     public function index()
     {
-        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
         return inertia('admin/activity-type/Index');
     }
 
@@ -44,7 +43,6 @@ class ActivityTypeController extends Controller
 
     public function duplicate($id)
     {
-        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
         $item = ActivityType::findOrFail($id);
         $item->id = null;
         return inertia('admin/activity-type/Editor', [
@@ -54,7 +52,6 @@ class ActivityTypeController extends Controller
 
     public function editor($id = 0)
     {
-        allowed_roles([User::Role_Admin, User::Role_Agronomist]);
         $item = $id ? ActivityType::findOrFail($id) : new ActivityType([
             'default_quearter_target' => 0,
             'default_month1_target' => 0,
@@ -99,7 +96,6 @@ class ActivityTypeController extends Controller
 
     public function delete($id)
     {
-        allowed_roles([User::Role_Admin]);
 
         $item = ActivityType::findOrFail($id);
         $item->delete();

@@ -125,6 +125,7 @@ function removeLocation() {
                 v-model="form.image_path"
               />
               <q-select
+                v-if="$page.props.auth.user.role == 'admin'"
                 v-model="form.user_id"
                 label="BS"
                 :options="users"

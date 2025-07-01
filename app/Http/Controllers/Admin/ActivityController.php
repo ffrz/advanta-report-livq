@@ -210,8 +210,6 @@ class ActivityController extends Controller
 
     public function delete($id)
     {
-        allowed_roles([User::Role_Admin]);
-
         $item = Activity::findOrFail($id);
         $item->delete();
 

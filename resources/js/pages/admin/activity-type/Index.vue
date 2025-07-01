@@ -104,6 +104,7 @@ watch(filter, () => storage.set("filter", filter), {
     <template #title>{{ title }}</template>
     <template #right-button>
       <q-btn
+        v-if="$can('admin.activity-type.add')"
         icon="add"
         dense
         color="primary"
@@ -227,14 +228,15 @@ watch(filter, () => storage.set("filter", filter), {
               }}
             </q-td>
             <q-td key="action" :props="props">
-              <div class="flex justify-end">
+              <div
+                class="flex justify-end"
+                v-if="
+                  $can('admin.activity-type.edit') ||
+                  $can('admin.activity-type.delete') ||
+                  $can('admin.activity-type.duplicate')
+                "
+              >
                 <q-btn
-                  :disabled="
-                    !check_role([
-                      $CONSTANTS.USER_ROLE_ADMIN,
-                      $CONSTANTS.USER_ROLE_AGRONOMIST,
-                    ])
-                  "
                   icon="more_vert"
                   dense
                   flat
@@ -249,6 +251,7 @@ watch(filter, () => storage.set("filter", filter), {
                   >
                     <q-list style="width: 200px">
                       <q-item
+                        v-if="$can('admin.activity-type.duplicate')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -264,6 +267,7 @@ watch(filter, () => storage.set("filter", filter), {
                         <q-item-section icon="copy">Duplikat</q-item-section>
                       </q-item>
                       <q-item
+                        v-if="$can('admin.activity-type.edit')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -279,7 +283,7 @@ watch(filter, () => storage.set("filter", filter), {
                         <q-item-section icon="edit">Edit</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="check_role($CONSTANTS.USER_ROLE_ADMIN)"
+                        v-if="$can('admin.activity-type.delete')"
                         @click.stop="deleteItem(props.row)"
                         clickable
                         v-ripple
