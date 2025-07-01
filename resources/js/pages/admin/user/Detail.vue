@@ -9,10 +9,30 @@ const title = "Rincian Pengguna";
   <i-head :title="title" />
   <authenticated-layout>
     <template #title>{{ title }}</template>
+    <template #left-button>
+      <div class="q-gutter-sm">
+        <q-btn
+          icon="arrow_back"
+          dense
+          color="grey-7"
+          flat
+          rounded
+          @click="router.get(route('admin.user.index'))"
+        />
+      </div>
+    </template>
     <template #right-button>
       <div class="q-gutter-sm">
-        <q-btn icon="edit" dense color="primary" :disable="$page.props.auth.user.role != $CONSTANTS.USER_ROLE_ADMIN"
-          @click="router.get(route('admin.user.edit', { id: page.props.data.id }))" />
+        <q-btn
+          v-if="$can('admin.user.edit')"
+          icon="edit"
+          dense
+          color="primary"
+          :disable="$page.props.auth.user.role != $CONSTANTS.USER_ROLE_ADMIN"
+          @click="
+            router.get(route('admin.user.edit', { id: page.props.data.id }))
+          "
+        />
       </div>
     </template>
     <div class="row justify-center">
@@ -26,8 +46,8 @@ const title = "Rincian Pengguna";
               <table class="detail">
                 <tbody>
                   <tr>
-                    <td style="width:125px;">ID Pengguna</td>
-                    <td style="width:1px;">:</td>
+                    <td style="width: 125px">ID Pengguna</td>
+                    <td style="width: 1px">:</td>
                     <td>{{ page.props.data.username }}</td>
                   </tr>
                   <tr>
@@ -44,8 +64,16 @@ const title = "Rincian Pengguna";
                     <td>Supervisor</td>
                     <td>:</td>
                     <td>
-                      <my-link :href="route('admin.user.detail', { id: page.props.data.parent.id })">
-                        {{ page.props.data.parent.name }} ({{ $CONSTANTS.USER_ROLES[page.props.data.parent.role] }})
+                      <my-link
+                        :href="
+                          route('admin.user.detail', {
+                            id: page.props.data.parent.id,
+                          })
+                        "
+                      >
+                        {{ page.props.data.parent.name }} ({{
+                          $CONSTANTS.USER_ROLES[page.props.data.parent.role]
+                        }})
                       </my-link>
                     </td>
                   </tr>
@@ -59,7 +87,11 @@ const title = "Rincian Pengguna";
                     <td>:</td>
                     <td>
                       {{ $dayjs(page.props.data.created_at).fromNow() }} -
-                      {{ $dayjs(page.props.data.created_at).format("DD MMMM YY HH:mm:ss") }}
+                      {{
+                        $dayjs(page.props.data.created_at).format(
+                          "DD MMMM YY HH:mm:ss"
+                        )
+                      }}
                     </td>
                   </tr>
                   <tr v-if="page.props.data.updated_at">
@@ -67,7 +99,11 @@ const title = "Rincian Pengguna";
                     <td>:</td>
                     <td>
                       {{ $dayjs(page.props.data.updated_at).fromNow() }} -
-                      {{ $dayjs(page.props.data.updated_at).format("DD MMMM YY HH:mm:ss") }}
+                      {{
+                        $dayjs(page.props.data.updated_at).format(
+                          "DD MMMM YY HH:mm:ss"
+                        )
+                      }}
                     </td>
                   </tr>
                   <tr>
@@ -75,21 +111,34 @@ const title = "Rincian Pengguna";
                     <td>:</td>
                     <td>
                       <template v-if="page.props.data.last_login_datetime">
-                        {{ $dayjs(page.props.data.last_login_datetime).fromNow() }} -
-                        {{ $dayjs(page.props.data.last_login_datetime).format("DD MMMM YY HH:mm:ss") }}
+                        {{
+                          $dayjs(page.props.data.last_login_datetime).fromNow()
+                        }}
+                        -
+                        {{
+                          $dayjs(page.props.data.last_login_datetime).format(
+                            "DD MMMM YY HH:mm:ss"
+                          )
+                        }}
                       </template>
-                      <template v-else>
-                        Belum pernah login
-                      </template>
+                      <template v-else> Belum pernah login </template>
                     </td>
                   </tr>
                   <tr v-if="page.props.data.last_activity_datetime">
                     <td>Aktifitas Terakhir</td>
                     <td>:</td>
                     <td>
-                      {{ $dayjs(page.props.data.last_activity_datetime).fromNow() }} -
-                      {{ $dayjs(page.props.data.last_activity_datetime).format("DD MMMM YY HH:mm:ss") }}
-                      <br />Jenis aktifitas: {{ page.props.data.last_activity_description }}
+                      {{
+                        $dayjs(page.props.data.last_activity_datetime).fromNow()
+                      }}
+                      -
+                      {{
+                        $dayjs(page.props.data.last_activity_datetime).format(
+                          "DD MMMM YY HH:mm:ss"
+                        )
+                      }}
+                      <br />Jenis aktifitas:
+                      {{ page.props.data.last_activity_description }}
                     </td>
                   </tr>
                 </tbody>

@@ -19,9 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'auto-permission' => \App\Http\Middleware\AutoPermissionMiddleware::class,
         ]);
-        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

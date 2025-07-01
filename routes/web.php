@@ -45,7 +45,7 @@ Route::middleware([Auth::class])->group(function () {
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-        Route::prefix('products')->group(function () {
+        Route::prefix('products')->middleware('auto-permission')->group(function () {
             Route::get('', [ProductController::class, 'index'])->name('admin.product.index');
             Route::get('data', [ProductController::class, 'data'])->name('admin.product.data');
             Route::get('add', [ProductController::class, 'editor'])->name('admin.product.add');
@@ -57,7 +57,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('export', [ProductController::class, 'export'])->name('admin.product.export');
         });
 
-        Route::prefix('product-categories')->group(function () {
+        Route::prefix('product-categories')->middleware('auto-permission')->group(function () {
             Route::get('', [ProductCategoryController::class, 'index'])->name('admin.product-category.index');
             Route::get('data', [ProductCategoryController::class, 'data'])->name('admin.product-category.data');
             Route::get('add', [ProductCategoryController::class, 'editor'])->name('admin.product-category.add');
@@ -67,7 +67,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::post('delete/{id}', [ProductCategoryController::class, 'delete'])->name('admin.product-category.delete');
         });
 
-        Route::prefix('customers')->group(function () {
+        Route::prefix('customers')->middleware('auto-permission')->group(function () {
             Route::get('', [CustomerController::class, 'index'])->name('admin.customer.index');
             Route::get('data', [CustomerController::class, 'data'])->name('admin.customer.data');
             Route::get('add', [CustomerController::class, 'editor'])->name('admin.customer.add');
@@ -116,7 +116,7 @@ Route::middleware([Auth::class])->group(function () {
         });
 
 
-        Route::middleware(['role:admin,agronomist'])->prefix('activity-targets')->group(function () {
+        Route::prefix('activity-targets')->group(function () {
             Route::get('', [ActivityTargetController::class, 'index'])->name('admin.activity-target.index');
             Route::get('data', [ActivityTargetController::class, 'data'])->name('admin.activity-target.data');
             Route::get('duplicate/{id}', [ActivityTargetController::class, 'duplicate'])->name('admin.activity-target.duplicate');
@@ -129,38 +129,26 @@ Route::middleware([Auth::class])->group(function () {
         });
 
         Route::prefix('demo-plots')->group(function () {
-            Route::middleware(['role:admin,agronomist,bs'])->group(function () {
-                Route::get('', [DemoPlotController::class, 'index'])->name('admin.demo-plot.index');
-                Route::get('data', [DemoPlotController::class, 'data'])->name('admin.demo-plot.data');
-                Route::get('export', [DemoPlotController::class, 'export'])->name('admin.demo-plot.export');
-                Route::get('detail/{id}', [DemoPlotController::class, 'detail'])->name('admin.demo-plot.detail');
-            });
-
-            Route::middleware(['role:admin,bs'])->group(function () {
-                Route::get('duplicate/{id}', [DemoPlotController::class, 'duplicate'])->name('admin.demo-plot.duplicate');
-                Route::get('add', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.add');
-                Route::get('edit/{id}', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.edit');
-                Route::post('save', [DemoPlotController::class, 'save'])->name('admin.demo-plot.save');
-            });
-
-            Route::post('delete/{id}', [DemoPlotController::class, 'delete'])->name('admin.demo-plot.delete')->middleware('role:admin');
+            Route::get('', [DemoPlotController::class, 'index'])->name('admin.demo-plot.index');
+            Route::get('data', [DemoPlotController::class, 'data'])->name('admin.demo-plot.data');
+            Route::get('export', [DemoPlotController::class, 'export'])->name('admin.demo-plot.export');
+            Route::get('detail/{id}', [DemoPlotController::class, 'detail'])->name('admin.demo-plot.detail');
+            Route::get('duplicate/{id}', [DemoPlotController::class, 'duplicate'])->name('admin.demo-plot.duplicate');
+            Route::get('add', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.add');
+            Route::get('edit/{id}', [DemoPlotController::class, 'editor'])->name('admin.demo-plot.edit');
+            Route::post('save', [DemoPlotController::class, 'save'])->name('admin.demo-plot.save');
+            Route::post('delete/{id}', [DemoPlotController::class, 'delete'])->name('admin.demo-plot.delete');
         });
 
         Route::prefix('demo-plot-vistis')->group(function () {
-            Route::middleware(['role:admin,agronomist,bs'])->group(function () {
-                Route::get('', [DemoPlotVisitController::class, 'index'])->name('admin.demo-plot-visit.index');
-                Route::get('data', [DemoPlotVisitController::class, 'data'])->name('admin.demo-plot-visit.data');
-                Route::get('detail/{id}', [DemoPlotVisitController::class, 'detail'])->name('admin.demo-plot-visit.detail');
-                Route::get('export', [DemoPlotVisitController::class, 'export'])->name('admin.demo-plot-visit.export');
-            });
-
-            Route::middleware(['role:admin,bs'])->group(function () {
-                Route::get('add', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.add');
-                Route::get('edit/{id}', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.edit');
-                Route::post('save', [DemoPlotVisitController::class, 'save'])->name('admin.demo-plot-visit.save');
-            });
-
-            Route::post('delete/{id}', [DemoPlotVisitController::class, 'delete'])->name('admin.demo-plot-visit.delete')->middleware('role:admin');
+            Route::get('', [DemoPlotVisitController::class, 'index'])->name('admin.demo-plot-visit.index');
+            Route::get('data', [DemoPlotVisitController::class, 'data'])->name('admin.demo-plot-visit.data');
+            Route::get('detail/{id}', [DemoPlotVisitController::class, 'detail'])->name('admin.demo-plot-visit.detail');
+            Route::get('export', [DemoPlotVisitController::class, 'export'])->name('admin.demo-plot-visit.export');
+            Route::get('add', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.add');
+            Route::get('edit/{id}', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.edit');
+            Route::post('save', [DemoPlotVisitController::class, 'save'])->name('admin.demo-plot-visit.save');
+            Route::post('delete/{id}', [DemoPlotVisitController::class, 'delete'])->name('admin.demo-plot-visit.delete');
         });
 
         Route::prefix('settings')->group(function () {
@@ -171,7 +159,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('company-profile/edit', [CompanyProfileController::class, 'edit'])->name('admin.company-profile.edit');
             Route::post('company-profile/update', [CompanyProfileController::class, 'update'])->name('admin.company-profile.update');
 
-            Route::prefix('users')->group(function () {
+            Route::prefix('users')->middleware(['auto-permission'])->group(function () {
                 Route::get('', [UserController::class, 'index'])->name('admin.user.index');
                 Route::get('data', [UserController::class, 'data'])->name('admin.user.data');
                 Route::get('add', [UserController::class, 'editor'])->name('admin.user.add');

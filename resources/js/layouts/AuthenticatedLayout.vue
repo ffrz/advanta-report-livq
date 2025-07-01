@@ -367,6 +367,7 @@ onMounted(() => {
           </q-item>
           <q-separator />
           <q-item
+            v-if="$can('admin.user.index')"
             clickable
             v-ripple
             :active="$page.url.startsWith('/admin/settings/users')"
@@ -393,7 +394,7 @@ onMounted(() => {
             </q-item-section>
           </q-item>
           <q-item
-            v-if="$page.props.auth.user.role == $CONSTANTS.USER_ROLE_ADMIN"
+            v-if="$can('admin.company-profile.edit')"
             clickable
             v-ripple
             :active="$page.url.startsWith('/admin/settings/company-profile')"

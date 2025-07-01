@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -42,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->role,
                     'email' => $user->email,
                 ] : null,
+                'permissions' => fn() => config('roles.' . optional($request->user())->role, []),
             ],
             'flash' => [
                 'info' => $request->session()->get('message'),

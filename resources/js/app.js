@@ -48,6 +48,15 @@ createInertiaApp({
       .component('guest-layout', GuestLayout)
       .component('authenticated-layout', AuthenticatedLayout);
 
+    // 🧠 Inject global $can() method
+    VueApp.config.globalProperties.$can = function (permissionName) {
+      const user = this.$page.props.auth?.user
+      const permissions = this.$page.props.auth?.permissions || []
+      const isAdmin = user?.role === 'admin'
+      if (isAdmin) return true
+      return permissions.includes(permissionName)
+    }
+
     VueApp.config.globalProperties.$dayjs = dayjs;
     VueApp.config.globalProperties.$config = window.CONFIG;
     VueApp.config.globalProperties.$CONSTANTS = window.CONSTANTS;
