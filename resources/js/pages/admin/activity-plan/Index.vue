@@ -101,9 +101,9 @@ const responActivity = (row, status) => {
     message += "Atur ulang status";
   }
 
-  message += ` kegiatan ${row.type.name} - ${row.user.name} tanggal ${dayjs(
-    row.date
-  ).format("DD MMMM YYYY")}?`;
+  message += ` kegiatan ${row.user.name} periode ${dayjs(row.date).format(
+    "MMMM YYYY"
+  )}?`;
 
   Dialog.create({
     title: "Konfirmasi",
@@ -175,7 +175,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #title>{{ title }}</template>
     <template #right-button>
       <q-btn
-        v-if="$can('admin-activity-plan.add')"
+        v-if="$can('admin.activity-plan.add')"
         icon="add"
         dense
         color="primary"
@@ -189,7 +189,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
         @click="showFilter = !showFilter"
       />
       <q-btn
-        v-if="$can('admin-activity-plan.export')"
+        v-if="$can('admin.activity-plan.export')"
         icon="file_export"
         dense
         class="q-ml-sm"
@@ -383,15 +383,15 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               {{ props.row.notes }}
             </q-td>
             <q-td key="action" :props="props">
-              <div class="flex justify-end">
+              <div
+                class="flex justify-end"
+                v-if="
+                  $can('admin.activity-plan.respond') ||
+                  $can('admin.activity-plan.edit') ||
+                  $can('admin.activity-plan.delete')
+                "
+              >
                 <q-btn
-                  :disabled="
-                    !check_role([
-                      $CONSTANTS.USER_ROLE_AGRONOMIST,
-                      $CONSTANTS.USER_ROLE_ADMIN,
-                      $CONSTANTS.USER_ROLE_BS,
-                    ])
-                  "
                   icon="more_vert"
                   dense
                   flat
@@ -406,7 +406,10 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   >
                     <q-list style="width: 200px">
                       <q-item
-                        v-if="$can('admin-activity-plan.respond')"
+                        v-if="
+                          $can('admin.activity-plan.respond') &&
+                          props.row.status == 'not_responded'
+                        "
                         clickable
                         v-ripple
                         v-close-popup
@@ -418,7 +421,10 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Setujui</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="$can('admin-activity-plan.respond')"
+                        v-if="
+                          $can('admin.activity-plan.respond') &&
+                          props.row.status == 'not_responded'
+                        "
                         clickable
                         v-ripple
                         v-close-popup
@@ -430,7 +436,10 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Tolak</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="$can('admin-activity-plan.respond')"
+                        v-if="
+                          $can('admin.activity-plan.respond') &&
+                          props.row.status != 'not_responded'
+                        "
                         clickable
                         v-ripple
                         v-close-popup
@@ -443,7 +452,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                       </q-item>
                       <q-separator />
                       <q-item
-                        v-if="$can('admin-activity-plan.duplicate')"
+                        v-if="$can('admin.activity-plan.duplicate')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -459,7 +468,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Duplikat</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="$can('admin-activity-plan.edit')"
+                        v-if="$can('admin.activity-plan.edit')"
                         clickable
                         v-ripple
                         v-close-popup

@@ -1,11 +1,26 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
+import Detail from "./partial/Detail.vue";
 
 const page = usePage();
-const title = "Rincian Rencana Kegiatan";
-const tab = ref("main");
+const title = "Rincian Plan";
+
+const tab = ref(
+  new URLSearchParams(window.location.search).get("tab") || "main"
+);
+
+watch(tab, (newTab) => {
+  router.get(
+    route("admin.activity-plan.detail", {
+      id: page.props.data.id,
+      tab: newTab,
+    }),
+    {},
+    { preserveScroll: true, preserveState: true }
+  );
+});
 </script>
 
 <template>
@@ -27,7 +42,7 @@ const tab = ref("main");
     <template #right-button>
       <div class="q-gutter-sm">
         <q-btn
-          v-if="$can('admin-activity-plan.edit')"
+          v-if="$can('admin.activity-plan.edit')"
           icon="edit"
           dense
           color="primary"
@@ -61,7 +76,7 @@ const tab = ref("main");
                   class="q-pa-none q-pt-sm"
                   v-if="$can('admin.activity-plan-detail.index')"
                 >
-                  <!-- <visit-history class="q-pa-none q-ma-none" /> -->
+                  <detail class="q-pa-none q-ma-none" />
                 </q-tab-panel>
               </q-tab-panels>
             </q-card-section>

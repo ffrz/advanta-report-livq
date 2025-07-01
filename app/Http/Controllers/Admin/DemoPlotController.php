@@ -275,12 +275,21 @@ class DemoPlotController extends Controller
 
     protected function createQuery(Request $request)
     {
+        $current_user = Auth::user();
         $filter = $request->get('filter', []);
 
         $q = DemoPlot::with([
             'user:id,username,name',
             'product:id,name',
         ]);
+
+        if ($current_user->role == User::Role_Agronomist) {
+            $q->whereHas('user', function ($query) use ($current_user) {
+                $query->where('parent_id', $current_user->id);
+            });
+        } else if ($current_user->role == User::Role_BS) {
+            $q->where('user_id', $current_user->id);
+        }
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {

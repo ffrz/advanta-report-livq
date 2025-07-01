@@ -52,4 +52,9 @@ class ActivityPlan extends Model
     {
         return $this->belongsTo(User::class, 'updated_by_uid');
     }
+
+    public function details()
+    {
+        return $this->hasMany(ActivityPlanDetail::class, 'parent_id');
+    }
 }

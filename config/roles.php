@@ -28,6 +28,21 @@ return [
         'admin.demo-plot-visit.add',
         'admin.demo-plot-visit.edit',
         'admin.demo-plot-visit.save',
+
+        'admin.activity-plan.index',
+        'admin.activity-plan.data',
+        'admin.activity-plan.add',
+        'admin.activity-plan.edit',
+        'admin.activity-plan.save',
+        'admin.activity-plan.delete',
+        'admin.activity-plan.detail',
+
+        'admin.activity-plan-detail.index',
+        'admin.activity-plan-detail.data',
+        'admin.activity-plan-detail.add',
+        'admin.activity-plan-detail.edit',
+        'admin.activity-plan-detail.save',
+        'admin.activity-plan-detail.delete',
     ],
     User::Role_Agronomist => [
         'admin.user.index',
@@ -61,9 +76,15 @@ return [
 
         'admin.activity-plan.index',
         'admin.activity-plan.data',
-        'admin.activity-plan.add',
-        'admin.activity-plan.edit',
-        'admin.activity-plan.delete',
+        'admin.activity-plan.detail',
+        'admin.activity-plan.respond',
+
+        'admin.activity-plan-detail.index',
+        'admin.activity-plan-detail.data',
+        'admin.activity-plan-detail.add',
+        'admin.activity-plan-detail.edit',
+        'admin.activity-plan-detail.save',
+        'admin.activity-plan-detail.delete',
     ],
     User::Role_ASM => [
         'admin.user.index',

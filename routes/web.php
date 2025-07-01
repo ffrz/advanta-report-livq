@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\ActivityPlanController;
+use App\Http\Controllers\Admin\ActivityPlanDetailController;
 use App\Http\Controllers\Admin\ActivityTargetController;
 use App\Http\Controllers\Admin\ActivityTypeController;
 use App\Http\Controllers\Admin\AuthController;
@@ -18,7 +19,6 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Middleware\Auth;
 use App\Http\Middleware\NonAuthenticated;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth as AppAuth;
 
 Route::get('/', function () {
     return view('homepage-new');
@@ -114,6 +114,15 @@ Route::middleware([Auth::class])->group(function () {
                 Route::post('save', [ActivityPlanController::class, 'save'])->name('admin.activity-plan.save');
                 Route::post('delete/{id}', [ActivityPlanController::class, 'delete'])->name('admin.activity-plan.delete');
                 Route::get('export', [ActivityPlanController::class, 'export'])->name('admin.activity-plan.export');
+            });
+
+            Route::prefix('activity-plan-details')->group(function () {
+                Route::get('', [ActivityPlanDetailController::class, 'index'])->name('admin.activity-plan-detail.index');
+                Route::get('data', [ActivityPlanDetailController::class, 'data'])->name('admin.activity-plan-detail.data');
+                Route::get('add', [ActivityPlanDetailController::class, 'editor'])->name('admin.activity-plan-detail.add');
+                Route::get('edit/{id}', [ActivityPlanDetailController::class, 'editor'])->name('admin.activity-plan-detail.edit');
+                Route::post('save', [ActivityPlanDetailController::class, 'save'])->name('admin.activity-plan-detail.save');
+                Route::post('delete/{id}', [ActivityPlanDetailController::class, 'delete'])->name('admin.activity-plan-detail.delete');
             });
 
 
