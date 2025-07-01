@@ -1,13 +1,15 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import { router } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { check_role, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
+import { usePageStorage } from "@/helpers/usePageStorage";
 
 const title = "Jenis Kegiatan";
+const storage = usePageStorage("activity-type");
 const $q = useQuasar();
-const showFilter = ref(false);
+const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
 const statuses = [
@@ -16,11 +18,13 @@ const statuses = [
   { value: "inactive", label: "Tidak Aktif" },
 ];
 
-const filter = reactive({
-  search: "",
-  status: "all",
-  ...getQueryParams(),
-});
+const filter = reactive(
+  storage.get("filter", {
+    search: "",
+    status: "all",
+    ...getQueryParams(),
+  })
+);
 const pagination = ref({
   page: 1,
   rowsPerPage: 10,
@@ -85,6 +89,13 @@ const computedColumns = computed(() =>
     ? columns
     : columns.filter((col) => ["name", "action"].includes(col.name))
 );
+
+watch(showFilter, () => storage.set("show-filter", showFilter.value), {
+  deep: true,
+});
+watch(filter, () => storage.set("filter", filter), {
+  deep: true,
+});
 </script>
 
 <template>

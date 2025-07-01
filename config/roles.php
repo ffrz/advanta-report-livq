@@ -22,6 +22,14 @@ return [
         'admin.product.index',
         'admin.product.data',
         'admin.product.detail',
+
+        'admin.customer.index',
+        'admin.customer.data',
+        'admin.customer.detail',
+        'admin.customer.add',
+        'admin.customer.edit',
+        'admin.customer.save',
+        'admin.customer.duplicate',
     ],
     User::Role_ASM => [
         'admin.user.index',

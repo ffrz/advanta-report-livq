@@ -7,7 +7,7 @@ import { check_role } from "@/helpers/utils";
 
 const page = usePage();
 const title = "Rincian Client";
-const tab = ref('main')
+const tab = ref("main");
 </script>
 
 <template>
@@ -16,14 +16,33 @@ const tab = ref('main')
     <template #title>{{ title }}</template>
     <template #left-button>
       <div class="q-gutter-sm">
-        <q-btn icon="arrow_back" dense color="grey-7" flat rounded @click="router.get(route('admin.customer.index'))" />
+        <q-btn
+          icon="arrow_back"
+          dense
+          color="grey-7"
+          flat
+          rounded
+          @click="router.get(route('admin.customer.index'))"
+        />
       </div>
     </template>
     <template #right-button>
       <div class="q-gutter-sm">
-        <q-btn icon="edit" dense color="primary"
-          :disabled="!check_role([$CONSTANTS.USER_ROLE_AGRONOMIST, $CONSTANTS.USER_ROLE_ADMIN])"
-          @click="router.get(route('admin.customer.edit', { id: page.props.data.id }))" />
+        <q-btn
+          v-if="$can('admin.customer.edit')"
+          icon="edit"
+          dense
+          color="primary"
+          :disabled="
+            !check_role([
+              $CONSTANTS.USER_ROLE_AGRONOMIST,
+              $CONSTANTS.USER_ROLE_ADMIN,
+            ])
+          "
+          @click="
+            router.get(route('admin.customer.edit', { id: page.props.data.id }))
+          "
+        />
       </div>
     </template>
     <q-page class="row justify-center">

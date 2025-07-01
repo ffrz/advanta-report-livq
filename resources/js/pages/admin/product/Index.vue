@@ -2,13 +2,13 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams, formatNumber } from "@/helpers/utils";
+import { getQueryParams, formatNumber } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { useProductCategoryFilter } from "@/helpers/useProductCategoryFilter";
 import { usePageStorage } from "@/helpers/usePageStorage";
 
 const page = usePage();
-const storage = usePageStorage("products");
+const storage = usePageStorage("product");
 const statuses = [
   { value: "all", label: "Semua" },
   { value: "active", label: "Aktif" },
@@ -17,7 +17,7 @@ const statuses = [
 
 const title = "Varietas";
 const $q = useQuasar();
-const showFilter = ref(false);
+const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
 const filter = reactive(
@@ -206,14 +206,11 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             label="Kategori"
             class="custom-select col-xs-12 col-sm-2"
             outlined
-            use-input
             input-debounce="300"
-            clearable
             :options="filteredCategories"
             map-options
             dense
             emit-value
-            @filter="filterCategories"
             style="min-width: 150px"
             @update:model-value="onFilterChange"
           />
