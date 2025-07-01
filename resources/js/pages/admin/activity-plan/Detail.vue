@@ -27,6 +27,7 @@ const tab = ref("main");
     <template #right-button>
       <div class="q-gutter-sm">
         <q-btn
+          v-if="$can('admin-activity-plan.edit')"
           icon="edit"
           dense
           color="primary"
@@ -43,7 +44,26 @@ const tab = ref("main");
         <div class="row">
           <q-card square flat bordered class="col q-pa-none">
             <q-card-section class="q-pa-md">
-              <main-info />
+              <q-tabs v-model="tab" align="left">
+                <q-tab name="main" label="Info Utama" />
+                <q-tab
+                  name="detail"
+                  label="Rincian"
+                  v-if="$can('admin.activity-plan-detail.index')"
+                />
+              </q-tabs>
+              <q-tab-panels v-model="tab">
+                <q-tab-panel name="main">
+                  <main-info />
+                </q-tab-panel>
+                <q-tab-panel
+                  name="detail"
+                  class="q-pa-none q-pt-sm"
+                  v-if="$can('admin.activity-plan-detail.index')"
+                >
+                  <!-- <visit-history class="q-pa-none q-ma-none" /> -->
+                </q-tab-panel>
+              </q-tab-panels>
             </q-card-section>
           </q-card>
         </div>

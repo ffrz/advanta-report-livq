@@ -1,8 +1,11 @@
 <script setup>
 import { useForm, usePage } from "@inertiajs/vue3";
 import { handleSubmit } from "@/helpers/client-req-handler";
-import { scrollToFirstErrorField } from "@/helpers/utils";
-import DatePicker from "@/components/DatePicker.vue";
+import {
+  create_month_options,
+  create_year_options,
+  scrollToFirstErrorField,
+} from "@/helpers/utils";
 import dayjs from "dayjs";
 import { onMounted } from "vue";
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
@@ -15,21 +18,23 @@ const users = page.props.users.map((u) => ({
   label: `${u.name} (${u.username})`,
 }));
 
-const types = page.props.types.map((t) => ({
-  value: t.id,
-  label: `${t.name}`,
-  require_product: Number(t.require_product) === 1,
-}));
-
-const products = page.props.products.map((p) => ({
-  value: p.id,
-  label: `${p.name}`,
-}));
+const currentYear = new Date().getFullYear();
+const years = create_year_options(currentYear, currentYear + 1);
+const months = create_month_options();
 
 const form = useForm({
   id: page.props.data.id,
   user_id: page.props.data.user_id ? Number(page.props.data.user_id) : null,
-  date: dayjs(page.props.data.date).format("YYYY-MM-DD"),
+  year: Number(
+    page.props.data.date
+      ? dayjs(page.props.data.date).format("YYYY")
+      : new Date().getFullYear()
+  ),
+  month: Number(
+    page.props.data.date
+      ? dayjs(page.props.data.date).format("M")
+      : new Date().getMonth() + 1
+  ), // kita tahu ini zero based!
   notes: page.props.data.notes,
   total_cost: page.props.data.total_cost
     ? Number(page.props.data.total_cost)
@@ -85,12 +90,25 @@ onMounted(() => {
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
               />
-              <date-picker
-                v-model="form.date"
-                label="Tanggal"
-                :error="!!form.errors.date"
+              <q-select
+                v-model="form.year"
+                label="Tahun"
+                :options="years"
+                map-options
+                emit-value
+                :error="!!form.errors.year"
                 :disable="form.processing"
-                :error-message="form.errors.date"
+                :error-message="form.errors.year"
+              />
+              <q-select
+                v-model="form.month"
+                label="Bulan"
+                :options="months"
+                map-options
+                emit-value
+                :error="!!form.errors.month"
+                :disable="form.processing"
+                :error-message="form.errors.month"
               />
               <LocaleNumberInput
                 v-model:modelValue="form.total_cost"

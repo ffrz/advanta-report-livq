@@ -10,13 +10,8 @@ class ActivityPlan extends Model
 
     protected $fillable = [
         'user_id',
-        'type_id',
-        'product_id',
         'date',
-        'cost',
-        'location',
-        'latlong',
-        'image_path', // tidak dibutuhkan
+        'total_cost',
         'responded_by_id',
         'responded_datetime',
         'status',
@@ -43,19 +38,9 @@ class ActivityPlan extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class, 'product_id');
-    }
-
     public function responded_by()
     {
         return $this->belongsTo(User::class, 'responded_by_id');
-    }
-
-    public function type()
-    {
-        return $this->belongsTo(ActivityType::class, 'type_id');
     }
 
     public function created_by_user()

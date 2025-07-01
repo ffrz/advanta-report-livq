@@ -157,7 +157,7 @@ const onRowClicked = (row) =>
 const computedColumns = computed(() =>
   $q.screen.gt.sm
     ? columns
-    : columns.filter((col) => ["date", "action"].includes(col.name))
+    : columns.filter((col) => ["period", "action"].includes(col.name))
 );
 
 watch(filter, () => storage.set("filter", filter), { deep: true });
@@ -175,6 +175,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #title>{{ title }}</template>
     <template #right-button>
       <q-btn
+        v-if="$can('admin-activity-plan.add')"
         icon="add"
         dense
         color="primary"
@@ -188,6 +189,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
         @click="showFilter = !showFilter"
       />
       <q-btn
+        v-if="$can('admin-activity-plan.export')"
         icon="file_export"
         dense
         class="q-ml-sm"
@@ -318,26 +320,18 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             class="cursor-pointer"
             @click="onRowClicked(props.row)"
           >
-            <q-td key="date" :props="props">
+            <q-td key="period" :props="props">
               <template v-if="!$q.screen.lt.md">
-                {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
+                {{ $dayjs(props.row.date).format("MMMM YYYY") }}
               </template>
               <template v-else>
                 <div>
                   <q-icon name="edit_calendar" />
-                  {{ $dayjs(props.row.date).format("DD MMMM YYYY") }}
-                </div>
-                <div>
-                  <q-icon name="overview" />
-                  {{ props.row.type.name }}
+                  {{ $dayjs(props.row.date).format("MMMM YYYY") }}
                 </div>
                 <div>
                   <q-icon name="person" />
                   {{ props.row.user.name }} ({{ props.row.user.username }})
-                </div>
-                <div v-if="props.row.product_id">
-                  <q-icon name="potted_plant" />
-                  {{ props.row.product.name }}
                 </div>
                 <div>
                   <template v-if="props.row.status == 'approved'">
@@ -350,28 +344,21 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                     <q-badge label="Belum Direspon" color="grey" />
                   </template>
                 </div>
-                <div v-if="props.row.location">
-                  <q-icon name="home_pin" /> {{ props.row.location }}
-                </div>
+
                 <div>
-                  <q-icon name="sell" /> Rp. {{ formatNumber(props.row.cost) }}
+                  <q-icon name="sell" /> Rp.
+                  {{ formatNumber(props.row.total_cost) }}
                 </div>
                 <div v-if="props.row.notes">
                   <q-icon name="notes" /> {{ props.row.notes }}
                 </div>
               </template>
             </q-td>
-            <q-td key="type" :props="props">
-              {{ props.row.type.name }}
-            </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
             </q-td>
-            <q-td key="location" :props="props">
-              {{ props.row.location }}
-            </q-td>
-            <q-td key="cost" :props="props">
-              {{ formatNumber(props.row.cost) }}
+            <q-td key="total_cost" :props="props">
+              {{ formatNumber(props.row.total_cost) }}
             </q-td>
             <q-td key="status" :props="props">
               <template v-if="props.row.status == 'approved'">
@@ -419,12 +406,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   >
                     <q-list style="width: 200px">
                       <q-item
-                        v-if="
-                          props.row.status == 'not_responded' &&
-                          ['agronomist', 'admin'].includes(
-                            $page.props.auth.user.role
-                          )
-                        "
+                        v-if="$can('admin-activity-plan.respond')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -436,12 +418,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Setujui</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          props.row.status == 'not_responded' &&
-                          ['agronomist', 'admin'].includes(
-                            $page.props.auth.user.role
-                          )
-                        "
+                        v-if="$can('admin-activity-plan.respond')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -453,12 +430,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Tolak</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          props.row.status != 'not_responded' &&
-                          ['agronomist', 'admin'].includes(
-                            $page.props.auth.user.role
-                          )
-                        "
+                        v-if="$can('admin-activity-plan.respond')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -471,9 +443,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                       </q-item>
                       <q-separator />
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin-activity-plan.duplicate')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -489,9 +459,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Duplikat</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin-activity-plan.edit')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -507,9 +475,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Edit</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin-activity-plan.delete')"
                         @click.stop="deleteItem(props.row)"
                         clickable
                         v-ripple

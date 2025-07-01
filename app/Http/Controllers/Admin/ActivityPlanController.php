@@ -44,8 +44,6 @@ class ActivityPlanController extends Controller
         return inertia('admin/activity-plan/Detail', [
             'data' => ActivityPlan::with([
                 'user',
-                'type:id,name',
-                'product:id,name',
                 'responded_by:id,username,name',
                 'created_by_user:id,username,name',
                 'updated_by_user:id,username,name',
@@ -111,15 +109,20 @@ class ActivityPlanController extends Controller
 
     public function save(Request $request)
     {
-        $validated =  $request->validate([
-            'user_id'          => 'required|exists:users,id',
-            'date'             => 'required|date',
-            'notes'            => 'nullable|string|max:500',
+        $validated = $request->validate([
+            'user_id'     => 'required|exists:users,id',
+            'year'        => 'required|integer|min:2000|max:2100',
+            'month'       => 'required|integer|min:1|max:12',
+            'notes'       => 'nullable|string|max:500',
         ]);
 
         $item = !$request->id
             ? new ActivityPlan()
             : ActivityPlan::findOrFail($request->post('id', 0));
+
+        $validated['date'] = sprintf('%04d-%02d-01', $validated['year'], $validated['month']);
+        unset($validated['year'], $validated['month']);
+
         $item->fill($validated);
         $item->save();
 

@@ -11,12 +11,15 @@ const showViewer = ref(false);
   <table class="detail">
     <tbody>
       <tr>
-        <td>Tanggal</td>
+        <td colspan="3" class="bg-white">
+          <div class="text-bold text-grey-8 q-mt-md">Informasi Umum</div>
+        </td>
+      </tr>
+      <tr>
+        <td>Periode</td>
         <td>:</td>
         <td>
-          {{ $dayjs(page.props.data.date).format("DD MMMM YYYY") }} ({{
-            $dayjs(page.props.data.date).fromNow()
-          }})
+          {{ $dayjs(page.props.data.date).format("MMMM YYYY") }}
         </td>
       </tr>
       <tr>
@@ -39,28 +42,14 @@ const showViewer = ref(false);
           <template v-else> - </template>
         </td>
       </tr>
+
       <tr>
-        <td>Kegiatan</td>
+        <td>Total Biaya</td>
         <td>:</td>
-        <td>{{ page.props.data.type.name }}</td>
-      </tr>
-      <tr v-if="page.props.data.product_id">
-        <td>Varietas</td>
-        <td>:</td>
-        <td>{{ page.props.data.product.name }}</td>
+        <td>Rp. {{ formatNumber(page.props.data.total_cost) }}</td>
       </tr>
       <tr>
-        <td>Lokasi</td>
-        <td>:</td>
-        <td>{{ page.props.data.location }}</td>
-      </tr>
-      <tr>
-        <td>Biaya</td>
-        <td>:</td>
-        <td>Rp. {{ formatNumber(page.props.data.cost) }}</td>
-      </tr>
-      <tr>
-        <td>Status Rencana Kegiatan</td>
+        <td>Status</td>
         <td>:</td>
         <td>
           <template v-if="page.props.data.status == 'approved'">
@@ -89,45 +78,6 @@ const showViewer = ref(false);
         <td>:</td>
         <td>{{ page.props.data.notes ? page.props.data.notes : "-" }}</td>
       </tr>
-      <template v-if="page.props.data.image_path">
-        <tr>
-          <td colspan="3" class="bg-white">
-            <div class="q-mt-md">
-              Foto Lahan:<br />
-              <q-img
-                :src="`/${page.props.data.image_path}`"
-                class="q-mt-none"
-                style="max-width: 500px"
-                :style="{ border: '1px solid #ddd' }"
-                @click="showViewer = true"
-              />
-            </div>
-          </td>
-        </tr>
-      </template>
-      <template v-if="page.props.data.latlong">
-        <tr>
-          <td colspan="3" class="bg-white">
-            <div class="q-mt-md">
-              Lokasi:<br />
-              {{ page.props.data.latlong }}<br />
-              <div style="max-width: 500px">
-                <iframe
-                  :src="`https://www.google.com/maps?q=${encodeURIComponent(
-                    page.props.data.latlong
-                  )}&output=embed`"
-                  width="100%"
-                  height="300"
-                  style="border: 1px solid #ddd; margin-top: 10px"
-                  allowfullscreen
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </template>
       <tr>
         <td colspan="3" class="bg-white">
           <div class="text-bold text-grey-8 q-mt-md">Informasi Rekaman</div>
