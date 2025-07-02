@@ -7,6 +7,8 @@ import {
   formatNumber,
   getQueryParams,
   plantAge,
+  create_year_options,
+  create_month_options,
 } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
@@ -28,6 +30,8 @@ const filter = reactive(
       page.props.auth.user.role == "bs" ? page.props.auth.user.id : "all",
     type_id: "all",
     status: "all",
+    year: "all",
+    month: "all",
     ...getQueryParams(),
   })
 );
@@ -56,6 +60,13 @@ const users = [
     label: `${user.name} (${user.username})`,
   })),
 ];
+
+const thisYear = new Date().getFullYear();
+const years = [
+  { value: "all", label: "Semua" },
+  ...create_year_options(thisYear - 1, thisYear + 1),
+];
+const months = [{ value: "all", label: "Semua" }, ...create_month_options()];
 
 const columns = [
   {
@@ -243,6 +254,30 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #header v-if="showFilter">
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.year"
+            :options="years"
+            label="Tahun"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.month"
+            :options="months"
+            label="Bulan"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
           <q-select
             class="custom-select col-xs-12 col-sm-2"
             style="min-width: 150px"
