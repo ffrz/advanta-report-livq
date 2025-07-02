@@ -2,7 +2,13 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, formatNumber, getQueryParams } from "@/helpers/utils";
+import {
+  check_role,
+  formatNumber,
+  getQueryParams,
+  create_year_options,
+  create_month_options,
+} from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import dayjs from "dayjs";
@@ -22,6 +28,8 @@ const filter = reactive(
     user_id:
       page.props.auth.user.role == "bs" ? page.props.auth.user.id : "all",
     type_id: "all",
+    year: "all",
+    month: "all",
     status: "all",
     ...getQueryParams(),
   })
@@ -36,6 +44,13 @@ const pagination = ref(
     descending: true,
   })
 );
+
+const thisYear = new Date().getFullYear();
+const years = [
+  { value: "all", label: "Semua" },
+  ...create_year_options(thisYear - 1, thisYear + 1),
+];
+const months = [{ value: "all", label: "Semua" }, ...create_month_options()];
 
 const statuses = [
   { value: "all", label: "Semua" },
@@ -177,6 +192,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #right-button>
       <q-btn
         icon="add"
+        v-if="$can('admin.activity.add')"
         dense
         color="primary"
         @click="router.get(route('admin.activity.add'))"
@@ -242,6 +258,30 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #header v-if="showFilter">
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.year"
+            :options="years"
+            label="Tahun"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.month"
+            :options="months"
+            label="Bulan"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
           <q-select
             class="custom-select col-xs-12 col-sm-2"
             style="min-width: 150px"
@@ -430,15 +470,16 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               {{ props.row.notes }}
             </q-td>
             <q-td key="action" :props="props">
-              <div class="flex justify-end">
+              <div
+                class="flex justify-end"
+                v-if="
+                  $can('admin.activity.respond') ||
+                  $can('admin.activity.edit') ||
+                  $can('admin.activity.delete') ||
+                  $can('admin.activity.duplicate')
+                "
+              >
                 <q-btn
-                  :disabled="
-                    !check_role([
-                      $CONSTANTS.USER_ROLE_AGRONOMIST,
-                      $CONSTANTS.USER_ROLE_ADMIN,
-                      $CONSTANTS.USER_ROLE_BS,
-                    ])
-                  "
                   icon="more_vert"
                   dense
                   flat
@@ -455,9 +496,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                       <q-item
                         v-if="
                           props.row.status == 'not_responded' &&
-                          ['agronomist', 'admin'].includes(
-                            $page.props.auth.user.role
-                          )
+                          $can('admin.activity.respond')
                         "
                         clickable
                         v-ripple
@@ -472,9 +511,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                       <q-item
                         v-if="
                           props.row.status == 'not_responded' &&
-                          ['agronomist', 'admin'].includes(
-                            $page.props.auth.user.role
-                          )
+                          $can('admin.activity.respond')
                         "
                         clickable
                         v-ripple
@@ -489,9 +526,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                       <q-item
                         v-if="
                           props.row.status != 'not_responded' &&
-                          ['agronomist', 'admin'].includes(
-                            $page.props.auth.user.role
-                          )
+                          $can('admin.activity.respond')
                         "
                         clickable
                         v-ripple
@@ -505,9 +540,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                       </q-item>
                       <q-separator />
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin.activity.duplicate')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -523,9 +556,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Duplikat</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin.activity.edit')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -539,9 +570,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Edit</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin.activity.delete')"
                         @click.stop="deleteItem(props.row)"
                         clickable
                         v-ripple

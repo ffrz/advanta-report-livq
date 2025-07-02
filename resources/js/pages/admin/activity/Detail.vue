@@ -6,7 +6,6 @@ import MainInfo from "./partial/MainInfo.vue";
 const page = usePage();
 const title = "Rincian Kegiatan";
 const tab = ref("main");
-
 </script>
 
 <template>
@@ -15,13 +14,27 @@ const tab = ref("main");
     <template #title>{{ title }}</template>
     <template #left-button>
       <div class="q-gutter-sm">
-        <q-btn icon="arrow_back" dense color="grey-7" flat rounded @click="router.get(route('admin.activity.index'))" />
+        <q-btn
+          icon="arrow_back"
+          dense
+          color="grey-7"
+          flat
+          rounded
+          @click="router.get(route('admin.activity.index'))"
+        />
       </div>
     </template>
     <template #right-button>
       <div class="q-gutter-sm">
-        <q-btn icon="edit" dense color="primary"
-          @click="router.get(route('admin.activity.edit', { id: page.props.data.id }))" />
+        <q-btn
+          v-if="$can('admin.activity.edit')"
+          icon="edit"
+          dense
+          color="primary"
+          @click="
+            router.get(route('admin.activity.edit', { id: page.props.data.id }))
+          "
+        />
       </div>
     </template>
     <q-page class="row justify-center">

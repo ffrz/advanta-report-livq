@@ -43,6 +43,14 @@ return [
         'admin.activity-plan-detail.edit',
         'admin.activity-plan-detail.save',
         'admin.activity-plan-detail.delete',
+
+        'admin.activity.index',
+        'admin.activity.data',
+        'admin.activity.add',
+        'admin.activity.edit',
+        'admin.activity.save',
+        'admin.activity.delete',
+        'admin.activity.detail',
     ],
     User::Role_Agronomist => [
         'admin.user.index',
@@ -85,6 +93,11 @@ return [
         'admin.activity-plan-detail.edit',
         'admin.activity-plan-detail.save',
         'admin.activity-plan-detail.delete',
+
+        'admin.activity.index',
+        'admin.activity.data',
+        'admin.activity.detail',
+        'admin.activity.respond',
     ],
     User::Role_ASM => [
         'admin.user.index',

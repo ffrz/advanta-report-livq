@@ -308,33 +308,13 @@ class ActivityController extends Controller
             $q->where('status', '=', $filter['status']);
         }
 
-        // if (!empty($filter['period']) && ($filter['period'] != 'all')) {
-        //     if ($filter['period'] == 'this_month') {
-        //         $start = Carbon::now()->startOfMonth();
-        //         $end = Carbon::now()->endOfMonth();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'last_month') {
-        //         $start = Carbon::now()->subMonthNoOverflow()->startOfMonth();
-        //         $end = Carbon::now()->subMonthNoOverflow()->endOfMonth();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'this_year') {
-        //         $start = Carbon::now()->startOfYear();
-        //         $end = Carbon::now()->endOfYear();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'last_year') {
-        //         $start = Carbon::now()->subYear()->startOfYear();
-        //         $end = Carbon::now()->subYear()->endOfYear();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } else {
-        //         // Asumsikan filter['period'] dalam format YYYY-MM-DD
-        //         try {
-        //             $date = Carbon::parse($filter['period']);
-        //             $q->whereDate('date', $date);
-        //         } catch (\Exception $e) {
-        //             // Handle kesalahan parsing tanggal jika perlu
-        //         }
-        //     }
-        // }
+        if (!empty($filter['year']) && $filter['year'] != 'all') {
+            $q->whereYear('date', '=', $filter['year']);
+        }
+
+        if (!empty($filter['month']) && $filter['month'] != 'all') {
+            $q->whereMonth('date', '=', $filter['month']);
+        }
 
         return $q;
     }

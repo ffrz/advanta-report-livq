@@ -169,6 +169,71 @@ class ActivityPlanController extends Controller
         ]);
     }
 
+    public function exportOne(Request $request, $id)
+    {
+        $item = ActivityPlan::findOrFail($id);
+
+        // TODO: Verifikasi dan otorisasi rekaman sebelum digunakan
+
+        // persiapan title
+        $title = 'Rencana Kegiatan ' + $item->user->name + ' ' + Carbon::parse($item->date)->translatedFormat("F Y");
+        $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
+
+        // expor html dulu supaya hasil bisa kelihatan
+        if ($request->get('format') == 'html') {
+            return view('export.activity-plan-pdf', compact('item', 'title'));
+        }
+
+        if ($request->get('format') == 'pdf') {
+            $pdf = Pdf::loadView('export.activity-plan-pdf', compact('item', 'title'))
+                ->setPaper('A4', 'landscape');
+            return $pdf->download($filename . '.pdf');
+        }
+
+        if ($request->get('format') == 'excel') {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Tambahkan header
+            $sheet->setCellValue('A1', 'ID');
+            $sheet->setCellValue('B1', 'Tanggal');
+            $sheet->setCellValue('C1', 'Jenis');
+            $sheet->setCellValue('D1', 'BS');
+            $sheet->setCellValue('E1', 'Lokasi');
+            $sheet->setCellValue('F1', 'Biaya (Rp)');
+            $sheet->setCellValue('G1', 'Status');
+            $sheet->setCellValue('H1', 'Catatan');
+
+            // Tambahkan data ke Excel
+            $row = 2;
+            foreach ($item->details as $detail) {
+                $sheet->setCellValue('A' . $row, $detail->id);
+                $sheet->setCellValue('B' . $row, $detail->date);
+                $sheet->setCellValue('C' . $row, $detail->type->name);
+                $sheet->setCellValue('D' . $row, $detail->user->name);
+                $sheet->setCellValue('E' . $row, $detail->location);
+                $sheet->setCellValue('F' . $row, $detail->cost);
+                $sheet->setCellValue('G' . $row, ActivityPlan::Statuses[$detail->status]);
+                $sheet->setCellValue('H' . $row, $detail->notes);
+                $row++;
+            }
+
+            // Kirim ke memori tanpa menyimpan file
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
+
+            // Atur header response untuk download
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+
+            return $response;
+        }
+
+        return abort(400, 'Format tidak didukung');
+    }
+
     /**
      * Mengekspor daftar interaksi ke dalam format PDF atau Excel.
      */
