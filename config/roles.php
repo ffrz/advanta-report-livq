@@ -98,6 +98,15 @@ return [
         'admin.activity.data',
         'admin.activity.detail',
         'admin.activity.respond',
+
+        'admin.activity-target.index',
+        'admin.activity-target.data',
+        'admin.activity-target.detail',
+        'admin.activity-target.add',
+        'admin.activity-target.edit',
+        'admin.activity-target.delete',
+        'admin.activity-target.save',
+        'admin.activity-target.export',
     ],
     User::Role_ASM => [
         'admin.user.index',
