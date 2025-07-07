@@ -310,23 +310,27 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               :class="`text-center`"
             >
               {{
-                props.row.details.filter((d) => d.type_id === type.id)[0]
-                  .quarter_qty
+                props.row.details.filter(
+                  (d) => Number(d.type_id) === Number(type.id)
+                )[0].quarter_qty
               }}
               (
               {{
-                props.row.details.filter((d) => d.type_id === type.id)[0]
-                  .month1_qty
+                props.row.details.filter(
+                  (d) => Number(d.type_id) === Number(type.id)
+                )[0].month1_qty
               }}
               /
               {{
-                props.row.details.filter((d) => d.type_id === type.id)[0]
-                  .month2_qty
+                props.row.details.filter(
+                  (d) => Number(d.type_id) === Number(type.id)
+                )[0].month2_qty
               }}
               /
               {{
-                props.row.details.filter((d) => d.type_id === type.id)[0]
-                  .month3_qty
+                props.row.details.filter(
+                  (d) => Number(d.type_id) === Number(type.id)
+                )[0].month3_qty
               }}
               )
             </q-td>
