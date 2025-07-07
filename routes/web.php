@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\UserController;
 
 use App\Http\Middleware\Auth;
 use App\Http\Middleware\NonAuthenticated;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +28,11 @@ Route::get('/', function () {
 Route::get('/test', function () {
     return inertia('Test');
 })->name('test');
+
+Route::get('/_cmd/clear-all-cache', function () {
+    Artisan::call('optimize:clear');
+    return 'Cache cleared';
+});
 
 Route::middleware(NonAuthenticated::class)->group(function () {
     Route::redirect('/', 'admin/auth/login', 301);
