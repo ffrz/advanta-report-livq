@@ -69,6 +69,7 @@ const columns = [
     label: type.name,
     align: "center",
   })),
+  { name: "total_progress", label: "Total Progress", align: "center" },
   { name: "notes", field: "notes", align: "left", label: "Catatan" },
   { name: "action", align: "right" },
 ];
@@ -328,7 +329,8 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                           const detail = props.row.details.find(
                             (d) => Number(d.type_id) === Number(type.id)
                           );
-                          if (!detail || detail.quarter_qty === 0) return "0%";
+                          if (!detail || detail.quarter_qty === 0)
+                            return "Progress: 0%";
                           const percent =
                             (plan.quarter_qty / detail.quarter_qty) * 100;
                           return `Progress: ${percent.toFixed(0)}%`;
@@ -342,6 +344,62 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 <div v-if="props.row.notes" class="text-grey-8">
                   <q-icon name="notes" />
                   {{ props.row.notes }}
+                </div>
+
+                <!-- Progress Keseluruhan -->
+                <div class="q-mt-sm">
+                  {{
+                    (() => {
+                      let totalPlan = 0;
+                      let totalTarget = 0;
+
+                      for (const type of types) {
+                        const detail = props.row.details.find(
+                          (d) => Number(d.type_id) === Number(type.id)
+                        );
+                        const plan = props.row.plans?.[type.id];
+
+                        if (detail) {
+                          totalTarget += Number(detail.quarter_qty) || 0;
+                        }
+                        if (plan) {
+                          totalPlan += Number(plan.quarter_qty) || 0;
+                        }
+                      }
+
+                      const percent =
+                        totalTarget > 0
+                          ? Math.min((totalPlan / totalTarget) * 100, 100)
+                          : 0;
+                      return `Total Progress: ${percent.toFixed(0)}%`;
+                    })()
+                  }}
+                  <q-linear-progress
+                    :value="
+                      (() => {
+                        let totalPlan = 0;
+                        let totalTarget = 0;
+                        for (const type of types) {
+                          const detail = props.row.details.find(
+                            (d) => Number(d.type_id) === Number(type.id)
+                          );
+                          const plan = props.row.plans?.[type.id];
+                          if (detail)
+                            totalTarget += Number(detail.quarter_qty) || 0;
+                          if (plan) totalPlan += Number(plan.quarter_qty) || 0;
+                        }
+                        return totalTarget > 0
+                          ? Math.min(totalPlan / totalTarget, 1)
+                          : 0;
+                      })()
+                    "
+                    size="10px"
+                    color="primary"
+                    class="q-mt-xs"
+                    rounded
+                    stripe
+                    animated
+                  />
                 </div>
               </template>
             </q-td>
@@ -404,7 +462,63 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 }}
               </div>
             </q-td>
+            <q-td key="total_progress" :props="props">
+              {{
+                (() => {
+                  let totalPlan = 0;
+                  let totalTarget = 0;
 
+                  for (const type of types) {
+                    const detail = props.row.details.find(
+                      (d) => Number(d.type_id) === Number(type.id)
+                    );
+                    const plan = props.row.plans?.[type.id];
+
+                    if (detail) {
+                      totalTarget += Number(detail.quarter_qty) || 0;
+                    }
+                    if (plan) {
+                      totalPlan += Number(plan.quarter_qty) || 0;
+                    }
+                  }
+
+                  const percent =
+                    totalTarget > 0 ? (totalPlan / totalTarget) * 100 : 0;
+                  return `${percent.toFixed(0)}%`;
+                })()
+              }}
+
+              <q-linear-progress
+                :value="
+                  (() => {
+                    let totalPlan = 0;
+                    let totalTarget = 0;
+
+                    for (const type of types) {
+                      const detail = props.row.details.find(
+                        (d) => Number(d.type_id) === Number(type.id)
+                      );
+                      const plan = props.row.plans?.[type.id];
+
+                      if (detail) {
+                        totalTarget += Number(detail.quarter_qty) || 0;
+                      }
+                      if (plan) {
+                        totalPlan += Number(plan.quarter_qty) || 0;
+                      }
+                    }
+
+                    return totalTarget > 0 ? totalPlan / totalTarget : 0;
+                  })()
+                "
+                size="10px"
+                color="primary"
+                class="q-mt-xs"
+                rounded
+                stripe
+                animated
+              />
+            </q-td>
             <q-td key="notes" :props="props">
               {{ props.row.notes }}
             </q-td>
