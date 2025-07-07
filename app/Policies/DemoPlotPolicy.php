@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\DemoPlot;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class DemoPlotPolicy
 {
@@ -13,12 +12,17 @@ class DemoPlotPolicy
      */
     public function view(User $user, DemoPlot $item): bool
     {
-        return $item->user_id === $user->id
-            || $user->role === 'admin'
-            || (
-                $user->role === 'agronomist' &&
-                $item->user->parent_id === $user->id
-            );
+        if ($user->role === User::Role_Admin) return true;
+
+        if ($user->role === User::Role_BS) {
+            return $item->user_id === $user->id;
+        }
+
+        if ($user->role === User::Role_Agronomist) {
+            return $item->user->parent_id === $user->id;
+        }
+
+        return false;
     }
 
     /**
@@ -26,6 +30,12 @@ class DemoPlotPolicy
      */
     public function update(User $user, DemoPlot $item): bool
     {
-        return $user->role === 'admin' || $item->user_id === $user->id;
+        if ($user->role === User::Role_Admin) return true;
+
+        if ($user->role === User::Role_BS) {
+            return $item->id ? $item->user_id === $user->id : true;
+        }
+
+        return false;
     }
 }
