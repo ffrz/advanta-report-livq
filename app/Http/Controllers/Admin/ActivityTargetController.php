@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityPlan;
+use App\Models\ActivityPlanDetail;
 use App\Models\ActivityTarget;
 use App\Models\ActivityTargetDetail;
 use App\Models\ActivityType;
@@ -63,7 +65,52 @@ class ActivityTargetController extends Controller
         $items = $this->createQuery($request)
             ->orderBy($orderBy, $orderType)
             ->paginate($request->get('per_page', 10))
-            ->withQueryString();
+            ->withQueryString()
+            ->toArray();
+
+        foreach ($items['data'] as $index => $item) {
+            $year = $item['year'];
+            $quarter = $item['quarter'];
+            $start_month = $quarter * 3 - 2;
+            $end_month = $quarter * 3;
+            $start = Carbon::createFromDate($year, $start_month, 1)->startOfDay();
+            $end = Carbon::createFromDate($year, $end_month, 1)->endOfMonth()->endOfDay();
+
+            $plans = ActivityPlan::with('details')
+                ->where('user_id', $item['user_id'])
+                ->where('status', ActivityPlan::Status_Approved)
+                ->whereBetween('date', [$start, $end])
+                ->get();
+
+            $plan_details_by_type_ids = [];
+
+            foreach ($plans as $plan) {
+                foreach ($plan->details as $detail) {
+                    if (!isset($plan_details_by_type_ids[$detail->type_id])) {
+                        $plan_details_by_type_ids[$detail->type_id] = [];
+                    }
+
+                    if (!isset($plan_details_by_type_ids[$detail->type_id]['quarter_qty'])) {
+                        $plan_details_by_type_ids[$detail->type_id]['quarter_qty'] = 0;
+                        $plan_details_by_type_ids[$detail->type_id]['month1_qty'] = 0;
+                        $plan_details_by_type_ids[$detail->type_id]['month2_qty'] = 0;
+                        $plan_details_by_type_ids[$detail->type_id]['month3_qty'] = 0;
+                    }
+
+                    $plan_details_by_type_ids[$detail->type_id]['quarter_qty'] += 1;
+
+                    $month = Carbon::parse($plan->date)->month;
+                    if ($month % 3 == 1) {
+                        $plan_details_by_type_ids[$detail->type_id]['month1_qty'] += 1;
+                    } elseif ($month % 3 == 2) {
+                        $plan_details_by_type_ids[$detail->type_id]['month2_qty'] += 1;
+                    } else {
+                        $plan_details_by_type_ids[$detail->type_id]['month3_qty'] += 1;
+                    }
+                }
+            }
+            $items['data'][$index]['plans'] = $plan_details_by_type_ids;
+        }
 
         return response()->json($items);
     }

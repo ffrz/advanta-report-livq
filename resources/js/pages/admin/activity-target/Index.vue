@@ -281,25 +281,71 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
           >
             <q-td key="period" :props="props">
               {{ props.row.year }}-Q{{ props.row.quarter }}
+
               <template v-if="$q.screen.lt.md">
+                <!-- Informasi User -->
                 <div>
                   <q-icon name="person" />
                   {{ props.row.user.name }} ({{ props.row.user.username }})
                 </div>
+
+                <!-- Detail Target dan Realisasi -->
                 <ul class="q-ma-none q-pl-md q-pa-none">
-                  <li v-for="detail in props.row.details" :key="detail.id">
-                    {{ detail.type.name }}: {{ detail.quarter_qty }} ({{
-                      detail.month1_qty
-                    }}/{{ detail.month2_qty }}/{{ detail.month3_qty }})
-                    <br />
+                  <li v-for="type in types" :key="type.id">
+                    <b>Target {{ type.name }}</b
+                    >:
+                    {{
+                      (() => {
+                        const detail = props.row.details.find(
+                          (d) => Number(d.type_id) === Number(type.id)
+                        );
+                        return detail
+                          ? `${detail.quarter_qty} (${detail.month1_qty}/${detail.month2_qty}/${detail.month3_qty})`
+                          : "-";
+                      })()
+                    }}
+
+                    <!-- Realisasi (Plan) -->
+                    <div v-if="props.row.plans && props.row.plans[type.id]">
+                      Plan {{ type.name }}:
+                      {{
+                        `${props.row.plans[type.id].quarter_qty} (${
+                          props.row.plans[type.id].month1_qty
+                        }/${props.row.plans[type.id].month2_qty}/${
+                          props.row.plans[type.id].month3_qty
+                        })`
+                      }}
+                    </div>
+
+                    <!-- Persentase Progress -->
+                    <div
+                      v-if="props.row.plans && props.row.plans[type.id]"
+                      class="text-primary text-caption"
+                    >
+                      {{
+                        (() => {
+                          const plan = props.row.plans[type.id];
+                          const detail = props.row.details.find(
+                            (d) => Number(d.type_id) === Number(type.id)
+                          );
+                          if (!detail || detail.quarter_qty === 0) return "0%";
+                          const percent =
+                            (plan.quarter_qty / detail.quarter_qty) * 100;
+                          return `Progress: ${percent.toFixed(0)}%`;
+                        })()
+                      }}
+                    </div>
                   </li>
                 </ul>
+
+                <!-- Notes -->
                 <div v-if="props.row.notes" class="text-grey-8">
                   <q-icon name="notes" />
                   {{ props.row.notes }}
                 </div>
               </template>
             </q-td>
+
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
             </q-td>
@@ -307,33 +353,58 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               v-for="type in types"
               :key="`target-${type.id}`"
               :props="props"
-              :class="`text-center`"
+              class="text-center"
             >
-              {{
-                props.row.details.filter(
-                  (d) => Number(d.type_id) === Number(type.id)
-                )[0].quarter_qty
-              }}
-              (
-              {{
-                props.row.details.filter(
-                  (d) => Number(d.type_id) === Number(type.id)
-                )[0].month1_qty
-              }}
-              /
-              {{
-                props.row.details.filter(
-                  (d) => Number(d.type_id) === Number(type.id)
-                )[0].month2_qty
-              }}
-              /
-              {{
-                props.row.details.filter(
-                  (d) => Number(d.type_id) === Number(type.id)
-                )[0].month3_qty
-              }}
-              )
+              <!-- Target -->
+              <div>
+                {{
+                  (() => {
+                    const detail = props.row.details.find(
+                      (d) => Number(d.type_id) === Number(type.id)
+                    );
+                    return detail
+                      ? `${detail.quarter_qty} (${detail.month1_qty}/${detail.month2_qty}/${detail.month3_qty})`
+                      : "-";
+                  })()
+                }}
+              </div>
+
+              <!-- Realisasi (Plan) -->
+              <div v-if="props.row.plans && props.row.plans[type.id]">
+                {{
+                  `${props.row.plans[type.id].quarter_qty} (${
+                    props.row.plans[type.id].month1_qty
+                  }/${props.row.plans[type.id].month2_qty}/${
+                    props.row.plans[type.id].month3_qty
+                  })`
+                }}
+              </div>
+
+              <!-- Progress (%) -->
+              <div
+                v-if="
+                  props.row.plans &&
+                  props.row.plans[type.id] &&
+                  props.row.details
+                "
+              >
+                {{
+                  (() => {
+                    const plan = props.row.plans[type.id];
+                    const detail = props.row.details.find(
+                      (d) => Number(d.type_id) === Number(type.id)
+                    );
+
+                    if (!detail || detail.quarter_qty === 0) return "0%";
+
+                    const progress =
+                      (plan.quarter_qty / detail.quarter_qty) * 100;
+                    return `${progress.toFixed(0)}%`;
+                  })()
+                }}
+              </div>
             </q-td>
+
             <q-td key="notes" :props="props">
               {{ props.row.notes }}
             </q-td>
