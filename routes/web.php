@@ -30,6 +30,10 @@ Route::get('/test', function () {
 })->name('test');
 
 Route::get('/_cmd/clear-all-cache', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
     Artisan::call('optimize:clear');
     return 'Cache cleared';
 });
