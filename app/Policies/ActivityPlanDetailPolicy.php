@@ -34,7 +34,7 @@ class ActivityPlanDetailPolicy
         if ($user->role === User::Role_Admin) return true;
 
         if ($user->role === User::Role_BS) {
-            return $item->user_id == $user->id;
+            return $item->id ? $item->user_id == $user->id : true;
         }
 
         if ($user->role === User::Role_Agronomist) {
