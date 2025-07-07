@@ -27,6 +27,16 @@ class Product extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'product_id' => 'integer',
+        'category_id' => 'integer',
+        'active' => 'boolean',
+        'price_1' => 'float',
+        'price_2' => 'float',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+    ];
+
     /**
      * Get the category for the product.
      */

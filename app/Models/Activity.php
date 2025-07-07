@@ -23,6 +23,18 @@ class Activity extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'type_id' => 'integer',
+        'product_id' => 'integer',
+        'date' => 'date',
+        'cost' => 'float',
+        'responded_by_id' => 'integer',
+        'responded_datetime' => 'datetime',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+    ];
+
     public const Status_NotResponded = 'not_responded';
     public const Status_Approved = 'approved';
     public const Status_Rejected = 'rejected';

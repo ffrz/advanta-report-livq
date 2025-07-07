@@ -24,8 +24,17 @@ class DemoPlot extends Model
         'last_visit',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'product_id' => 'integer',
+        'plant_date' => 'date',
+        'active' => 'boolean',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+        'last_visit' => 'datetime',
+    ];
+
     const PlantStatus_NotYetPlanted   = 'not_yet_planted';
-    // const PlantStatus_Planted         = 'planted';
     const PlantStatus_NotYetEvaluated = 'not_yet_evaluated';
     const PlantStatus_Satisfactoy     = 'satisfactory';
     const PlantStatus_Unsatisfactory  = 'unsatisfactory';
@@ -34,7 +43,6 @@ class DemoPlot extends Model
 
     const PlantStatuses = [
         self::PlantStatus_NotYetPlanted   => 'Belum Ditanam',
-        // self::PlantStatus_Planted         => 'Baru Ditanam',
         self::PlantStatus_NotYetEvaluated => 'Belum Dievaluasi',
         self::PlantStatus_Satisfactoy     => 'Memuaskan',
         self::PlantStatus_Unsatisfactory  => 'Kurang Memuaskan',

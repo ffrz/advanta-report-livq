@@ -17,6 +17,15 @@ class ActivityTargetDetail extends Model
         'month3_qty',
     ];
 
+    protected $casts = [
+        'parent_id' => 'integer',
+        'type_id' => 'integer',
+        'quarter_qty' => 'integer',
+        'month1_qty' => 'integer',
+        'month2_qty' => 'integer',
+        'month3_qty' => 'integer',
+    ];
+
     public function parent()
     {
         return $this->belongsTo(ActivityTarget::class, 'parent_id');

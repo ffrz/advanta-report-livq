@@ -15,6 +15,14 @@ class ActivityTarget extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'year' => 'integer',
+        'quarter' => 'integer',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

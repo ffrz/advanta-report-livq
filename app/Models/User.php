@@ -43,6 +43,12 @@ class User extends Authenticatable
         'last_activity_datetime'
     ];
 
+    protected $casts = [
+        'active' => 'boolean',
+        'last_login_datetime' => 'datetime',
+        'last_activity_datetime' => 'datetime',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -20,6 +20,13 @@ class Customer extends Model
         'active',
     ];
 
+    protected $casts = [
+        'assigned_user_id' => 'integer',
+        'active' => 'boolean',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+    ];
+
     public static function activeCustomerCount()
     {
         return DB::select(

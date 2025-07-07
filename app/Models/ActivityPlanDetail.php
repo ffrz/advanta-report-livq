@@ -17,6 +17,15 @@ class ActivityPlanDetail extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'parent_id' => 'integer',
+        'type_id' => 'integer',
+        'product_id' => 'integer',
+        'cost' => 'float',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+    ];
+
     public function parent()
     {
         return $this->belongsTo(ActivityPlan::class, 'parent_id');

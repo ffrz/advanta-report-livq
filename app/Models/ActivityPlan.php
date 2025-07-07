@@ -18,6 +18,16 @@ class ActivityPlan extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'date' => 'date',
+        'total_cost' => 'float',
+        'responded_by_id' => 'integer',
+        'responded_datetime' => 'datetime',
+        'created_by_uid' => 'integer',
+        'updated_by_uid' => 'integer',
+    ];
+
     public const Status_NotResponded = 'not_responded';
     public const Status_Approved = 'approved';
     public const Status_Rejected = 'rejected';
