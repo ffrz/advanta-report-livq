@@ -13,12 +13,17 @@ class ActivityPlanDetailPolicy
      */
     public function view(User $user, ActivityPlanDetail $item): bool
     {
-        return $item->parent->user_id === $user->id
-            || $user->role === 'admin'
-            || (
-                $user->role === 'agronomist' &&
-                $item->parent->user->parent_id === $user->id
-            );
+        if ($user->role === User::Role_Admin) return true;
+
+        if ($user->role === User::Role_BS) {
+            return $item->user_id === $user->id;
+        }
+
+        if ($user->role === User::Role_Agronomist) {
+            return $item->user->parent_id === $user->id;
+        }
+
+        return false;
     }
 
     /**
@@ -26,11 +31,16 @@ class ActivityPlanDetailPolicy
      */
     public function update(User $user, ActivityPlanDetail $item): bool
     {
-        return $item->parent->user_id === $user->id
-            || $user->role === 'admin'
-            || (
-                $user->role === 'agronomist' &&
-                $item->parent->user->parent_id === $user->id
-            );
+        if ($user->role === User::Role_Admin) return true;
+
+        if ($user->role === User::Role_BS) {
+            return $item->user_id === $user->id;
+        }
+
+        if ($user->role === User::Role_Agronomist) {
+            return $item->user->parent_id === $user->id;
+        }
+
+        return false;
     }
 }

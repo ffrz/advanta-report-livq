@@ -52,9 +52,7 @@ class ActivityPlanDetailController extends Controller
             'parent_id' => $request->get('parent_id')
         ]);
 
-        if ($id) {
-            $this->authorize('update', $item);
-        }
+        $this->authorize('update', $item);
 
         return inertia('admin/activity-plan-detail/Editor', [
             'data' => $item,
@@ -78,9 +76,7 @@ class ActivityPlanDetailController extends Controller
             ? new ActivityPlanDetail()
             : ActivityPlanDetail::findOrFail($request->post('id', 0));
 
-        if ($request->id) {
-            $this->authorize('update', $item);
-        }
+        $this->authorize('update', $item);
 
         DB::beginTransaction();
         $item->fill($validated);

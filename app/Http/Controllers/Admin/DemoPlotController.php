@@ -99,9 +99,7 @@ class DemoPlotController extends Controller
             'plant_status' => DemoPlot::PlantStatus_NotYetPlanted,
         ]);
 
-        if ($id) {
-            $this->authorize('update', $item);
-        }
+        $this->authorize('update', $item);
 
         return inertia('admin/demo-plot/Editor', [
             'data' => $item,
@@ -133,9 +131,7 @@ class DemoPlotController extends Controller
             ])
             : DemoPlot::findOrFail($request->post('id', 0));
 
-        if ($request->id) {
-            $this->authorize('update', $item);
-        }
+        $this->authorize('update', $item);
 
         // Force current user id
         $current_user = Auth::user();

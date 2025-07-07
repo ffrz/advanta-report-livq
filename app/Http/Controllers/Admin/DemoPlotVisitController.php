@@ -100,9 +100,7 @@ class DemoPlotVisitController extends Controller
             'demo_plot_id' => $request->get('demo_plot_id')
         ]);
 
-        if ($id) {
-            $this->authorize('update', $item);
-        }
+        $this->authorize('update', $item);
 
         return inertia('admin/demo-plot-visit/Editor', [
             'data' => $item,
@@ -129,9 +127,7 @@ class DemoPlotVisitController extends Controller
             ? new DemoPlotVisit()
             : DemoPlotVisit::findOrFail($request->post('id', 0));
 
-        if ($request->id) {
-            $this->authorize('update', $item);
-        }
+        $this->authorize('update', $item);
 
         // Handle image upload jika ada
         if ($request->hasFile('image')) {

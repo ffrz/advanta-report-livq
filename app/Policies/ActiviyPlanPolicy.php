@@ -12,12 +12,17 @@ class ActiviyPlanPolicy
      */
     public function view(User $user, ActivityPlan $item): bool
     {
-        return $item->user_id === $user->id
-            || $user->role === 'admin'
-            || (
-                $user->role === 'agronomist' &&
-                $item->user->parent_id === $user->id
-            );
+        if ($user->role === User::Role_Admin) return true;
+
+        if ($user->role === User::Role_BS) {
+            return $item->user_id === $user->id;
+        }
+
+        if ($user->role === User::Role_Agronomist) {
+            return $item->user->parent_id === $user->id;
+        }
+
+        return false;
     }
 
     /**
@@ -25,6 +30,12 @@ class ActiviyPlanPolicy
      */
     public function update(User $user, ActivityPlan $item): bool
     {
-        return $user->role === 'admin' || $item->user_id === $user->id;
+        if ($user->role === User::Role_Admin) return true;
+
+        if ($user->role === User::Role_BS) {
+            return $item->id ? $item->user_id === $user->id : true;
+        }
+
+        return false;
     }
 }
