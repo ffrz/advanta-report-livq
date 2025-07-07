@@ -119,9 +119,10 @@ class ActivityTargetController extends Controller
                 ->first();
 
             if ($existingTarget && $existingTarget->id != $activityTarget->id) {
+                $user = $existingTarget->user;
                 DB::rollBack();
                 return back()->withInput()->withErrors([
-                    'message' => "Target untuk user ini pada tahun $year dan kuartal $quarter sudah ada.",
+                    'message' => "Target $year-Q$quarter $user->username sudah ada!",
                 ]);
             }
 
@@ -140,7 +141,7 @@ class ActivityTargetController extends Controller
                 if (intval($target['m1'] + $target['m2'] + $target['m3']) != intval($target['q'])) {
                     DB::rollBack();
                     return back()->withInput()->withErrors([
-                        'message' => "Jumlah bulan tidak sama dengan target kuartal untuk tipe $typeId",
+                        'message' => "Jumlah bulan tidak sama dengan target kuartal untuk keigiatan $typeId",
                     ]);
                 }
 

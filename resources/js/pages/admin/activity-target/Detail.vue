@@ -4,7 +4,7 @@ import { ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
 
 const page = usePage();
-const title = "Rincian Kegiatan";
+const title = "Rincian Target Kegiatan";
 const tab = ref("main");
 </script>
 

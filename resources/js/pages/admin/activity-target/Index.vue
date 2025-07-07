@@ -281,6 +281,24 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
           >
             <q-td key="period" :props="props">
               {{ props.row.year }}-Q{{ props.row.quarter }}
+              <template v-if="$q.screen.lt.md">
+                <div>
+                  <q-icon name="person" />
+                  {{ props.row.user.name }} ({{ props.row.user.username }})
+                </div>
+                <ul class="q-ma-none q-pl-md q-pa-none">
+                  <li v-for="detail in props.row.details" :key="detail.id">
+                    {{ detail.type.name }}: {{ detail.quarter_qty }} ({{
+                      detail.month1_qty
+                    }}/{{ detail.month2_qty }}/{{ detail.month3_qty }})
+                    <br />
+                  </li>
+                </ul>
+                <div v-if="props.row.notes" class="text-grey-8">
+                  <q-icon name="notes" />
+                  {{ props.row.notes }}
+                </div>
+              </template>
             </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})

@@ -10,7 +10,12 @@ const showViewer = ref(false);
   <table class="detail">
     <tbody>
       <tr>
-        <td style="width: 150px">BS</td>
+        <td colspan="3" class="bg-white">
+          <div class="text-bold text-grey-8 q-mt-md">Informasi Utama</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width: 100px">BS</td>
         <td>:</td>
         <td>
           <template v-if="page.props.data.user">
@@ -37,34 +42,16 @@ const showViewer = ref(false);
       <tr>
         <td>Target</td>
         <td>:</td>
+        <td></td>
+      </tr>
+      <tr v-for="detail in page.props.data.details" :key="detail.id">
         <td>
-          <template
-            v-if="page.props.data.details && page.props.data.details.length"
-          >
-            <table class="">
-              <thead>
-                <tr>
-                  <th>Jenis Kegiatan</th>
-                  <th class="text-center">Q</th>
-                  <th class="text-center">M1</th>
-                  <th class="text-center">M2</th>
-                  <th class="text-center">M3</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="detail in page.props.data.details" :key="detail.id">
-                  <td>{{ detail.type.name }}</td>
-                  <td class="text-center">{{ detail.quarter_qty }}</td>
-                  <td class="text-center">{{ detail.month1_qty }}</td>
-                  <td class="text-center">{{ detail.month2_qty }}</td>
-                  <td class="text-center">{{ detail.month3_qty }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </template>
-          <template v-else>
-            <span class="text-grey-6">Tidak ada target yang ditetapkan</span>
-          </template>
+          <span class="q-ml-sm">- {{ detail.type.name }}</span>
+        </td>
+        <td>:</td>
+        <td>
+          {{ detail.quarter_qty }} ({{ detail.month1_qty }} /
+          {{ detail.month2_qty }} / {{ detail.month3_qty }})
         </td>
       </tr>
       <tr>
@@ -117,7 +104,7 @@ const showViewer = ref(false);
         </td>
       </tr>
       <tr>
-        <td style="width: 125px">Kegiatan ID</td>
+        <td style="width: 100px">ID</td>
         <td style="width: 1px">:</td>
         <td>#{{ page.props.data.id }}</td>
       </tr>
