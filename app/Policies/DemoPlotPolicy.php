@@ -12,6 +12,8 @@ class DemoPlotPolicy
      */
     public function view(User $user, DemoPlot $item): bool
     {
+        dd($user->toArray(), $item->toArray());
+
         if ($user->role === User::Role_Admin) return true;
 
         if ($user->role === User::Role_BS) {
