@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityTarget;
+use App\Models\ActivityTargetDetail;
 use App\Models\ActivityType;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -11,32 +12,33 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Intervention\Image\ImageManager;
 use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-// TODO: Controller dan view pada modul ini belum disesuaikan dengan perubahan database ActivityTarget,
-// perlu diperbaiki!!
-
 class ActivityTargetController extends Controller
 {
     public function index()
     {
-        $users = [];
-        if (Auth::user()->role == User::Role_BS) {
-            $users = User::query()->where('role', User::Role_BS)->orderBy('name')->get();
-        } else if (Auth::user()->role == User::Role_Agronomist) {
-            $users = User::query()
-                ->where('role', User::Role_BS)
-                ->where('parent_id', Auth::user()->id)
-                ->orderBy('name')->get();
+        $q = User::query()
+            ->where('role', User::Role_BS);
+
+        if (Auth::user()->role == User::Role_Agronomist) {
+            $q->where('parent_id', Auth::user()->id)
+                ->orWhere('id', Auth::user()->id);
         }
+
+        $users = $q->select(['id', 'username', 'name'])
+            ->orderBy('name', 'asc')
+            ->get();
 
         return inertia('admin/activity-target/Index', [
             'users' => $users,
-            'types' => ActivityType::query()->where('active', true)->orderBy('name')->get(),
+            'types' => ActivityType::where('active', true)
+                ->select(['id', 'name'])
+                ->orderBy('name', 'asc')
+                ->get(),
         ]);
     }
 
@@ -44,8 +46,9 @@ class ActivityTargetController extends Controller
     {
         return inertia('admin/activity-target/Detail', [
             'data' => ActivityTarget::with([
-                'user',
-                'type:id,name',
+                'user:id,username,name',
+                'details',
+                'details.type:id,name',
                 'created_by_user:id,username,name',
                 'updated_by_user:id,username,name',
             ])->findOrFail($id),
@@ -71,97 +74,101 @@ class ActivityTargetController extends Controller
         $item = ActivityTarget::findOrFail($id);
         $item->id = 0;
         $item->user_id = $user->role == User::Role_BS ? $user->id : $item->user->id;
-        return inertia('admin/activity-target/Editor', [
-            'data' => $item,
-            'types' => ActivityType::where('active', true)
-                ->orderBy('name', 'asc')
-                ->get(),
-            'users' => User::where('active', true)
-                ->where('role', User::Role_BS)
-                ->orderBy('username', 'asc')->get(),
-        ]);
+        return $this->_editor($item);
     }
 
     public function editor(Request $request, $id = 0)
     {
-        $user = Auth::user();
         $item = $id ? ActivityTarget::findOrFail($id) : new ActivityTarget([
             'year' => intval(date('Y')),
-            'month' => intval(date('m')),
-            'period_type' => 'month',
-            'qty' => 1,
+            'quarter' => 1,
         ]);
 
-        return inertia('admin/activity-target/Editor', [
-            'data' => $item,
-            'types' => ActivityType::where('active', true)
-                ->orderBy('name', 'asc')
-                ->get(),
-            'users' => User::where('active', true)
-                ->where('role', User::Role_BS)
-                ->orderBy('username', 'asc')->get(),
-        ]);
+        return $this->_editor($item);
     }
 
     public function save(Request $request)
     {
         $validated = $request->validate([
-            'user_id'     => 'required|exists:users,id',
-            'quarter'     => ['required', 'regex:/^\d{4}-q[1-4]$/i'],
-            'targets'     => 'required|array',
+            'user_id'      => 'required|exists:users,id',
+            'quarter'      => ['required', 'regex:/^\d{4}-q[1-4]$/i'],
+            'targets'      => 'required|array',
             'targets.*.q'  => 'required|numeric',
             'targets.*.m1' => 'required|numeric',
             'targets.*.m2' => 'required|numeric',
             'targets.*.m3' => 'required|numeric',
+            'notes'        => 'nullable|string|max:250',
         ]);
 
         DB::beginTransaction();
         try {
+            $quarterTextArr = explode('-', $validated['quarter']);
+            $year = intval($quarterTextArr[0]);
+            $quarter = intval($quarterTextArr[1][1]);
+
+            if ($request->id) {
+                $activityTarget = ActivityTarget::findOrFail($request->id);
+            } else {
+                $activityTarget = new ActivityTarget();
+            }
+
+            // Cek apakah target untuk user, tahun dan kuartal ini sudah ada
+            $existingTarget = ActivityTarget::where('user_id', $validated['user_id'])
+                ->where('year', $year)
+                ->where('quarter', $quarter)
+                ->first();
+
+            if ($existingTarget && $existingTarget->id != $activityTarget->id) {
+                DB::rollBack();
+                return back()->withInput()->withErrors([
+                    'message' => "Target untuk user ini pada tahun $year dan kuartal $quarter sudah ada.",
+                ]);
+            }
+
+            $activityTarget->user_id = $validated['user_id'];
+            $activityTarget->year = $year;
+            $activityTarget->quarter = $quarter;
+            $activityTarget->notes = $validated['notes'] ?? null;
+            $activityTarget->save();
+
+            $existingDetails = $activityTarget->details()->pluck('id', 'type_id')->toArray();
+            $typeIdsInRequest = [];
+
             foreach ($request->targets as $typeId => $target) {
-                // Optional: validasi penjumlahan q == m1+m2+m3
+                $typeIdsInRequest[] = $typeId;
+
                 if (intval($target['m1'] + $target['m2'] + $target['m3']) != intval($target['q'])) {
                     DB::rollBack();
                     return back()->withInput()->withErrors([
-                        'message.' => "Jumlah bulan tidak sama dengan target kuartal untuk tipe $typeId"
+                        'message' => "Jumlah bulan tidak sama dengan target kuartal untuk tipe $typeId",
                     ]);
                 }
 
-                $quarterTextArr = explode('-', $validated['quarter']);
-                $year = intval($quarterTextArr[0]);
-                $quarter = intval($quarterTextArr[1][1]);
-
-                // Cek apakah record sudah ada
-                $existing = ActivityTarget::where('user_id', $request->user_id)
-                    ->where('type_id', $typeId)
-                    ->where('year', $year)
-                    ->where('quarter', $quarter)
-                    ->when($request->id, fn($q) => $q->where('id', '!=', $request->id)) // abaikan jika sedang update
-                    ->exists();
-
-                if ($existing) {
-                    DB::rollBack();
-                    return back()->withInput()->withErrors([
-                        "message" => "Target untuk jenis kegiatan ini pada tahun $year kuartal $quarter sudah ada.",
+                // Jika type_id sudah ada, update
+                if (isset($existingDetails[$typeId])) {
+                    ActivityTargetDetail::where('id', $existingDetails[$typeId])->update([
+                        'quarter_qty' => $target['q'],
+                        'month1_qty' => $target['m1'],
+                        'month2_qty' => $target['m2'],
+                        'month3_qty' => $target['m3'],
                     ]);
-                }
-
-                $item = ActivityTarget::updateOrCreate(
-                    [
-                        'user_id' => $request->user_id,
+                } else {
+                    // Jika belum, insert
+                    ActivityTargetDetail::create([
+                        'parent_id' => $activityTarget->id,
                         'type_id' => $typeId,
-                        'year'    => $year,
-                        'quarter' => $quarter,
-                    ],
-                    [
-                        'quarter_qty'    => $target['q'],
-                        'month1_qty'     => $target['m1'],
-                        'month2_qty'     => $target['m2'],
-                        'month3_qty'     => $target['m3'],
-                    ]
-                );
-
-                $item->save();
+                        'quarter_qty' => $target['q'],
+                        'month1_qty' => $target['m1'],
+                        'month2_qty' => $target['m2'],
+                        'month3_qty' => $target['m3'],
+                    ]);
+                }
             }
+
+            // Opsional: hapus detail yang tidak dikirim (jika perlu sinkron penuh)
+            ActivityTargetDetail::where('parent_id', $activityTarget->id)
+                ->whereNotIn('type_id', $typeIdsInRequest)
+                ->delete();
 
             DB::commit();
             return redirect()->route('admin.activity-target.index')
@@ -178,7 +185,7 @@ class ActivityTargetController extends Controller
         $item->delete();
 
         return response()->json([
-            'message' => "Kegiatan #$item->id telah dihapus."
+            'message' => "Target kegiatan #$item->id telah dihapus."
         ]);
     }
 
@@ -256,15 +263,12 @@ class ActivityTargetController extends Controller
 
         $q = ActivityTarget::with([
             'user:id,username,name',
-            'type:id,name',
+            'details',
+            'details.type:id,name',
         ]);
 
         if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
             $q->where('user_id', '=', $filter['user_id']);
-        }
-
-        if (!empty($filter['type_id']) && ($filter['type_id'] != 'all')) {
-            $q->where('type_id', '=', $filter['type_id']);
         }
 
         if (!empty($filter['year']) && ($filter['year'] != 'all')) {
@@ -275,6 +279,28 @@ class ActivityTargetController extends Controller
             $q->where('quarter', $filter['quarter']);
         }
 
+        if (!empty($filter['search'])) {
+            $q->where(function ($q) use ($filter) {
+                $q->where('notes', 'like', '%' . $filter['search'] . '%');
+            });
+        }
+
         return $q;
+    }
+
+    private function _editor(ActivityTarget $item)
+    {
+        return inertia('admin/activity-target/Editor', [
+            'data' => $item,
+            'types' => ActivityType::where('active', true)
+                ->select(['id', 'name', 'default_quarter_target', 'default_month1_target', 'default_month2_target', 'default_month3_target'])
+                ->orderBy('name', 'asc')
+                ->get(),
+            'users' => User::where('active', true)
+                ->select(['id', 'username', 'name'])
+                ->where('role', User::Role_BS)
+                ->orderBy('username', 'asc')
+                ->get(),
+        ]);
     }
 }

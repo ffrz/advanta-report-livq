@@ -117,7 +117,6 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
         dense
         color="primary"
         @click="router.get(route('admin.user.add'))"
-        :disable="$page.props.auth.user.role != $CONSTANTS.USER_ROLE_ADMIN"
       />
       <q-btn
         class="q-ml-sm"

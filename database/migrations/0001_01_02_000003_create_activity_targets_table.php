@@ -15,15 +15,10 @@ return new class extends Migration
     {
         Schema::create('activity_targets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('type_id')->on('activity_types')->restrictOnDelete();
             $table->foreignId('user_id')->on('users')->restrictOnDelete();
             $table->unsignedSmallInteger('year');
             $table->unsignedTinyInteger('quarter')->nullable();
-            $table->unsignedTinyInteger('quarter_qty')->default(0);
-            $table->unsignedTinyInteger('month1_qty')->default(0);
-            $table->unsignedTinyInteger('month2_qty')->default(0);
-            $table->unsignedTinyInteger('month3_qty')->default(0);
-            $table->date('notes');
+            $table->text('notes')->nullable();
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();
@@ -31,7 +26,7 @@ return new class extends Migration
             $table->foreignId('created_by_uid')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by_uid')->nullable()->constrained('users')->nullOnDelete();
 
-            $table->unique(['user_id', 'type_id', 'year', 'quarter']);
+            $table->unique(['user_id', 'year', 'quarter']);
         });
     }
 

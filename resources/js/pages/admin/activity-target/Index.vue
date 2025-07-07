@@ -2,11 +2,9 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams, plantAge } from "@/helpers/utils";
+import { getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
-import dayjs from "dayjs";
-import { Notify, Dialog } from "quasar";
 
 const page = usePage();
 const storage = usePageStorage("activity-target");
@@ -19,9 +17,8 @@ const currentYear = new Date().getFullYear();
 
 const filter = reactive(
   storage.get("filter", {
-    // search: "",
+    search: "",
     user_id: "all",
-    type_id: "all",
     year: currentYear,
     quarter: "all",
     ...getQueryParams(),
@@ -37,6 +34,8 @@ const pagination = ref(
     descending: true,
   })
 );
+
+const types = page.props.types;
 
 const years = [
   { value: "all", label: "Semua" },
@@ -62,24 +61,15 @@ const users = [
   })),
 ];
 
-const types = [
-  { value: "all", label: "Semua" },
-  ...page.props.types.map((type) => ({
-    value: type.id,
-    label: `${type.name}`,
-  })),
-];
-
 const columns = [
   { name: "period", label: "Periode", field: "period", align: "left" },
-  { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
-  {
-    name: "target",
-    label: "Target",
-    field: "target",
-    align: "left",
-  },
+  ...types.map((type) => ({
+    name: `target-${type.id}`,
+    label: type.name,
+    align: "center",
+  })),
+  { name: "notes", field: "notes", align: "left", label: "Catatan" },
   { name: "action", align: "right" },
 ];
 
@@ -89,9 +79,7 @@ onMounted(() => {
 
 const deleteItem = (row) =>
   handleDelete({
-    message: `Hapus Target Kegiatan ${row.type.name} tanggal ${dayjs(
-      row.date
-    ).format("DD MMMM YYYY")}?`,
+    message: `Hapus Target Kegiatan ${row.user.name} periode ${row.year}-Q${row.quarter}?`,
     url: route("admin.activity-target.delete", row.id),
     fetchItemsCallback: fetchItems,
     loading,
@@ -133,6 +121,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     <template #title>{{ title }}</template>
     <template #right-button>
       <q-btn
+        v-if="$can('admin.activity-target.add')"
         icon="add"
         dense
         color="primary"
@@ -146,6 +135,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
         @click="showFilter = !showFilter"
       />
       <q-btn
+        v-if="$can('admin.activity-target.export')"
         icon="file_export"
         dense
         class="q-ml-sm"
@@ -227,18 +217,6 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
           <q-select
             class="custom-select col-xs-12 col-sm-2"
             style="min-width: 150px"
-            v-model="filter.type_id"
-            :options="types"
-            label="Jenis Kegiatan"
-            dense
-            map-options
-            emit-value
-            outlined
-            @update:model-value="onFilterChange"
-          />
-          <q-select
-            class="custom-select col-xs-12 col-sm-2"
-            style="min-width: 150px"
             v-model="filter.user_id"
             v-show="$page.props.auth.user.role != 'bs'"
             :options="users"
@@ -249,7 +227,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             outlined
             @update:model-value="onFilterChange"
           />
-          <!-- <q-input
+          <q-input
             class="col"
             outlined
             dense
@@ -261,7 +239,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             <template v-slot:append>
               <q-icon name="search" />
             </template>
-          </q-input> -->
+          </q-input>
         </div>
       </q-toolbar>
     </template>
@@ -304,26 +282,48 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             <q-td key="period" :props="props">
               {{ props.row.year }}-Q{{ props.row.quarter }}
             </q-td>
-            <q-td key="type" :props="props">
-              {{ props.row.type.name }}
-            </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
             </q-td>
-            <q-td key="target" :props="props">
-              {{ props.row.quarter_qty }} ({{ props.row.month1_qty }} /
-              {{ props.row.month2_qty }} / {{ props.row.month3_qty }})
+            <q-td
+              v-for="type in types"
+              :key="`target-${type.id}`"
+              :props="props"
+              :class="`text-center`"
+            >
+              {{
+                props.row.details.filter((d) => d.type_id === type.id)[0]
+                  .quarter_qty
+              }}
+              (
+              {{
+                props.row.details.filter((d) => d.type_id === type.id)[0]
+                  .month1_qty
+              }}
+              /
+              {{
+                props.row.details.filter((d) => d.type_id === type.id)[0]
+                  .month2_qty
+              }}
+              /
+              {{
+                props.row.details.filter((d) => d.type_id === type.id)[0]
+                  .month3_qty
+              }}
+              )
+            </q-td>
+            <q-td key="notes" :props="props">
+              {{ props.row.notes }}
             </q-td>
             <q-td key="action" :props="props">
-              <div class="flex justify-end">
+              <div
+                class="flex justify-end"
+                v-if="
+                  $can('admin.activity-target.edit') ||
+                  $can('admin.activity-target.delete')
+                "
+              >
                 <q-btn
-                  :disabled="
-                    !check_role([
-                      $CONSTANTS.USER_ROLE_AGRONOMIST,
-                      $CONSTANTS.USER_ROLE_ADMIN,
-                      $CONSTANTS.USER_ROLE_BS,
-                    ])
-                  "
                   icon="more_vert"
                   dense
                   flat
@@ -338,9 +338,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   >
                     <q-list style="width: 200px">
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin.activity-target.edit')"
                         clickable
                         v-ripple
                         v-close-popup
@@ -356,9 +354,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                         <q-item-section>Edit</q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          ['bs', 'admin'].includes($page.props.auth.user.role)
-                        "
+                        v-if="$can('admin.activity-target.delete')"
                         @click.stop="deleteItem(props.row)"
                         clickable
                         v-ripple

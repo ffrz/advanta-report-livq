@@ -1,14 +1,12 @@
 <script setup>
-import { router, useForm, usePage } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import { handleSubmit } from "@/helpers/client-req-handler";
 import {
   scrollToFirstErrorField,
-  create_month_options,
   create_year_options,
   create_quarter_options,
 } from "@/helpers/utils";
 import dayjs from "dayjs";
-import { ref, onMounted } from "vue";
 
 const page = usePage();
 const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Target Kegiatan";
@@ -26,12 +24,8 @@ const types = page.props.types.map((type) => ({
 // buatkan kode untuk generate daftar tahun, setahun kebelakang, tahun ini dan tahun depan
 // lalu masukan sebagai parameter di bawah ini
 const currentYear = new Date().getFullYear();
-const years = create_year_options(
-  String(currentYear - 1),
-  String(currentYear + 1)
-);
 
-const quarters = create_quarter_options(dayjs().format("YYYY"));
+const quarters = create_quarter_options(currentYear);
 
 const defaultTargets = {};
 page.props.types.forEach((type) => {
@@ -61,8 +55,9 @@ if (page.props.data.targets) {
 const form = useForm({
   id: page.props.data.id,
   user_id: page.props.data.user_id ? Number(page.props.data.user_id) : [],
-  quarter: page.props.data.quarter,
+  quarter: `${page.props.data.year}-q${page.props.data.quarter}`,
   targets: defaultTargets,
+  notes: page.props.data.notes,
 });
 
 const submit = () =>
@@ -180,6 +175,19 @@ function getQuarterError(typeId) {
                   Jumlah bulan tidak sama dengan target kuartal
                 </div>
               </div>
+              <q-input
+                v-model.trim="form.notes"
+                type="textarea"
+                autogrow
+                counter
+                maxlength="250"
+                label="Catatan"
+                lazy-rules
+                :disable="form.processing"
+                :error="!!form.errors.notes"
+                :error-message="form.errors.notes"
+                :rules="[]"
+              />
             </q-card-section>
             <q-card-section class="q-gutter-sm">
               <q-btn
