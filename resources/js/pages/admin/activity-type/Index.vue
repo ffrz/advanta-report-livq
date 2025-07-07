@@ -177,7 +177,7 @@ watch(filter, () => storage.set("filter", filter), {
           </div>
         </template>
         <template v-slot:body="props">
-          <q-tr :props="props">
+          <q-tr :props="props" :class="{ inactive: !props.row.active }">
             <q-td key="name" :props="props" class="wrap-column">
               {{ props.row.name }}
               <template v-if="!$q.screen.gt.sm">

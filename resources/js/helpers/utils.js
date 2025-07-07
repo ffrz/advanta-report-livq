@@ -12,6 +12,8 @@ export const getQueryParams = (...args) => {
 }
 
 export function wa_send_url(phone, country_code = '62') {
+  if (!phone) return '';
+
   // Hapus semua karakter non-digit (kecuali + di awal)
   const cleaned = phone.replace(/[^0-9]/g, '');
 
