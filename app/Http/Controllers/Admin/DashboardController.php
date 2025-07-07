@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityPlan;
+use App\Models\ActivityTarget;
+use App\Models\ActivityType;
 use App\Models\Closing;
 use App\Models\Customer;
 use App\Models\CustomerService;
@@ -11,13 +14,93 @@ use App\Models\Service;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
+
     public function index(Request $request)
     {
-        // $period = $request->get('period', 'this_month');
-        // [$start_date, $end_date] = resolve_period($period);
+        $period = $request->get('period', 'this_month');
+        [$start_date, $end_date] = resolve_period($period);
+        $start_date = $start_date ? Carbon::parse($start_date) : Carbon::createFromDate(2000, 1, 1);
+        $month = $start_date->month;
+        $month_position = ($month - 1) % 3 + 1; // hasilnya 1, 2, atau 3
+
+        $user = $request->user();
+
+        if ($user->role === User::Role_BS) {
+            $year = $start_date->year;
+            $quarter = (int) ceil($start_date->month / 3);
+
+            $targets = ActivityTarget::with(['details.type'])
+                ->where('user_id', $user->id)
+                ->where('year', $year)
+                ->where('quarter', ceil($month / 3))
+                ->get();
+
+            $summary = [];
+            $month_column = 'month' . $month_position . '_qty';
+
+            foreach ($targets as $target) {
+                foreach ($target->details as $detail) {
+                    $type_id = $detail->type_id;
+                    if (!isset($summary[$type_id])) {
+                        $summary[$type_id] = [
+                            'type_id' => $type_id,
+                            'type_name' => $detail->type->code ?? $detail->type->name,
+                            'target_qty' => 0,
+                            'plan_qty' => 0,
+                        ];
+                    }
+
+                    $summary[$type_id]['target_qty'] += (int) $detail->{$month_column};
+                }
+            }
+
+            // Cari plan yang disetujui di periode yang sama
+            $start_month = $quarter * 3 - 2;
+            $end_month = $quarter * 3;
+
+            $start = Carbon::createFromDate($year, $start_month, 1)->startOfDay();
+            $end = Carbon::createFromDate($year, $end_month, 1)->endOfMonth()->endOfDay();
+
+            $plans = ActivityPlan::with('details')
+                ->where('user_id', $user->id)
+                ->where('status', ActivityPlan::Status_Approved)
+                ->whereMonth('date', $month)
+                ->whereYear('date', $start_date->year)
+                ->get();
+
+            foreach ($plans as $plan) {
+                foreach ($plan->details as $detail) {
+                    $type_id = $detail->type_id;
+
+                    if (!isset($summary[$type_id])) {
+                        $summary[$type_id] = [
+                            'type_id' => $type_id,
+                            'type_name' => $detail->type->code ?? 'Unknown',
+                            'target_qty' => 0,
+                            'plan_qty' => 0,
+                        ];
+                    }
+
+                    $summary[$type_id]['plan_qty'] += 1;
+                }
+            }
+
+
+            return inertia('admin/dashboard/Index', [
+                'data' => array_values($summary),
+                'period' => [
+                    'label' => \Illuminate\Support\Str::headline(str_replace('_', ' ', $period)),
+                    'start_date' => $start->toDateString(),
+                    'end_date' => $end->toDateString(),
+                ],
+            ]);
+        }
+
+
 
         // $labels = [];
         // $count_interactions = [];

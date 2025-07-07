@@ -319,7 +319,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                     </div>
 
                     <!-- Persentase Progress -->
-                    <div
+                    <!-- <div
                       v-if="props.row.plans && props.row.plans[type.id]"
                       class="text-primary text-caption"
                     >
@@ -336,7 +336,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                           return `Progress: ${percent.toFixed(0)}%`;
                         })()
                       }}
-                    </div>
+                    </div> -->
                   </li>
                 </ul>
 
@@ -435,30 +435,6 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   }/${props.row.plans[type.id].month2_qty}/${
                     props.row.plans[type.id].month3_qty
                   })`
-                }}
-              </div>
-
-              <!-- Progress (%) -->
-              <div
-                v-if="
-                  props.row.plans &&
-                  props.row.plans[type.id] &&
-                  props.row.details
-                "
-              >
-                {{
-                  (() => {
-                    const plan = props.row.plans[type.id];
-                    const detail = props.row.details.find(
-                      (d) => Number(d.type_id) === Number(type.id)
-                    );
-
-                    if (!detail || detail.quarter_qty === 0) return "0%";
-
-                    const progress =
-                      (plan.quarter_qty / detail.quarter_qty) * 100;
-                    return `${progress.toFixed(0)}%`;
-                  })()
                 }}
               </div>
             </q-td>

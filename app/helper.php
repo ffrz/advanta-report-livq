@@ -272,6 +272,11 @@ function resolve_period(string $period, ?string $start = null, ?string $end = nu
             $end_date = $now;
             break;
 
+        case 'next_month':
+            $start_date = $today->copy()->addMonth()->startOfMonth();
+            $end_date = $start_date->copy()->endOfMonth();
+            break;
+
         case 'last_month':
             $start_date = $today->copy()->subMonthNoOverflow()->startOfMonth();
             $end_date = $start_date->copy()->endOfMonth();
