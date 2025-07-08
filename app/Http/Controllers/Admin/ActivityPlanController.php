@@ -120,7 +120,25 @@ class ActivityPlanController extends Controller
             ? new ActivityPlan()
             : ActivityPlan::findOrFail($request->post('id', 0));
 
-        $validated['date'] = sprintf('%04d-%02d-01', $validated['year'], $validated['month']);
+        $date = sprintf('%04d-%02d-01', $validated['year'], $validated['month']);
+
+        // Cek jika ada plan yang sudah approved untuk user & bulan/tahun yang sama
+        $existingApproved = ActivityPlan::where('user_id', $validated['user_id'])
+            ->where('date', $date)
+            ->where('status', 'approved');
+
+        // Jika edit (ada request id), abaikan record itu sendiri dari validasi
+        if ($request->id) {
+            $existingApproved->where('id', '!=', $request->id);
+        }
+
+        if ($existingApproved->exists()) {
+            return back()->withErrors([
+                'month' => 'Plan disetujui sudah ada untuk bulan tersebut.',
+            ])->withInput();
+        }
+
+        $validated['date'] = $date;
         unset($validated['year'], $validated['month']);
 
         $item->fill($validated);
