@@ -86,6 +86,7 @@ class ActivityTypeController extends Controller
             'require_product' => 'nullable|boolean',
         ]);
 
+        $validated['description'] = $validated['description'] ? $validated['description'] : '';
         $item->fill($validated);
         $item->save();
 
