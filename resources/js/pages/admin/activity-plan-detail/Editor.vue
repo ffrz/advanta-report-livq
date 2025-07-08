@@ -84,9 +84,7 @@ const submit = () =>
                 :disable="form.processing"
                 :error="!!form.errors.location"
                 :error-message="form.errors.location"
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Lokasi harus diisi.',
-                ]"
+                :rules="[]"
               />
               <LocaleNumberInput
                 v-model:modelValue="form.cost"
@@ -95,9 +93,7 @@ const submit = () =>
                 :disable="form.processing"
                 :error="!!form.errors.cost"
                 :errorMessage="form.errors.cost"
-                :rules="[
-                  (val) => (val && val.length > 0) || 'Biaya harus diisi.',
-                ]"
+                :rules="[]"
               />
               <q-input
                 v-model.trim="form.notes"

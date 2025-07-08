@@ -67,8 +67,8 @@ class ActivityPlanDetailController extends Controller
             'parent_id'  => 'required|exists:activity_plans,id',
             'type_id'    => 'required|exists:activity_types,id',
             'product_id' => 'nullable|exists:products,id',
-            'cost'       => 'required|numeric',
-            'location'   => 'required|string|max:100',
+            'cost'       => 'nullable|numeric',
+            'location'   => 'nullable|string|max:100',
             'notes'      => 'nullable|string|max:500',
         ]);
 
@@ -79,6 +79,8 @@ class ActivityPlanDetailController extends Controller
         $this->authorize('update', $item);
 
         DB::beginTransaction();
+        $validated['cost'] = !empty($validated['cost']) ? $validated['cost'] : 0;
+        $validated['location'] = !empty($validated['location']) ? $validated['location'] : '';
         $item->fill($validated);
         $item->save();
 

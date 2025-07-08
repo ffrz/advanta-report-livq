@@ -172,6 +172,11 @@ class ActivityController extends Controller
             }
         }
 
+        $validated['cost'] = $validated['cost'] ? $validated['cost'] : 0;
+        $validated['location'] = $validated['location'] ? $validated['location'] : '';
+        $validated['latlong'] = $validated['latlong'] ? $validated['latlong'] : '';
+        $validated['notes'] = $validated['notes'] ? $validated['notes'] : '';
+
         $item->fill($validated);
         $item->save();
 

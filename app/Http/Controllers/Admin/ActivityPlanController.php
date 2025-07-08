@@ -122,10 +122,9 @@ class ActivityPlanController extends Controller
 
         $date = sprintf('%04d-%02d-01', $validated['year'], $validated['month']);
 
-        // Cek jika ada plan yang sudah approved untuk user & bulan/tahun yang sama
+        // Cek jika ada plan untuk user & bulan/tahun yang sama
         $existingApproved = ActivityPlan::where('user_id', $validated['user_id'])
-            ->where('date', $date)
-            ->where('status', 'approved');
+            ->where('date', $date);
 
         // Jika edit (ada request id), abaikan record itu sendiri dari validasi
         if ($request->id) {
@@ -134,7 +133,7 @@ class ActivityPlanController extends Controller
 
         if ($existingApproved->exists()) {
             return back()->withErrors([
-                'month' => 'Plan disetujui sudah ada untuk bulan tersebut.',
+                'month' => 'Plan sudah ada untuk bulan tersebut.',
             ])->withInput();
         }
 
