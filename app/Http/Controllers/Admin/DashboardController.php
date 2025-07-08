@@ -79,7 +79,7 @@ class DashboardController extends Controller
                     if (!isset($summary[$type_id])) {
                         $summary[$type_id] = [
                             'type_id' => $type_id,
-                            'type_name' => $detail->type->code ?? 'Unknown',
+                            'type_name' => $detail->type->name,
                             'target_qty' => 0,
                             'plan_qty' => 0,
                         ];
@@ -88,7 +88,6 @@ class DashboardController extends Controller
                     $summary[$type_id]['plan_qty'] += 1;
                 }
             }
-
 
             return inertia('admin/dashboard/Index', [
                 'data' => array_values($summary),
