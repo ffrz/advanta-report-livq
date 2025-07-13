@@ -55,10 +55,10 @@ export function create_year_options(startYear, endYear) {
 export function create_quarter_options(year) {
   // const nextYear = Number(year) + 1;
   return [
-    { value: `${year}-q1`, label: `${year}-Q1` },
-    { value: `${year}-q2`, label: `${year}-Q2` },
-    { value: `${year}-q3`, label: `${year}-Q3` },
-    { value: `${year}-q4`, label: `${year}-Q4` },
+    { value: `${year}-q1`, label: `${year}-Q1 (April-Juni)` },
+    { value: `${year}-q2`, label: `${year}-Q2 (Juli-September)` },
+    { value: `${year}-q3`, label: `${year}-Q3 (Oktober-Desember)` },
+    { value: `${year}-q4`, label: `${year}-Q4 (Januari-Maret)` },
   ]
 }
 

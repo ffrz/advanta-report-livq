@@ -41,16 +41,16 @@ const years = [
   { value: "all", label: "Semua" },
   ...Array.from({ length: 3 }, (_, i) => {
     const year = currentYear - 1 + i;
-    return { value: year, label: String(year) };
+    return { value: year, label: String(year) + " / " + String(year + 1) };
   }),
 ];
 
 const quarters = [
   { value: "all", label: "Semua" },
-  { value: 1, label: "Q1" },
-  { value: 2, label: "Q2" },
-  { value: 3, label: "Q3" },
-  { value: 4, label: "Q4" },
+  { value: 1, label: "Q1 (April-Juni)" },
+  { value: 2, label: "Q2 (Juli-September)" },
+  { value: 3, label: "Q3 (Oktober-Desember)" },
+  { value: 4, label: "Q4 (Januari-Maret)" },
 ];
 
 const users = [

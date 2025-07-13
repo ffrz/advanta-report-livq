@@ -99,7 +99,7 @@ onMounted(() => {
 
 const deleteItem = (row) =>
   handleDelete({
-    message: `Hapus Kegiatan ${row.type.name} tanggal ${dayjs(row.date).format(
+    message: `Hapus Kegiatan ${row.user.name} tanggal ${dayjs(row.date).format(
       "DD MMMM YYYY"
     )}?`,
     url: route("admin.activity.delete", row.id),

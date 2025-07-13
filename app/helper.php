@@ -3,6 +3,38 @@
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
+function getFiscalQuarter($month)
+{
+    // Pastikan bulan valid
+    if ($month < 1 || $month > 12) {
+        throw new InvalidArgumentException("Bulan harus antara 1 dan 12.");
+    }
+
+    // Mapping bulan ke kuartal dengan fiscal year mulai April
+    $map = [
+        4 => 'Q1',
+        5 => 'Q1',
+        6 => 'Q1',
+        7 => 'Q2',
+        8 => 'Q2',
+        9 => 'Q2',
+        10 => 'Q3',
+        11 => 'Q3',
+        12 => 'Q3',
+        1 => 'Q4',
+        2 => 'Q4',
+        3 => 'Q4',
+    ];
+
+    return $map[$month];
+}
+
+function getFiscalYear($year, $month)
+{
+    // Jika bulan Jan, Feb, Mar → masuk ke fiscal year sebelumnya
+    return ($month < 4) ? $year - 1 : $year;
+}
+
 function encrypt_id($string)
 {
     return base64_encode($string);
