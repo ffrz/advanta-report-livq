@@ -228,7 +228,11 @@ class ActivityController extends Controller
      */
     public function export(Request $request)
     {
-        $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
+        $q = $this->createQuery($request)
+            ->orderBy('users.name', 'asc')
+            ->orderBy('date', 'asc');
+
+        $items = $q->get();
 
         $title = 'Realisasi Kegiatan';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
@@ -240,8 +244,6 @@ class ActivityController extends Controller
         }
 
         if ($request->get('format') == 'excel') {
-            throw new NotImplementedException('Belum diimplementasikan');
-
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
@@ -289,11 +291,13 @@ class ActivityController extends Controller
     {
         $filter = $request->get('filter', []);
 
-        $q = Activity::with([
-            'user:id,username,name',
-            'responded_by:id,username,name',
-            'type:id,name',
-        ]);
+        $q = Activity::select('activities.*')
+            ->join('users', 'users.id', '=', 'activities.user_id')
+            ->with([
+                'user:id,username,name',
+                'responded_by:id,username,name',
+                'type:id,name',
+            ]);
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
@@ -303,11 +307,19 @@ class ActivityController extends Controller
 
         $current_user = Auth::user();
         if ($current_user->role == User::Role_Agronomist) {
-            $q->whereHas('user', function ($query) use ($current_user) {
-                $query->where('parent_id', $current_user->id);
-            });
+            if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
+                $q->where('user_id', '=', $filter['user_id']);
+            } else {
+                $q->whereHas('user', function ($query) use ($current_user) {
+                    $query->where('parent_id', $current_user->id);
+                });
+            }
         } else if ($current_user->role == User::Role_BS) {
             $q->where('user_id', $current_user->id);
+        } else if ($current_user->role == User::Role_Admin) {
+            if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
+                $q->where('user_id', '=', $filter['user_id']);
+            }
         }
 
         if (!empty($filter['type_id']) && ($filter['type_id'] != 'all')) {

@@ -180,7 +180,14 @@ const computedColumns = computed(() =>
                   }}
                 </q-badge>
               </div>
-              <div v-if="props.row.notes">
+              <div
+                v-if="props.row.notes"
+                style="
+                  white-space: pre-wrap;
+                  word-break: break-word;
+                  overflow-wrap: break-word;
+                "
+              >
                 <q-icon name="notes" /> {{ props.row.notes }}
               </div>
             </template>

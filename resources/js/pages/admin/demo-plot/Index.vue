@@ -359,7 +359,14 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 <div v-if="props.row.owner_phone">
                   <q-icon name="phone" /> {{ props.row.owner_phone }}
                 </div>
-                <div v-if="props.row.field_location">
+                <div
+                  v-if="props.row.field_location"
+                  style="
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                  "
+                >
                   <q-icon name="distance" /> Lokasi:
                   {{ props.row.field_location }}
                 </div>

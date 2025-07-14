@@ -431,8 +431,20 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                     <q-badge label="Belum Direspon" color="grey" />
                   </template>
                 </div>
-                <div v-if="props.row.notes">
-                  <q-icon name="notes" /> {{ props.row.notes }}
+                <div
+                  v-if="props.row.notes"
+                  style="
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                  "
+                >
+                  <q-icon name="notes" />
+                  {{
+                    props.row.notes.length > 100
+                      ? props.row.notes.slice(0, 100) + "..."
+                      : props.row.notes
+                  }}
                 </div>
               </template>
             </q-td>
@@ -468,7 +480,11 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               <template v-else> Belum Direspon </template>
             </q-td>
             <q-td key="notes" :props="props">
-              {{ props.row.notes }}
+              {{
+                props.row.notes.length > 15
+                  ? props.row.notes.slice(0, 15) + "..."
+                  : props.row.notes
+              }}
             </q-td>
             <q-td key="action" :props="props">
               <div
