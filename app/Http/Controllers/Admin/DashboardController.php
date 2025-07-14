@@ -24,20 +24,25 @@ class DashboardController extends Controller
         $period = $request->get('period', 'this_month');
         [$start_date, $end_date] = resolve_period($period);
         $start_date = $start_date ? Carbon::parse($start_date) : Carbon::createFromDate(2000, 1, 1);
-        $month = $start_date->month;
-        $month_position = ($month - 1) % 3 + 1; // hasilnya 1, 2, atau 3
 
         $user = $request->user();
 
         if ($user->role === User::Role_BS) {
-            $year = $start_date->year;
-            $quarter = (int) ceil($start_date->month / 3);
+            // Hitung informasi kuartal fiscal
+            $fiscalInfo = getFiscalQuarterInfo($start_date);
 
+            $year = $fiscalInfo['fiscal_year'];
+            $quarter = $fiscalInfo['quarter'];
+            $month_position = $fiscalInfo['month_position'];
+
+            // Ambil target
             $targets = ActivityTarget::with(['details.type'])
                 ->where('user_id', $user->id)
                 ->where('year', $year)
-                ->where('quarter', ceil($month / 3))
+                ->where('quarter', $quarter)
                 ->get();
+
+            // dd($fiscalInfo, $targets->toArray());
 
             $summary = [];
             $month_column = 'month' . $month_position . '_qty';
@@ -58,18 +63,14 @@ class DashboardController extends Controller
                 }
             }
 
-            // Cari plan yang disetujui di periode yang sama
-            $start_month = $quarter * 3 - 2;
-            $end_month = $quarter * 3;
-
-            $start = Carbon::createFromDate($year, $start_month, 1)->startOfDay();
-            $end = Carbon::createFromDate($year, $end_month, 1)->endOfMonth()->endOfDay();
+            // Ambil plan disetujui di kuartal tersebut (berdasarkan rentang tanggal)
+            $start = Carbon::createFromDate($fiscalInfo['start_year'], $fiscalInfo['start_month'], 1)->startOfDay();
+            $end = Carbon::createFromDate($fiscalInfo['end_year'], $fiscalInfo['end_month'], 1)->endOfMonth()->endOfDay();
 
             $plans = ActivityPlan::with('details')
                 ->where('user_id', $user->id)
                 ->where('status', ActivityPlan::Status_Approved)
-                ->whereMonth('date', $month)
-                ->whereYear('date', $start_date->year)
+                ->whereBetween('date', [$start, $end])
                 ->get();
 
             foreach ($plans as $plan) {
@@ -98,7 +99,6 @@ class DashboardController extends Controller
                 ],
             ]);
         }
-
 
 
         // $labels = [];

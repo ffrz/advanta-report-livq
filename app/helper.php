@@ -3,6 +3,40 @@
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
+function getFiscalQuarterInfo(Carbon $date): array
+{
+    $month = $date->month;
+    $year = $date->year;
+
+    $quarters = [
+        1 => [4, 5, 6],    // Q1 = Apr–Jun
+        2 => [7, 8, 9],    // Q2 = Jul–Sep
+        3 => [10, 11, 12], // Q3 = Okt–Des
+        4 => [1, 2, 3],    // Q4 = Jan–Mar (tahun berikutnya)
+    ];
+
+    foreach ($quarters as $q => $months) {
+        if (in_array($month, $months)) {
+            $fiscal_year = ($q === 4) ? $year - 1 : $year;
+            $start_year = $end_year = ($q === 4) ? $year : $year;
+            $month_position = array_search($month, $months); // 0, 1, 2
+
+            return [
+                'quarter' => $q,
+                'fiscal_year' => $fiscal_year,
+                'month_position' => $month_position + 1, // 1–3
+                'start_month' => $months[0],
+                'end_month' => $months[2],
+                'start_year' => $start_year,
+                'end_year' => $end_year,
+            ];
+        }
+    }
+
+    throw new \InvalidArgumentException("Invalid month: $month");
+}
+
+
 function getFiscalQuarter($month)
 {
     // Pastikan bulan valid

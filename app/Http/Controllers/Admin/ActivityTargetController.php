@@ -68,13 +68,25 @@ class ActivityTargetController extends Controller
             ->withQueryString()
             ->toArray();
 
+        // Mapping fiscal quarters
+        $fiscalQuarterMonths = [
+            1 => [4, 5, 6],    // Q1 = Apr–Jun
+            2 => [7, 8, 9],    // Q2 = Jul–Sep
+            3 => [10, 11, 12], // Q3 = Oct–Dec
+            4 => [1, 2, 3],    // Q4 = Jan–Mar (tahun berikutnya)
+        ];
+
         foreach ($items['data'] as $index => $item) {
-            $year = $item['year'];
-            $quarter = $item['quarter'];
-            $start_month = $quarter * 3 - 2;
-            $end_month = $quarter * 3;
-            $start = Carbon::createFromDate($year, $start_month, 1)->startOfDay();
-            $end = Carbon::createFromDate($year, $end_month, 1)->endOfMonth()->endOfDay();
+            $year = $item['year'];         // fiscal year
+            $quarter = $item['quarter'];   // 1-4
+            $months = $fiscalQuarterMonths[$quarter];
+
+            // Hitung tahun untuk bulan-bulan Q4
+            $startYear = ($quarter == 4) ? $year + 1 : $year;
+            $endYear = $startYear;
+
+            $start = Carbon::createFromDate($startYear, $months[0], 1)->startOfDay();
+            $end = Carbon::createFromDate($endYear, $months[2], 1)->endOfMonth()->endOfDay();
 
             $plans = ActivityPlan::with('details')
                 ->where('user_id', $item['user_id'])
@@ -85,35 +97,40 @@ class ActivityTargetController extends Controller
             $plan_details_by_type_ids = [];
 
             foreach ($plans as $plan) {
+                $planMonth = Carbon::parse($plan->date)->month;
+
+                // Dapatkan index bulan relatif terhadap kuartal (0, 1, 2)
+                $monthIndex = array_search($planMonth, $months);
+
+                if ($monthIndex === false) {
+                    continue; // abaikan jika bulan tidak cocok (harusnya tidak terjadi)
+                }
+
                 foreach ($plan->details as $detail) {
-                    if (!isset($plan_details_by_type_ids[$detail->type_id])) {
-                        $plan_details_by_type_ids[$detail->type_id] = [];
+                    $typeId = $detail->type_id;
+
+                    if (!isset($plan_details_by_type_ids[$typeId])) {
+                        $plan_details_by_type_ids[$typeId] = [
+                            'quarter_qty' => 0,
+                            'month1_qty' => 0,
+                            'month2_qty' => 0,
+                            'month3_qty' => 0,
+                        ];
                     }
 
-                    if (!isset($plan_details_by_type_ids[$detail->type_id]['quarter_qty'])) {
-                        $plan_details_by_type_ids[$detail->type_id]['quarter_qty'] = 0;
-                        $plan_details_by_type_ids[$detail->type_id]['month1_qty'] = 0;
-                        $plan_details_by_type_ids[$detail->type_id]['month2_qty'] = 0;
-                        $plan_details_by_type_ids[$detail->type_id]['month3_qty'] = 0;
-                    }
+                    $plan_details_by_type_ids[$typeId]['quarter_qty'] += 1;
 
-                    $plan_details_by_type_ids[$detail->type_id]['quarter_qty'] += 1;
-
-                    $month = Carbon::parse($plan->date)->month;
-                    if ($month % 3 == 1) {
-                        $plan_details_by_type_ids[$detail->type_id]['month1_qty'] += 1;
-                    } elseif ($month % 3 == 2) {
-                        $plan_details_by_type_ids[$detail->type_id]['month2_qty'] += 1;
-                    } else {
-                        $plan_details_by_type_ids[$detail->type_id]['month3_qty'] += 1;
-                    }
+                    $monthKey = 'month' . ($monthIndex + 1) . '_qty';
+                    $plan_details_by_type_ids[$typeId][$monthKey] += 1;
                 }
             }
+
             $items['data'][$index]['plans'] = $plan_details_by_type_ids;
         }
 
         return response()->json($items);
     }
+
 
     public function duplicate(Request $request, $id)
     {
