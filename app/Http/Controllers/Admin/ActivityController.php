@@ -301,8 +301,13 @@ class ActivityController extends Controller
             });
         }
 
-        if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
-            $q->where('user_id', '=', $filter['user_id']);
+        $current_user = Auth::user();
+        if ($current_user->role == User::Role_Agronomist) {
+            $q->whereHas('user', function ($query) use ($current_user) {
+                $query->where('parent_id', $current_user->id);
+            });
+        } else if ($current_user->role == User::Role_BS) {
+            $q->where('user_id', $current_user->id);
         }
 
         if (!empty($filter['type_id']) && ($filter['type_id'] != 'all')) {
