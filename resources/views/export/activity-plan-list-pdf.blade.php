@@ -20,7 +20,7 @@
       @forelse ($items as $index => $item)
         <tr>
           <td align="right">{{ $index + 1 }}</td>
-          <td>{{ \Carbon\Carbon::parse($item['created_at'])->format('d F Y') }}</td>
+          <td>{{ \Carbon\Carbon::parse($item->date)->format('d F Y') }}</td>
           <td>{{ $item->type->name }}</td>
           <td>{{ $item->user->name }}</td>
           <td>{{ $item->location }}</td>
