@@ -20,7 +20,7 @@ class ActivityPlanDetailPolicy
         }
 
         if ($user->role === User::Role_Agronomist) {
-            return $item->user->parent_id == $user->id;
+            return $item->parent->user->parent_id == $user->id;
         }
 
         return false;
@@ -38,7 +38,7 @@ class ActivityPlanDetailPolicy
         }
 
         if ($user->role === User::Role_Agronomist) {
-            return $item->user->parent_id == $user->id;
+            return $item->parent->user->parent_id == $user->id;
         }
 
         return false;
