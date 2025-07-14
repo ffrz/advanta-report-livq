@@ -205,6 +205,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
         @click="showFilter = !showFilter"
       />
       <q-btn
+        v-if="$can('admin.activity.export')"
         icon="file_export"
         dense
         class="q-ml-sm"

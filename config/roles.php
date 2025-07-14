@@ -86,6 +86,7 @@ return [
         'admin.activity-plan.data',
         'admin.activity-plan.detail',
         'admin.activity-plan.respond',
+        'admin.activity-plan.export',
 
         'admin.activity-plan-detail.index',
         'admin.activity-plan-detail.data',
@@ -98,6 +99,7 @@ return [
         'admin.activity.data',
         'admin.activity.detail',
         'admin.activity.respond',
+        'admin.activity.export',
 
         'admin.activity-target.index',
         'admin.activity-target.data',
