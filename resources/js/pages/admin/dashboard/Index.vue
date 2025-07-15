@@ -59,6 +59,9 @@ const onFilterChange = () => {
       </q-toolbar>
     </template>
     <div class="q-pa-sm" v-if="$page.props.auth.user.role === 'bs'">
+      <div class="q-mb-md text-grey-8 text-italic text-subtitle2">
+        Ket: T = Target, P = Plan, R = Realisasi
+      </div>
       <BsTargetCard />
     </div>
     <div class="q-pa-sm" v-if="$page.props.auth.user.role === 'admin'">
