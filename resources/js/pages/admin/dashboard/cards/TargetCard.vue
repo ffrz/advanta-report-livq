@@ -3,6 +3,10 @@ import { router } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({
+  real_count: {
+    type: [String, Number],
+    required: true,
+  },
   plan_count: {
     type: [String, Number],
     required: true,
@@ -77,7 +81,7 @@ function handleClick() {
         <q-item-label
           class="text-white text-h6 text-weight-bolder shake-on-hover"
         >
-          {{ plan_count }} / {{ target_count }}
+          {{ target_count }} / {{ plan_count }} / {{ real_count }}
         </q-item-label>
         <q-item-label class="shake-on-hover">{{ label }}</q-item-label>
       </q-item-section>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use App\Models\ActivityPlan;
 use App\Models\ActivityTarget;
 use App\Models\ActivityType;
@@ -23,7 +24,9 @@ class DashboardController extends Controller
     {
         $period = $request->get('period', 'this_month');
         [$start_date, $end_date] = resolve_period($period);
-        $start_date = $start_date ? Carbon::parse($start_date) : Carbon::createFromDate(2000, 1, 1);
+
+        $start_date = $start_date ? Carbon::parse($start_date)->startOfMonth() : Carbon::createFromDate(2000, 1, 1);
+        $end_date = $start_date->copy()->endOfMonth();
 
         $user = $request->user();
 
@@ -42,10 +45,12 @@ class DashboardController extends Controller
                 ->where('quarter', $quarter)
                 ->get();
 
-            // dd($fiscalInfo, $targets->toArray());
-
             $summary = [];
             $month_column = 'month' . $month_position . '_qty';
+
+            $total_target = 0;
+            $total_completed = 0;
+            $total_planned = 0;
 
             foreach ($targets as $target) {
                 foreach ($target->details as $detail) {
@@ -56,10 +61,12 @@ class DashboardController extends Controller
                             'type_name' => $detail->type->code ?? $detail->type->name,
                             'target_qty' => 0,
                             'plan_qty' => 0,
+                            'real_qty' => 0,
                         ];
                     }
 
                     $summary[$type_id]['target_qty'] += (int) $detail->{$month_column};
+                    $total_target += 1;
                 }
             }
 
@@ -70,7 +77,7 @@ class DashboardController extends Controller
             $plans = ActivityPlan::with('details')
                 ->where('user_id', $user->id)
                 ->where('status', ActivityPlan::Status_Approved)
-                ->whereBetween('date', [$start, $end])
+                ->whereBetween('date', [$start_date, $end_date])
                 ->get();
 
             foreach ($plans as $plan) {
@@ -83,15 +90,43 @@ class DashboardController extends Controller
                             'type_name' => $detail->type->name,
                             'target_qty' => 0,
                             'plan_qty' => 0,
+                            'real_qty' => 0,
                         ];
                     }
 
                     $summary[$type_id]['plan_qty'] += 1;
+                    $total_planned += 1;
                 }
             }
 
+            $activities = Activity::with(['type'])
+                ->where('user_id', $user->id)
+                ->where('status', Activity::Status_Approved)
+                ->whereBetween('date', [$start_date, $end_date])
+                ->get();
+
+            foreach ($activities as $activity) {
+                $type_id = $activity->type_id;
+                if (!isset($summary[$type_id])) {
+                    $summary[$type_id] = [
+                        'type_id' => $type_id,
+                        'type_name' => $activity->type->name,
+                        'target_qty' => 0,
+                        'plan_qty' => 0,
+                        'real_qty' => 0,
+                    ];
+                }
+                $summary[$type_id]['real_qty'] += 1;
+                $total_completed += 1;
+            }
+
             return inertia('admin/dashboard/Index', [
-                'data' => array_values($summary),
+                'data' => [
+                    'targets' => array_values($summary),
+                    'total_target' => $total_target,
+                    'total_completed' => $total_completed,
+
+                ],
                 'period' => [
                     'label' => \Illuminate\Support\Str::headline(str_replace('_', ' ', $period)),
                     'start_date' => $start->toDateString(),

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use App\Models\ActivityPlan;
 use App\Models\ActivityPlanDetail;
 use App\Models\ActivityTarget;
@@ -68,12 +69,12 @@ class ActivityTargetController extends Controller
             ->withQueryString()
             ->toArray();
 
-        // Mapping fiscal quarters
+        // Mapping fiscal quarters mulai dari April
         $fiscalQuarterMonths = [
-            1 => [4, 5, 6],    // Q1 = Apr–Jun
-            2 => [7, 8, 9],    // Q2 = Jul–Sep
-            3 => [10, 11, 12], // Q3 = Oct–Dec
-            4 => [1, 2, 3],    // Q4 = Jan–Mar (tahun berikutnya)
+            1 => [4, 5, 6],    // Q1: Apr–Jun
+            2 => [7, 8, 9],    // Q2: Jul–Sep
+            3 => [10, 11, 12], // Q3: Oct–Dec
+            4 => [1, 2, 3],    // Q4: Jan–Mar (tahun berikutnya)
         ];
 
         foreach ($items['data'] as $index => $item) {
@@ -81,12 +82,11 @@ class ActivityTargetController extends Controller
             $quarter = $item['quarter'];   // 1-4
             $months = $fiscalQuarterMonths[$quarter];
 
-            // Hitung tahun untuk bulan-bulan Q4
+            // Jika Q4, berarti tahun awalnya naik 1 (karena Jan–Mar tahun berikutnya)
             $startYear = ($quarter == 4) ? $year + 1 : $year;
-            $endYear = $startYear;
 
             $start = Carbon::createFromDate($startYear, $months[0], 1)->startOfDay();
-            $end = Carbon::createFromDate($endYear, $months[2], 1)->endOfMonth()->endOfDay();
+            $end = Carbon::createFromDate($startYear, $months[2], 1)->endOfMonth()->endOfDay();
 
             $plans = ActivityPlan::with('details')
                 ->where('user_id', $item['user_id'])
@@ -98,13 +98,9 @@ class ActivityTargetController extends Controller
 
             foreach ($plans as $plan) {
                 $planMonth = Carbon::parse($plan->date)->month;
-
-                // Dapatkan index bulan relatif terhadap kuartal (0, 1, 2)
                 $monthIndex = array_search($planMonth, $months);
 
-                if ($monthIndex === false) {
-                    continue; // abaikan jika bulan tidak cocok (harusnya tidak terjadi)
-                }
+                if ($monthIndex === false) continue;
 
                 foreach ($plan->details as $detail) {
                     $typeId = $detail->type_id;
@@ -119,17 +115,48 @@ class ActivityTargetController extends Controller
                     }
 
                     $plan_details_by_type_ids[$typeId]['quarter_qty'] += 1;
-
                     $monthKey = 'month' . ($monthIndex + 1) . '_qty';
                     $plan_details_by_type_ids[$typeId][$monthKey] += 1;
                 }
             }
 
+            $activities = Activity::query()
+                ->where('user_id', $item['user_id'])
+                ->where('status', Activity::Status_Approved)
+                ->whereBetween('date', [$start, $end])
+                ->get();
+
+            $actvities_by_type_ids = [];
+
+            foreach ($activities as $activity) {
+                $activityMonth = Carbon::parse($activity->date)->month;
+                $monthIndex = array_search($activityMonth, $months);
+
+                if ($monthIndex === false) continue;
+
+                $typeId = $activity->type_id;
+
+                if (!isset($actvities_by_type_ids[$typeId])) {
+                    $actvities_by_type_ids[$typeId] = [
+                        'quarter_qty' => 0,
+                        'month1_qty' => 0,
+                        'month2_qty' => 0,
+                        'month3_qty' => 0,
+                    ];
+                }
+
+                $actvities_by_type_ids[$typeId]['quarter_qty'] += 1;
+                $monthKey = 'month' . ($monthIndex + 1) . '_qty';
+                $actvities_by_type_ids[$typeId][$monthKey] += 1;
+            }
+
             $items['data'][$index]['plans'] = $plan_details_by_type_ids;
+            $items['data'][$index]['activities'] = $actvities_by_type_ids;
         }
 
         return response()->json($items);
     }
+
 
 
     public function duplicate(Request $request, $id)

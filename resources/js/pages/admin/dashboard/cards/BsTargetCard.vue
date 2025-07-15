@@ -4,6 +4,7 @@ import TargetCard from "./TargetCard.vue";
 import { usePage } from "@inertiajs/vue3";
 
 const page = usePage();
+console.log(page.props.data);
 </script>
 
 <template>
@@ -11,11 +12,12 @@ const page = usePage();
     <q-card class="bg-transparent no-shadow no-border col" bordered>
       <q-card-section class="q-pa-none">
         <div class="row q-col-gutter-sm">
-          <template v-if="$page.props.data.length > 0">
-            <template v-for="item in $page.props.data" :key="item.id">
+          <template v-if="$page.props.data.targets.length > 0">
+            <template v-for="item in $page.props.data.targets" :key="item.id">
               <TargetCard
                 icon="info"
                 :plan_count="item.plan_qty"
+                :real_count="item.real_qty"
                 :target_count="item.target_qty"
                 :label="item.type_name"
                 :to="route('admin.activity-plan.index')"
