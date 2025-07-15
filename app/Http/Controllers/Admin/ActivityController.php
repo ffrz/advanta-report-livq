@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
-use Nette\NotImplementedException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -301,7 +300,8 @@ class ActivityController extends Controller
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('notes', 'like', '%' . $filter['search'] . '%');
+                $q->where('location', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%');
             });
         }
 

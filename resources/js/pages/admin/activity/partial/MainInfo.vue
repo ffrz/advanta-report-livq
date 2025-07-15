@@ -93,7 +93,7 @@ const showViewer = ref(false);
         <tr>
           <td colspan="3" class="bg-white">
             <div class="q-mt-md">
-              Foto Lahan:<br />
+              Foto Dokumentasi:<br />
               <q-img
                 :src="`/${page.props.data.image_path}`"
                 class="q-mt-none"
