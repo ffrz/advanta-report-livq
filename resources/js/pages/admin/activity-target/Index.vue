@@ -456,25 +456,25 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             <q-td key="total_progress" :props="props">
               {{
                 (() => {
-                  let totalPlan = 0;
+                  let totalActivity = 0;
                   let totalTarget = 0;
 
                   for (const type of types) {
                     const detail = props.row.details.find(
                       (d) => Number(d.type_id) === Number(type.id)
                     );
-                    const plan = props.row.plans?.[type.id];
+                    const plan = props.row.activities?.[type.id];
 
                     if (detail) {
                       totalTarget += Number(detail.quarter_qty) || 0;
                     }
                     if (plan) {
-                      totalPlan += Number(plan.quarter_qty) || 0;
+                      totalActivity += Number(plan.quarter_qty) || 0;
                     }
                   }
 
                   const percent =
-                    totalTarget > 0 ? (totalPlan / totalTarget) * 100 : 0;
+                    totalTarget > 0 ? (totalActivity / totalTarget) * 100 : 0;
                   return `${percent.toFixed(0)}%`;
                 })()
               }}

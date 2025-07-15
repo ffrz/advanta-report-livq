@@ -65,8 +65,10 @@ class DashboardController extends Controller
                         ];
                     }
 
-                    $summary[$type_id]['target_qty'] += (int) $detail->{$month_column};
-                    $total_target += 1;
+                    $qty = (int) $detail->{$month_column};
+
+                    $summary[$type_id]['target_qty'] += $qty;
+                    $total_target += $qty;
                 }
             }
 

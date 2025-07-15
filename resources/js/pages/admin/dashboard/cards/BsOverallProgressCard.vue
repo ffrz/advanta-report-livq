@@ -1,22 +1,15 @@
 <script setup>
+import { formatNumber } from "@/helpers/utils";
 import { router } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({
-  real_count: {
+  total_completed: {
     type: [String, Number],
     required: true,
   },
-  plan_count: {
+  total_target: {
     type: [String, Number],
-    required: true,
-  },
-  target_count: {
-    type: [String, Number],
-    required: true,
-  },
-  label: {
-    type: String,
     required: true,
   },
   icon: {
@@ -81,9 +74,12 @@ function handleClick() {
         <q-item-label
           class="text-white text-h6 text-weight-bolder shake-on-hover"
         >
-          T:{{ target_count }} / P:{{ plan_count }} / R:{{ real_count }}
+          T:{{ total_target }} / R:{{ total_completed }} ({{
+            formatNumber((total_completed / total_target) * 100, "id", 2)
+          }}
+          %)
         </q-item-label>
-        <q-item-label class="shake-on-hover">{{ label }}</q-item-label>
+        <q-item-label class="shake-on-hover">Overall Progress</q-item-label>
       </q-item-section>
     </q-item>
   </div>
