@@ -93,6 +93,10 @@ class ActivityPlanController extends Controller
             'user_id' => $user->role == User::Role_BS ? $user->id : null,
         ]);
 
+        if ($user->role == User::Role_BS && $id && $item->status == ActivityPlan::Status_Approved) {
+            abort(403, 'Rekaman yang sudah disetujui tidak bisa diubah!');
+        }
+
         return inertia('admin/activity-plan/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
@@ -179,6 +183,8 @@ class ActivityPlanController extends Controller
     public function delete($id)
     {
         $item = ActivityPlan::findOrFail($id);
+
+
         $item->delete();
 
         return response()->json([

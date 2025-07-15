@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityPlan;
 use App\Models\ActivityPlanDetail;
 use App\Models\ActivityType;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ActivityPlanDetailController extends Controller
@@ -51,6 +54,11 @@ class ActivityPlanDetailController extends Controller
         $item = $id ? ActivityPlanDetail::findOrFail($id) : new ActivityPlanDetail([
             'parent_id' => $request->get('parent_id')
         ]);
+
+        $user = Auth::user();
+        if ($user->role == User::Role_BS && $id && $item->parent->status == ActivityPlan::Status_Approved) {
+            abort(403, 'Rekaman yang sudah disetujui tidak bisa diedit.');
+        }
 
         $this->authorize('update', $item);
 
@@ -97,6 +105,11 @@ class ActivityPlanDetailController extends Controller
     {
         $item = ActivityPlanDetail::findOrFail($id);
         $parent = $item->parent;
+
+        $user = Auth::user();
+        if ($user->role == User::Role_BS && $item->parent->status == ActivityPlan::Status_Approved) {
+            abort(403, 'Rekaman yang sudah disetujui tidak bisa dihapus');
+        }
 
         DB::beginTransaction();
         $item->delete();

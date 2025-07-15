@@ -96,6 +96,10 @@ class ActivityController extends Controller
             'user_id' => $user->role == User::Role_BS ? $user->id : null,
         ]);
 
+        if ($user->role == User::Role_BS && $id && $item->status == Activity::Status_Approved) {
+            abort(403, 'Rekaman yang telah disetujui tidak bisa diubah!');
+        }
+
         return inertia('admin/activity/Editor', [
             'data' => $item,
             'types' => ActivityType::where('active', true)
@@ -215,7 +219,13 @@ class ActivityController extends Controller
     public function delete($id)
     {
         $item = Activity::findOrFail($id);
+
+        if (Auth::user()->role == User::Role_BS && $item->status == Activity::Status_Approved) {
+            abort(403, 'Rekaman yang telah disetujui tidak bisa dihapus!');
+        }
+
         $item->delete();
+
 
         return response()->json([
             'message' => "Kegiatan #$item->id telah dihapus."
