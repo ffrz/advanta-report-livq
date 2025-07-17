@@ -6,33 +6,29 @@
   <table>
     <thead>
       <tr>
-        <th>No</th>
-        <th>Tanggal</th>
-        <th>Jenis</th>
+        <th>Bulan</th>
         <th>BS</th>
+        <th>Kegiatan</th>
+        <th>Varietas</th>
         <th>Lokasi</th>
-        <th>Biaya (Rp)</th>
+        <th>Biaya</th>
         <th>Status</th>
         <th>Catatan</th>
       </tr>
     </thead>
     <tbody>
-      @forelse ($items as $index => $item)
+      @foreach ($items as $row)
         <tr>
-          <td align="right">{{ $index + 1 }}</td>
-          <td>{{ \Carbon\Carbon::parse($item->date)->format('d F Y') }}</td>
-          <td>{{ $item->type->name }}</td>
-          <td>{{ $item->user->name }}</td>
-          <td>{{ $item->location }}</td>
-          <td align="right">{{ format_number($item->cost) }}</td>
-          <td>{{ \App\Models\ActivityPlan::Statuses[$item->status] }}</td>
-          <td>{{ $item->notes }}</td>
+          <td>{{ \Carbon\Carbon::parse($row->date)->translatedFormat('F Y') }}</td>
+          <td>{{ $row->bs_name }}</td>
+          <td>{{ $row->activity_type }}</td>
+          <td>{{ $row->product_name }}</td>
+          <td>{{ $row->location }}</td>
+          <td align="right">{{ number_format($row->cost, 0, ',', '.') }}</td>
+          <td>{{ \App\Models\ActivityPlan::Statuses[$row->status] }}</td>
+          <td>{{ $row->notes }}</td>
         </tr>
-      @empty
-        <tr>
-          <td colspan="8" align="center">Tidak ada data</td>
-        </tr>
-      @endforelse
+      @endforeach
     </tbody>
   </table>
 @endsection

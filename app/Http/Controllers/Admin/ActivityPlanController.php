@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityPlan;
+use App\Models\ActivityPlanDetail;
 use App\Models\ActivityType;
 use App\Models\Product;
 use App\Models\User;
@@ -262,7 +263,10 @@ class ActivityPlanController extends Controller
      */
     public function export(Request $request)
     {
-        $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
+        $items = $this->createQueryForExport($request)
+            ->orderBy('users.name', 'asc')
+            ->orderBy('activity_types.name', 'asc')
+            ->get();
 
         $title = 'Rencana Kegiatan';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
@@ -277,39 +281,41 @@ class ActivityPlanController extends Controller
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
-            // Tambahkan header
-            $sheet->setCellValue('A1', 'ID');
-            $sheet->setCellValue('B1', 'Tanggal');
-            $sheet->setCellValue('C1', 'Jenis');
-            $sheet->setCellValue('D1', 'BS');
+            // Header kolom
+            $sheet->setCellValue('A1', 'Bulan');
+            $sheet->setCellValue('B1', 'BS');
+            $sheet->setCellValue('C1', 'Kegiatan');
+            $sheet->setCellValue('D1', 'Varietas');
             $sheet->setCellValue('E1', 'Lokasi');
             $sheet->setCellValue('F1', 'Biaya (Rp)');
             $sheet->setCellValue('G1', 'Status');
             $sheet->setCellValue('H1', 'Catatan');
 
-            // Tambahkan data ke Excel
+            // Data isi
             $row = 2;
             foreach ($items as $item) {
-                $sheet->setCellValue('A' . $row, $item->id);
-                $sheet->setCellValue('B' . $row, $item->date);
-                $sheet->setCellValue('C' . $row, $item->type->name);
-                $sheet->setCellValue('D' . $row, $item->user->name);
+                $sheet->setCellValue('A' . $row, \Carbon\Carbon::parse($item->date)->translatedFormat('F Y'));
+                $sheet->setCellValue('B' . $row, $item->bs_name);
+                $sheet->setCellValue('C' . $row, $item->activity_type);
+                $sheet->setCellValue('D' . $row, $item->product_name);
                 $sheet->setCellValue('E' . $row, $item->location);
                 $sheet->setCellValue('F' . $row, $item->cost);
-                $sheet->setCellValue('G' . $row, ActivityPlan::Statuses[$item->status]);
+                $sheet->setCellValue('G' . $row, \App\Models\ActivityPlan::Statuses[$item->status] ?? '-');
                 $sheet->setCellValue('H' . $row, $item->notes);
                 $row++;
             }
 
-            // Kirim ke memori tanpa menyimpan file
+            // Kirim file ke browser
             $response = new StreamedResponse(function () use ($spreadsheet) {
-                $writer = new Xlsx($spreadsheet);
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
                 $writer->save('php://output');
             });
 
-            // Atur header response untuk download
+            $filename = 'export_rencana_kegiatan_' . date('Ymd_His') . '.xlsx';
+
             $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            $response->headers->set('Cache-Control', 'max-age=0');
 
             return $response;
         }
@@ -323,39 +329,99 @@ class ActivityPlanController extends Controller
 
         $filter = $request->get('filter', []);
 
-        $q = ActivityPlan::with([
-            'user:id,username,name',
-            'responded_by:id,username,name',
-        ]);
+        $q = ActivityPlan::select('activity_plans.*')
+            ->join('users', 'users.id', '=', 'activity_plans.user_id')
+            ->with([
+                'user:id,username,name',
+                'responded_by:id,username,name',
+            ]);
 
         if ($current_user->role == User::Role_Agronomist) {
             $q->whereHas('user', function ($query) use ($current_user) {
                 $query->where('parent_id', $current_user->id);
             });
         } else if ($current_user->role == User::Role_BS) {
-            $q->where('user_id', $current_user->id);
+            $q->where('activity_plans.user_id', $current_user->id);
         }
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('notes', 'like', '%' . $filter['search'] . '%');
+                $q->where('activity_plans.notes', 'like', '%' . $filter['search'] . '%');
             });
         }
 
         if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
-            $q->where('user_id', '=', $filter['user_id']);
+            $q->where('activity_plans.user_id', '=', $filter['user_id']);
         }
 
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {
-            $q->where('status', '=', $filter['status']);
+            $q->where('activity_plans.status', '=', $filter['status']);
         }
 
         if (!empty($filter['year']) && $filter['year'] != 'all') {
-            $q->whereYear('date', '=', $filter['year']);
+            $q->whereYear('activity_plans.date', '=', $filter['year']);
         }
 
         if (!empty($filter['month']) && $filter['month'] != 'all') {
-            $q->whereMonth('date', '=', $filter['month']);
+            $q->whereMonth('activity_plans.date', '=', $filter['month']);
+        }
+
+        return $q;
+    }
+
+    protected function createQueryForExport(Request $request)
+    {
+        $current_user = Auth::user();
+        $filter = $request->get('filter', []);
+
+        $q = ActivityPlanDetail::select([
+            'activity_plans.date',
+            'activity_plans.status',
+            'users.name as bs_name',
+            'activity_types.name as activity_type',
+            'products.name as product_name',
+            'activity_plan_details.location',
+            'activity_plan_details.cost',
+            'activity_plan_details.notes',
+        ])
+            ->join('activity_plans', 'activity_plans.id', '=', 'activity_plan_details.parent_id')
+            ->join('users', 'users.id', '=', 'activity_plans.user_id')
+            ->leftJoin('activity_types', 'activity_types.id', '=', 'activity_plan_details.type_id')
+            ->leftJoin('products', 'products.id', '=', 'activity_plan_details.product_id');
+
+        // Filter berdasarkan role
+        if ($current_user->role == User::Role_Agronomist) {
+            $q->where('users.parent_id', $current_user->id);
+        } elseif ($current_user->role == User::Role_BS) {
+            $q->where('users.id', $current_user->id);
+        }
+
+        // Filter pencarian
+        if (!empty($filter['search'])) {
+            $q->where(function ($q) use ($filter) {
+                $q->where('activity_plan_details.notes', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('activity_plan_details.location', 'like', '%' . $filter['search'] . '%');
+            });
+        }
+
+        // Filter user
+        if (!empty($filter['user_id']) && $filter['user_id'] !== 'all') {
+            $q->where('users.id', '=', $filter['user_id']);
+        }
+
+        // Filter status rencana (jika diperlukan)
+        if (!empty($filter['status']) && $filter['status'] !== 'all') {
+            $q->where('activity_plans.status', '=', $filter['status']);
+        }
+
+        // Filter tahun
+        if (!empty($filter['year']) && $filter['year'] !== 'all') {
+            $q->whereYear('activity_plans.date', '=', $filter['year']);
+        }
+
+        // Filter bulan
+        if (!empty($filter['month']) && $filter['month'] !== 'all') {
+            $q->whereMonth('activity_plans.date', '=', $filter['month']);
         }
 
         return $q;
