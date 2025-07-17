@@ -93,9 +93,9 @@ class ActivityPlanController extends Controller
             'user_id' => $user->role == User::Role_BS ? $user->id : null,
         ]);
 
-        // if ($user->role == User::Role_BS && $id && $item->status == ActivityPlan::Status_Approved) {
-        //     abort(403, 'Rekaman yang sudah disetujui tidak bisa diubah!');
-        // }
+        if ($user->role == User::Role_BS && $id && $item->status == ActivityPlan::Status_Approved) {
+            abort(403, 'Rekaman yang sudah disetujui tidak bisa diubah!');
+        }
 
         return inertia('admin/activity-plan/Editor', [
             'data' => $item,
@@ -157,9 +157,9 @@ class ActivityPlanController extends Controller
         $item = ActivityPlan::findOrFail($id);
         $supervisor_account = $item->user->parent;
 
-        // if (!($current_user->role == User::Role_Admin || $current_user->role == User::Role_Agronomist)) {
-        //     abort(403, 'Akses ditolak, hanya supervisor yang bisa menyetujui.');
-        // }
+        if (!($current_user->role == User::Role_Admin || $current_user->role == User::Role_Agronomist)) {
+            abort(403, 'Akses ditolak, hanya supervisor yang bisa menyetujui.');
+        }
 
         $action = $request->get('action');
         if ($action == 'approve') {
