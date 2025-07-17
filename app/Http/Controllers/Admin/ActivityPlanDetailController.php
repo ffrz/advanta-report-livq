@@ -56,9 +56,9 @@ class ActivityPlanDetailController extends Controller
         ]);
 
         $user = Auth::user();
-        if ($user->role == User::Role_BS && $id && $item->parent->status == ActivityPlan::Status_Approved) {
-            abort(403, 'Rekaman yang sudah disetujui tidak bisa diedit.');
-        }
+        // if ($user->role == User::Role_BS && $id && $item->parent->status == ActivityPlan::Status_Approved) {
+        //     abort(403, 'Rekaman yang sudah disetujui tidak bisa diedit.');
+        // }
 
         $this->authorize('update', $item);
 
@@ -107,9 +107,9 @@ class ActivityPlanDetailController extends Controller
         $parent = $item->parent;
 
         $user = Auth::user();
-        if ($user->role == User::Role_BS && $item->parent->status == ActivityPlan::Status_Approved) {
-            abort(403, 'Rekaman yang sudah disetujui tidak bisa dihapus');
-        }
+        // if ($user->role == User::Role_BS && $item->parent->status == ActivityPlan::Status_Approved) {
+        //     abort(403, 'Rekaman yang sudah disetujui tidak bisa dihapus');
+        // }
 
         DB::beginTransaction();
         $item->delete();
