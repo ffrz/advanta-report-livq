@@ -12,17 +12,7 @@ class DemoPlotPolicy
      */
     public function view(User $user, DemoPlot $item): bool
     {
-        if ($user->role === User::Role_Admin) return true;
-
-        if ($user->role === User::Role_BS) {
-            return $item->user_id == $user->id;
-        }
-
-        if ($user->role === User::Role_Agronomist) {
-            return $item->user->parent_id == $user->id;
-        }
-
-        return false;
+        return $this->canAccess($user, $item, 'view');
     }
 
     /**
@@ -30,12 +20,29 @@ class DemoPlotPolicy
      */
     public function update(User $user, DemoPlot $item): bool
     {
-        if ($user->role === User::Role_Admin) return true;
+        return $this->canAccess($user, $item, 'update');
+    }
 
-        if ($user->role === User::Role_BS) {
-            return $item->id ? $item->user_id == $user->id : true;
+    /**
+     * Shared authorization logic.
+     */
+    protected function canAccess(User $user, DemoPlot $item, string $action): bool
+    {
+        switch ($user->role) {
+            case User::Role_Admin:
+                return true;
+
+            case User::Role_BS:
+                if ($action === 'update') {
+                    return !$item->id || $item->user_id === $user->id;
+                }
+                return $item->user_id === $user->id;
+
+            case User::Role_Agronomist:
+                return $action === 'view' && $item->user->parent_id === $user->id;
+
+            default:
+                return false;
         }
-
-        return false;
     }
 }

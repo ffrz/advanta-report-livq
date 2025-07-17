@@ -7,23 +7,12 @@ use App\Models\User;
 
 class ActivityPlanDetailPolicy
 {
-
     /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, ActivityPlanDetail $item): bool
     {
-        if ($user->role === User::Role_Admin) return true;
-
-        if ($user->role === User::Role_BS) {
-            return $item->parent->user_id == $user->id;
-        }
-
-        if ($user->role === User::Role_Agronomist) {
-            return $item->parent->user->parent_id == $user->id;
-        }
-
-        return false;
+        return $this->canAccess($user, $item);
     }
 
     /**
@@ -31,16 +20,26 @@ class ActivityPlanDetailPolicy
      */
     public function update(User $user, ActivityPlanDetail $item): bool
     {
-        if ($user->role === User::Role_Admin) return true;
+        return $this->canAccess($user, $item);
+    }
 
-        if ($user->role === User::Role_BS) {
-            return $item->id ? $item->parent->user_id == $user->id : true;
+    /**
+     * Shared authorization logic for view and update.
+     */
+    protected function canAccess(User $user, ActivityPlanDetail $item): bool
+    {
+        switch ($user->role) {
+            case User::Role_Admin:
+                return true;
+
+            case User::Role_BS:
+                return !$item->id || $item->parent->user_id === $user->id;
+
+            case User::Role_Agronomist:
+                return !$item->id || $item->parent->user->parent_id === $user->id;
+
+            default:
+                return false;
         }
-
-        if ($user->role === User::Role_Agronomist) {
-            return $item->parent->user->parent_id == $user->id;
-        }
-
-        return false;
     }
 }
