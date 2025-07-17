@@ -8,6 +8,7 @@
       <tr>
         <th>No</th>
         <th>BS</th>
+        <th>Varietas</th>
         <th>Pemilik</th>
         <th>No HP</th>
         <th>Lokasi</th>
@@ -24,6 +25,7 @@
         <tr>
           <td align="right">{{ $index + 1 }}</td>
           <td>{{ optional($item->user)->name }}</td>
+          <td>{{ $item->product->name }}</td>
           <td>{{ $item->owner_name }}</td>
           <td>{{ $item->owner_phone }}</td>
           <td>{{ $item->field_location }}</td>
