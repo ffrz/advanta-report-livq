@@ -34,11 +34,15 @@ class DemoPlotVisitPolicy
 
             case User::Role_BS:
                 if ($action === 'update') {
+                    // boleh add atau edit jika punya sendiri
                     return !$item->id || $item->user_id === $user->id;
                 }
+
+                // boleh lihat jika punya sendiri
                 return $item->user_id === $user->id;
 
             case User::Role_Agronomist:
+                // boleh lihat jika punya bawahan sendiri
                 return $action === 'view' && $item->user->parent_id === $user->id;
 
             default:

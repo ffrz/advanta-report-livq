@@ -33,9 +33,11 @@ class ActivityPlanDetailPolicy
                 return true;
 
             case User::Role_BS:
+                // bolehkan create, atau bolehkan jika ActivityPlan ownernya adalah user yang login
                 return !$item->id || $item->parent->user_id === $user->id;
 
             case User::Role_Agronomist:
+                // bolehkan create, atau bolehkan jika supervisor dari ownernya ActivityPlan adalah user yang login
                 return !$item->id || $item->parent->user->parent_id === $user->id;
 
             default:
