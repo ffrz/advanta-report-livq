@@ -203,7 +203,10 @@ class DemoPlotController extends Controller
      */
     public function export(Request $request)
     {
-        $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
+        $items = $this->createQuery($request)
+            ->orderBy('users.name', 'asc')
+            ->orderBy('products.name', 'asc')
+            ->get();
 
         $title = 'Daftar Demo Plot';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
@@ -276,42 +279,45 @@ class DemoPlotController extends Controller
         $current_user = Auth::user();
         $filter = $request->get('filter', []);
 
-        $q = DemoPlot::with([
-            'user:id,username,name',
-            'product:id,name',
-        ]);
+        $q = DemoPlot::select('demo_plots.*')
+            ->leftJoin('users', 'users.id', '=', 'demo_plots.user_id')
+            ->leftJoin('products', 'products.id', '=', 'demo_plots.product_id')
+            ->with([
+                'user:id,username,name',
+                'product:id,name',
+            ]);
 
         if ($current_user->role == User::Role_Agronomist) {
             $q->whereHas('user', function ($query) use ($current_user) {
                 $query->where('parent_id', $current_user->id);
             });
         } else if ($current_user->role == User::Role_BS) {
-            $q->where('user_id', $current_user->id);
+            $q->where('demo_plots.user_id', $current_user->id);
         }
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('owner_name', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('owner_phone', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('field_location', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%');
+                $q->where('demo_plots.owner_name', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('demo_plots.owner_phone', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('demo_plots.field_location', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('demo_plots.notes', 'like', '%' . $filter['search'] . '%');
             });
         }
 
         if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
-            $q->where('user_id', '=', $filter['user_id']);
+            $q->where('demo_plots.user_id', '=', $filter['user_id']);
         }
 
         if (!empty($filter['product_id']) && ($filter['product_id'] != 'all')) {
-            $q->where('product_id', '=', $filter['product_id']);
+            $q->where('demo_plots.product_id', '=', $filter['product_id']);
         }
 
         if (!empty($filter['plant_status']) && ($filter['plant_status'] != 'all')) {
-            $q->where('plant_status', '=', $filter['plant_status']);
+            $q->where('demo_plots.plant_status', '=', $filter['plant_status']);
         }
 
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {
-            $q->where('active', '=', $filter['status'] == 'active');
+            $q->where('demo_plots.active', '=', $filter['status'] == 'active');
         }
 
         // if (!empty($filter['period']) && ($filter['period'] != 'all')) {
