@@ -310,42 +310,42 @@ class ActivityController extends Controller
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
-                $q->where('location', 'like', '%' . $filter['search'] . '%')
-                    ->orWhere('notes', 'like', '%' . $filter['search'] . '%');
+                $q->where('activities.location', 'like', '%' . $filter['search'] . '%')
+                    ->orWhere('activities.notes', 'like', '%' . $filter['search'] . '%');
             });
         }
 
         $current_user = Auth::user();
         if ($current_user->role == User::Role_Agronomist) {
             if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
-                $q->where('user_id', '=', $filter['user_id']);
+                $q->where('activities.user_id', '=', $filter['user_id']);
             } else {
                 $q->whereHas('user', function ($query) use ($current_user) {
                     $query->where('parent_id', $current_user->id);
                 });
             }
         } else if ($current_user->role == User::Role_BS) {
-            $q->where('user_id', $current_user->id);
+            $q->where('activities.user_id', $current_user->id);
         } else if ($current_user->role == User::Role_Admin) {
             if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
-                $q->where('user_id', '=', $filter['user_id']);
+                $q->where('activities.user_id', '=', $filter['user_id']);
             }
         }
 
         if (!empty($filter['type_id']) && ($filter['type_id'] != 'all')) {
-            $q->where('type_id', '=', $filter['type_id']);
+            $q->where('activities.type_id', '=', $filter['type_id']);
         }
 
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {
-            $q->where('status', '=', $filter['status']);
+            $q->where('activities.status', '=', $filter['status']);
         }
 
         if (!empty($filter['year']) && $filter['year'] != 'all') {
-            $q->whereYear('date', '=', $filter['year']);
+            $q->whereYear('activities.date', '=', $filter['year']);
         }
 
         if (!empty($filter['month']) && $filter['month'] != 'all') {
-            $q->whereMonth('date', '=', $filter['month']);
+            $q->whereMonth('activities.date', '=', $filter['month']);
         }
 
         return $q;
