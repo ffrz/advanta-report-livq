@@ -44,6 +44,7 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
+        'parent_id' => 'integer',
         'active' => 'boolean',
         'last_login_datetime' => 'datetime',
         'last_activity_datetime' => 'datetime',
