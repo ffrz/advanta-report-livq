@@ -59,11 +59,9 @@ class DemoPlotController extends Controller
 
     public function data(Request $request)
     {
-        $orderBy = $request->get('order_by', 'id');
-        $orderType = $request->get('order_type', 'asc');
-
         $items = $this->createQuery($request)
-            ->orderBy($orderBy, $orderType)
+            ->orderBy('last_visit', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($request->get('per_page', 10))
             ->withQueryString();
 
@@ -319,34 +317,6 @@ class DemoPlotController extends Controller
         if (!empty($filter['status']) && ($filter['status'] != 'all')) {
             $q->where('demo_plots.active', '=', $filter['status'] == 'active');
         }
-
-        // if (!empty($filter['period']) && ($filter['period'] != 'all')) {
-        //     if ($filter['period'] == 'this_month') {
-        //         $start = Carbon::now()->startOfMonth();
-        //         $end = Carbon::now()->endOfMonth();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'last_month') {
-        //         $start = Carbon::now()->subMonthNoOverflow()->startOfMonth();
-        //         $end = Carbon::now()->subMonthNoOverflow()->endOfMonth();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'this_year') {
-        //         $start = Carbon::now()->startOfYear();
-        //         $end = Carbon::now()->endOfYear();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } elseif ($filter['period'] == 'last_year') {
-        //         $start = Carbon::now()->subYear()->startOfYear();
-        //         $end = Carbon::now()->subYear()->endOfYear();
-        //         $q->whereBetween('date', [$start, $end]);
-        //     } else {
-        //         // Asumsikan filter['period'] dalam format YYYY-MM-DD
-        //         try {
-        //             $date = Carbon::parse($filter['period']);
-        //             $q->whereDate('date', $date);
-        //         } catch (\Exception $e) {
-        //             // Handle kesalahan parsing tanggal jika perlu
-        //         }
-        //     }
-        // }
 
         return $q;
     }
