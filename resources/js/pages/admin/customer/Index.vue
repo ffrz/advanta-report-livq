@@ -231,14 +231,40 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
               </div>
               <template v-if="$q.screen.lt.md">
                 <div><q-icon name="phone" /> {{ props.row.phone }}</div>
-                <div><q-icon name="home_pin" /> {{ props.row.address }}</div>
-                <div>
+                <div
+                  style="
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                  "
+                >
+                  <q-icon name="home_pin" /> {{ props.row.address }}
+                </div>
+                <div
+                  style="
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                  "
+                >
                   <q-icon name="local_shipping" />
                   {{ props.row.shipping_address }}
                 </div>
                 <div><q-icon name="category" /> {{ props.row.type }}</div>
-                <div v-if="props.row.notes">
-                  <q-icon name="notes" /> {{ props.row.notes }}
+                <div
+                  v-if="props.row.notes"
+                  style="
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                  "
+                >
+                  <q-icon name="notes" />
+                  {{
+                    props.row.notes.length > 100
+                      ? props.row.notes.slice(0, 100) + "..."
+                      : props.row.notes
+                  }}
                 </div>
               </template>
             </q-td>

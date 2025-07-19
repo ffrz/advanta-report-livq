@@ -157,8 +157,20 @@ const computedColumns = computed(() =>
                 <q-icon name="payments" /> Rp.
                 {{ formatNumber(props.row.cost) }}
               </div>
-              <div v-if="props.row.notes">
-                <q-icon name="notes" /> {{ props.row.notes }}
+              <div
+                v-if="props.row.notes"
+                style="
+                  white-space: pre-wrap;
+                  word-break: break-word;
+                  overflow-wrap: break-word;
+                "
+              >
+                <q-icon name="notes" />
+                {{
+                  props.row.notes.length > 100
+                    ? props.row.notes.slice(0, 100) + "..."
+                    : props.row.notes
+                }}
               </div>
             </template>
           </q-td>
@@ -172,7 +184,20 @@ const computedColumns = computed(() =>
             {{ formatNumber(props.row.cost) }}
           </q-td>
           <q-td key="notes" :props="props">
-            {{ props.row.notes }}
+            <div
+              v-if="props.row.notes"
+              style="
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow-wrap: break-word;
+              "
+            >
+              {{
+                props.row.notes.length > 100
+                  ? props.row.notes.slice(0, 100) + "..."
+                  : props.row.notes
+              }}
+            </div>
           </q-td>
           <q-td key="action" :props="props">
             <div
