@@ -239,6 +239,7 @@ class ActivityController extends Controller
     {
         $q = $this->createQuery($request)
             ->orderBy('users.name', 'asc')
+            ->orderBy('activity_types.name', 'asc')
             ->orderBy('date', 'asc');
 
         $items = $q->get();
@@ -302,6 +303,7 @@ class ActivityController extends Controller
 
         $q = Activity::select('activities.*')
             ->join('users', 'users.id', '=', 'activities.user_id')
+            ->join('activity_types', 'activity_types.id', '=', 'activities.type_id')
             ->with([
                 'user:id,username,name',
                 'responded_by:id,username,name',

@@ -80,7 +80,7 @@ const plant_status_colors = {
 };
 
 const columns = [
-  { name: "field", label: "Lahan", field: "field", align: "left" },
+  { name: "field", label: "Lokasi", field: "field", align: "left" },
   { name: "product", label: "Varietas", field: "product", align: "left" },
   {
     name: "plant_date",
@@ -367,19 +367,19 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                     overflow-wrap: break-word;
                   "
                 >
-                  <q-icon name="distance" /> Lokasi:
+                  <q-icon name="distance" />
                   {{ props.row.field_location }}
                 </div>
               </template>
 
               <template v-if="$q.screen.lt.md">
-                <div>
-                  <q-icon name="edit_calendar" /> Tgl Tanam:
-                  {{ $dayjs(props.row.plant_date).format("D MMMM YYYY") }}
+                <div v-if="props.row.product">
+                  <q-icon name="potted_plant" />
+                  {{ props.row.product.name }}
                 </div>
                 <template v-if="props.row.active">
                   <div>
-                    <q-icon name="calendar_clock" /> Umur:
+                    <q-icon name="calendar_clock" />
                     {{ plantAge(props.row.plant_date) }} hari
                   </div>
                 </template>
