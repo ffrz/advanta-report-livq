@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DatabaseController;
 use App\Http\Controllers\Admin\DemoPlotController;
 use App\Http\Controllers\Admin\DemoPlotVisitController;
 use App\Http\Controllers\Admin\ProductCategoryController;
@@ -191,6 +192,10 @@ Route::middleware([Auth::class])->group(function () {
                 Route::get('detail/{id}', [UserController::class, 'detail'])->name('admin.user.detail');
                 Route::get('export', [UserController::class, 'export'])->name('admin.user.export');
             });
+
+            Route::get('database', [DatabaseController::class, 'index'])->name('admin.db.index');
+            Route::get('database/backup', [DatabaseController::class, 'backup'])->name('admin.db.backup');
+            Route::get('db/restore', [DatabaseController::class, 'restore'])->name('admin.db.restore');
         });
     });
 });

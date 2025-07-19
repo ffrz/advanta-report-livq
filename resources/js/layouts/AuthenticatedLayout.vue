@@ -341,6 +341,21 @@ onMounted(() => {
               <q-item-label>Profil Perusahaan</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item
+            v-close-popup
+            v-if="$can('admin.db.menu')"
+            clickable
+            v-ripple
+            :active="$page.url.startsWith('/admin/settings/db')"
+            @click="router.get(route('admin.db.index'))"
+          >
+            <q-item-section avatar>
+              <q-icon name="database" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Database</q-item-label>
+            </q-item-section>
+          </q-item>
 
           <q-separator />
 
