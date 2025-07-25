@@ -291,55 +291,45 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 </div>
 
                 <!-- Detail Target dan Realisasi -->
-                <ul
-                  class="q-ma-none q-ml-md q-pl-md q-pa-none"
-                  style="font-family: monospace"
-                >
-                  <li v-for="type in types" :key="type.id">
-                    <b>{{ type.name }}</b>
-                    <div>
-                      T:
-                      {{
-                        (() => {
-                          const detail = props.row.details.find(
-                            (d) => Number(d.type_id) === Number(type.id)
-                          );
-                          return detail
-                            ? `${detail.quarter_qty} (${detail.month1_qty}/${detail.month2_qty}/${detail.month3_qty})`
-                            : "-";
-                        })()
-                      }}
-                    </div>
-
-                    <!-- Plan -->
-                    <div v-if="props.row.plans && props.row.plans[type.id]">
-                      P:
-                      {{
-                        `${props.row.plans[type.id].quarter_qty} (${
-                          props.row.plans[type.id].month1_qty
-                        }/${props.row.plans[type.id].month2_qty}/${
-                          props.row.plans[type.id].month3_qty
-                        })`
-                      }}
-                    </div>
-
-                    <!-- Plan -->
-                    <div
-                      v-if="
-                        props.row.activities && props.row.activities[type.id]
-                      "
-                    >
-                      R:
-                      {{
-                        `${props.row.activities[type.id].quarter_qty} (${
-                          props.row.activities[type.id].month1_qty
-                        }/${props.row.activities[type.id].month2_qty}/${
-                          props.row.activities[type.id].month3_qty
-                        })`
-                      }}
-                    </div>
-                  </li>
-                </ul>
+                <table class="q-table q-table--flat dense-table">
+                  <thead>
+                    <th>Kegiatan</th>
+                    <th>Target</th>
+                    <th>Plan</th>
+                    <th>Realisasi</th>
+                  </thead>
+                  <tbody>
+                    <tr v-for="type in types" :key="type.id">
+                      <td>{{ type.name }}</td>
+                      <td>
+                        {{
+                          (() => {
+                            const detail = props.row.details.find(
+                              (d) => Number(d.type_id) === Number(type.id)
+                            );
+                            return detail ? `${detail.quarter_qty}` : "-";
+                          })()
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          (() => {
+                            const plan = props.row.plans?.[type.id];
+                            return plan ? `${plan.quarter_qty}` : "-";
+                          })()
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          (() => {
+                            const activity = props.row.activities?.[type.id];
+                            return activity ? `${activity.quarter_qty}` : "-";
+                          })()
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
                 <!-- Notes -->
                 <div v-if="props.row.notes" class="text-grey-8">
@@ -574,3 +564,18 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     </div>
   </authenticated-layout>
 </template>
+<style scoped>
+.dense-table {
+  font-size: 0.8rem;
+  width: 100%;
+  margin: 5px 0;
+}
+.dense-table th,
+.dense-table td {
+  padding: 2px 8px !important;
+  height: auto !important;
+}
+.dense-table td:not(:nth-child(1)) {
+  text-align: center !important;
+}
+</style>
