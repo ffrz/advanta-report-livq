@@ -38,7 +38,9 @@ const props = defineProps({
 });
 
 /**
- * Mendapatkan nilai quarter_qty dari struktur berbeda:
+ * Mendapatkan nilai quarter_qty dari struktur berbeda: ini sudah terlajur data dari server 
+ * untuk target dalam bentuk array, sedangkan plans dan activities dalam bentuk map by activity type ID.
+ * Jika data dari server diubah, fungsi ini bisa disederhanakan atau bahkan tidak diperlukan.
  * - Array (details)
  * - Object keyed (plans, activities)
  */

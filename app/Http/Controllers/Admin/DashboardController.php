@@ -7,15 +7,9 @@ use App\Models\Activity;
 use App\Models\ActivityPlan;
 use App\Models\ActivityTarget;
 use App\Models\ActivityType;
-use App\Models\Closing;
-use App\Models\Customer;
-use App\Models\CustomerService;
-use App\Models\Interaction;
-use App\Models\Service;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -28,7 +22,6 @@ class DashboardController extends Controller
         $quarter = null;
 
         if (!$quarter) {
-            $month = now()->month;
             if (in_array($month, [4, 5, 6])) $quarter = 1;
             elseif (in_array($month, [7, 8, 9])) $quarter = 2;
             elseif (in_array($month, [10, 11, 12])) $quarter = 3;
@@ -120,14 +113,14 @@ class DashboardController extends Controller
             $monthKey = 'month' . ($monthIndex + 1) . '_qty';
             $actvities_by_type_ids[$typeId][$monthKey] += 1;
         }
-
+        
         return inertia('admin/dashboard/Index', [
             'data' => [
                 'types' => ActivityType::where('active', true)
                     ->select(['id', 'name', 'weight'])
                     ->orderBy('name', 'asc')
                     ->get(),
-                'targets' => $targets ? $targets[0]->details : [],
+                'targets' => count($targets) > 0 ? $targets[0]->details : [],
                 'plans' => $plan_details_by_type_ids,
                 'activities' => $actvities_by_type_ids,
             ],
