@@ -39,7 +39,7 @@ class ActivityTargetController extends Controller
         return inertia('admin/activity-target/Index', [
             'users' => $users,
             'types' => ActivityType::where('active', true)
-                ->select(['id', 'name'])
+                ->select(['id', 'name', 'weight'])
                 ->orderBy('name', 'asc')
                 ->get(),
         ]);

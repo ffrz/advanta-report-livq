@@ -5,6 +5,8 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
+import ActivityTable from "@/components/ActivityTable.vue";
+import { calculateQuarterActivityProgress } from "@/composables/useCalculateActivityProgress";
 
 const page = usePage();
 const storage = usePageStorage("activity-target");
@@ -114,6 +116,17 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
 watch(showFilter, () => storage.set("show-filter", showFilter.value), {
   deep: true,
 });
+
+const calculated_progress = {};
+function calculateQuarterProgress(types, row) {
+  if (calculated_progress[row.id]) {
+    return calculated_progress[row.id];
+  }
+  const percent = calculateQuarterActivityProgress(types, row.details, row.activities);
+  calculated_progress[row.id] = percent;
+  return percent;
+}
+
 </script>
 
 <template>
@@ -291,45 +304,12 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 </div>
 
                 <!-- Detail Target dan Realisasi -->
-                <table class="q-table q-table--flat dense-table">
-                  <thead>
-                    <th>Kegiatan</th>
-                    <th>Target</th>
-                    <th>Plan</th>
-                    <th>Realisasi</th>
-                  </thead>
-                  <tbody>
-                    <tr v-for="type in types" :key="type.id">
-                      <td>{{ type.name }}</td>
-                      <td>
-                        {{
-                          (() => {
-                            const detail = props.row.details.find(
-                              (d) => Number(d.type_id) === Number(type.id)
-                            );
-                            return detail ? `${detail.quarter_qty}` : "-";
-                          })()
-                        }}
-                      </td>
-                      <td>
-                        {{
-                          (() => {
-                            const plan = props.row.plans?.[type.id];
-                            return plan ? `${plan.quarter_qty}` : "-";
-                          })()
-                        }}
-                      </td>
-                      <td>
-                        {{
-                          (() => {
-                            const activity = props.row.activities?.[type.id];
-                            return activity ? `${activity.quarter_qty}` : "-";
-                          })()
-                        }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <ActivityTable
+                  :types="types"
+                  :targets="props.row.details"
+                  :plans="props.row.plans"
+                  :activities="props.row.activities"
+                  />
 
                 <!-- Notes -->
                 <div v-if="props.row.notes" class="text-grey-8">
@@ -339,51 +319,9 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
 
                 <!-- Progress Keseluruhan -->
                 <div class="q-mt-sm">
-                  {{
-                    (() => {
-                      let totalActivity = 0;
-                      let totalTarget = 0;
-
-                      for (const type of types) {
-                        const detail = props.row.details.find(
-                          (d) => Number(d.type_id) === Number(type.id)
-                        );
-                        const activity = props.row.activities?.[type.id];
-
-                        if (detail) {
-                          totalTarget += Number(detail.quarter_qty) || 0;
-                        }
-                        if (activity) {
-                          totalActivity += Number(activity.quarter_qty) || 0;
-                        }
-                      }
-                      const percent =
-                        totalTarget > 0 && totalActivity > 0
-                          ? Math.min((totalActivity / totalTarget) * 100, 100)
-                          : 0;
-                      return `Total Progress: ${percent.toFixed(0)}%`;
-                    })()
-                  }}
+                  Total Progress: {{ calculateQuarterProgress(types, props.row).toFixed(2) }}%
                   <q-linear-progress
-                    :value="
-                      (() => {
-                        let totalTarget = 0;
-                        let totalActivity = 0;
-                        for (const type of types) {
-                          const detail = props.row.details.find(
-                            (d) => Number(d.type_id) === Number(type.id)
-                          );
-                          const activity = props.row.activities?.[type.id];
-                          if (detail)
-                            totalTarget += Number(detail.quarter_qty) || 0;
-                          if (activity)
-                            totalActivity += Number(activity.quarter_qty) || 0;
-                        }
-                        return totalTarget > 0 && totalActivity > 0
-                          ? Math.min(totalActivity / totalTarget, 1)
-                          : 0;
-                      })()
-                    "
+                    :value="calculateQuarterProgress(types, props.row) / 100"
                     size="10px"
                     color="primary"
                     class="q-mt-xs"
@@ -406,7 +344,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             >
               <!-- Target -->
               <div>
-                Target:
+                T:
                 {{
                   (() => {
                     const detail = props.row.details.find(
@@ -421,7 +359,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
 
               <!-- (Plan) -->
               <div v-if="props.row.plans && props.row.plans[type.id]">
-                Plan:
+                P:
                 {{
                   `${props.row.plans[type.id].quarter_qty} (${
                     props.row.plans[type.id].month1_qty
@@ -433,7 +371,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
 
               <!-- Realisasi -->
               <div v-if="props.row.activities && props.row.activities[type.id]">
-                Realisasi:
+                R:
                 {{
                   `${props.row.activities[type.id].quarter_qty} (${
                     props.row.activities[type.id].month1_qty
@@ -444,54 +382,10 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               </div>
             </q-td>
             <q-td key="total_progress" :props="props">
-              {{
-                (() => {
-                  let totalActivity = 0;
-                  let totalTarget = 0;
-
-                  for (const type of types) {
-                    const detail = props.row.details.find(
-                      (d) => Number(d.type_id) === Number(type.id)
-                    );
-                    const plan = props.row.activities?.[type.id];
-
-                    if (detail) {
-                      totalTarget += Number(detail.quarter_qty) || 0;
-                    }
-                    if (plan) {
-                      totalActivity += Number(plan.quarter_qty) || 0;
-                    }
-                  }
-
-                  const percent =
-                    totalTarget > 0 ? (totalActivity / totalTarget) * 100 : 0;
-                  return `${percent.toFixed(0)}%`;
-                })()
-              }}
+              {{ calculateQuarterProgress(types, props.row).toFixed(2) }}%
 
               <q-linear-progress
-                :value="
-                  (() => {
-                    let totalPlan = 0;
-                    let totalTarget = 0;
-
-                    for (const type of types) {
-                      const detail = props.row.details.find(
-                        (d) => Number(d.type_id) === Number(type.id)
-                      );
-                      const plan = props.row.plans?.[type.id];
-
-                      if (detail) {
-                        totalTarget += Number(detail.quarter_qty) || 0;
-                      }
-                      if (plan) {
-                        totalPlan += Number(plan.quarter_qty) || 0;
-                      }
-                    }
-
-                    return totalTarget > 0 ? totalPlan / totalTarget : 0;
-                  })()
-                "
+                :value="calculateQuarterProgress(types, props.row) / 100"
                 size="10px"
                 color="primary"
                 class="q-mt-xs"
@@ -564,18 +458,3 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     </div>
   </authenticated-layout>
 </template>
-<style scoped>
-.dense-table {
-  font-size: 0.8rem;
-  width: 100%;
-  margin: 5px 0;
-}
-.dense-table th,
-.dense-table td {
-  padding: 2px 8px !important;
-  height: auto !important;
-}
-.dense-table td:not(:nth-child(1)) {
-  text-align: center !important;
-}
-</style>

@@ -11,6 +11,12 @@ export const getQueryParams = (...args) => {
   return Object.assign(Object.fromEntries(new URLSearchParams(queryString)), ...args);
 }
 
+export function getMonthIndexInQuarter(month) {
+  // month = 1–12
+  const fiscalIndex = (month - 4 + 12) % 12; // Geser agar April = 0
+  return (fiscalIndex % 3) + 1;              // Ambil posisi dalam kuartal
+}
+
 export function wa_send_url(phone, country_code = '62') {
   if (!phone) return '';
 
@@ -60,6 +66,22 @@ export function create_quarter_options(year) {
     { value: `${year}-q3`, label: `${year}-Q3 (Oktober-Desember)` },
     { value: `${year}-q4`, label: `${year}-Q4 (Januari-Maret)` },
   ]
+}
+
+export function current_year() {
+  return new Date().getFullYear();
+}
+
+export function current_month() {
+  return new Date().getMonth() + 1; // getMonth() returns 0-11
+}
+
+export function current_quarter() {
+  const month = new Date().getMonth() + 1; // getMonth() returns 0-11
+  if (month >= 1 && month <= 3) return 4; // Jan-Mar
+  if (month >= 4 && month <= 6) return 1; // Apr-Jun
+  if (month >= 7 && month <= 9) return 2; // Jul-Sep
+  return 3; // Oct-Dec
 }
 
 export function create_month_options() {

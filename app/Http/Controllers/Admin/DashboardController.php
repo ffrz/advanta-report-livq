@@ -19,8 +19,142 @@ use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
+    public function bsDashboard(Request $request)
+    {
+        // TODO: refactor karena kode dupikat dengan ActivityTargetController@index()
+        $user = auth()->user(); // atau Auth::user()
+        $year = $request->get('year', now()->year);
+        $month = $request->get('month', now()->month);
+        $quarter = null;
+
+        if (!$quarter) {
+            $month = now()->month;
+            if (in_array($month, [4, 5, 6])) $quarter = 1;
+            elseif (in_array($month, [7, 8, 9])) $quarter = 2;
+            elseif (in_array($month, [10, 11, 12])) $quarter = 3;
+            else $quarter = 4;
+        }
+
+        $fiscalQuarterMonths = [
+            1 => [4, 5, 6],
+            2 => [7, 8, 9],
+            3 => [10, 11, 12],
+            4 => [1, 2, 3],
+        ];
+
+        $months = $fiscalQuarterMonths[$quarter];
+        $startYear = ($quarter == 4) ? $year + 1 : $year;
+
+        $start = Carbon::createFromDate($startYear, $months[0], 1)->startOfDay();
+        $end = Carbon::createFromDate($startYear, $months[2], 1)->endOfMonth()->endOfDay();
+
+        $targets = ActivityTarget::with([
+            'user:id,username,name',
+            'details',
+            'details.type:id,name',
+        ])->where('user_id', $user->id)
+            ->where('year', $year)
+            ->where('quarter', $quarter)
+            ->get();
+
+        // Ambil data rencana kegiatan (plans)
+        $plans = ActivityPlan::with('details')
+            ->where('user_id', $user->id)
+            ->where('status', ActivityPlan::Status_Approved)
+            ->whereBetween('date', [$start, $end])
+            ->get();
+
+        $plan_details_by_type_ids = [];
+
+        foreach ($plans as $plan) {
+            $planMonth = Carbon::parse($plan->date)->month;
+            $monthIndex = array_search($planMonth, $months);
+
+            if ($monthIndex === false) continue;
+
+            foreach ($plan->details as $detail) {
+                $typeId = $detail->type_id;
+
+                if (!isset($plan_details_by_type_ids[$typeId])) {
+                    $plan_details_by_type_ids[$typeId] = [
+                        'quarter_qty' => 0,
+                        'month1_qty' => 0,
+                        'month2_qty' => 0,
+                        'month3_qty' => 0,
+                    ];
+                }
+
+                $plan_details_by_type_ids[$typeId]['quarter_qty'] += 1;
+                $monthKey = 'month' . ($monthIndex + 1) . '_qty';
+                $plan_details_by_type_ids[$typeId][$monthKey] += 1;
+            }
+        }
+
+        // Ambil data realisasi kegiatan (activities)
+        $activities = Activity::query()
+            ->where('user_id', $user->id)
+            ->where('status', Activity::Status_Approved)
+            ->whereBetween('date', [$start, $end])
+            ->get();
+
+        $actvities_by_type_ids = [];
+
+        foreach ($activities as $activity) {
+            $activityMonth = Carbon::parse($activity->date)->month;
+            $monthIndex = array_search($activityMonth, $months);
+
+            if ($monthIndex === false) continue;
+
+            $typeId = $activity->type_id;
+
+            if (!isset($actvities_by_type_ids[$typeId])) {
+                $actvities_by_type_ids[$typeId] = [
+                    'quarter_qty' => 0,
+                    'month1_qty' => 0,
+                    'month2_qty' => 0,
+                    'month3_qty' => 0,
+                ];
+            }
+
+            $actvities_by_type_ids[$typeId]['quarter_qty'] += 1;
+            $monthKey = 'month' . ($monthIndex + 1) . '_qty';
+            $actvities_by_type_ids[$typeId][$monthKey] += 1;
+        }
+
+        return inertia('admin/dashboard/Index', [
+            'data' => [
+                'types' => ActivityType::where('active', true)
+                    ->select(['id', 'name', 'weight'])
+                    ->orderBy('name', 'asc')
+                    ->get(),
+                'targets' => $targets ? $targets[0]->details : [],
+                'plans' => $plan_details_by_type_ids,
+                'activities' => $actvities_by_type_ids,
+            ],
+            ''
+        ]);
+    }
 
     public function index(Request $request)
+    {
+        // Redirect to BS dashboard if user is BS
+        if ($request->user()->role === User::Role_BS) {
+            return $this->bsDashboard($request);
+        }
+
+        // For other roles, show the default dashboard
+        return inertia('admin/dashboard/Index', [
+            'data' => [],
+            'period' => [
+                'label' => 'This Month',
+                'start_date' => '',
+                'end_date' => '',
+            ],
+        ]);
+    }
+
+    /// TIDAK DIGUNAKAN
+    public function _index(Request $request)
     {
         $period = $request->get('period', 'this_month');
         [$start_date, $end_date] = resolve_period($period);
@@ -31,14 +165,12 @@ class DashboardController extends Controller
         $user = $request->user();
 
         if ($user->role === User::Role_BS) {
-            // Hitung informasi kuartal fiscal
             $fiscalInfo = getFiscalQuarterInfo($start_date);
 
             $year = $fiscalInfo['fiscal_year'];
             $quarter = $fiscalInfo['quarter'];
             $month_position = $fiscalInfo['month_position'];
 
-            // Ambil target
             $targets = ActivityTarget::with(['details.type'])
                 ->where('user_id', $user->id)
                 ->where('year', $year)
@@ -51,10 +183,14 @@ class DashboardController extends Controller
             $total_target = 0;
             $total_completed = 0;
             $total_planned = 0;
+            $total_weight = 0;
+            $weighted_progress = 0;
 
             foreach ($targets as $target) {
                 foreach ($target->details as $detail) {
                     $type_id = $detail->type_id;
+                    $weight = (int) $detail->type->weight ?? 0;
+
                     if (!isset($summary[$type_id])) {
                         $summary[$type_id] = [
                             'type_id' => $type_id,
@@ -62,7 +198,9 @@ class DashboardController extends Controller
                             'target_qty' => 0,
                             'plan_qty' => 0,
                             'real_qty' => 0,
+                            'weight' => $weight,
                         ];
+                        $total_weight += $weight;
                     }
 
                     $qty = (int) $detail->{$month_column};
@@ -72,7 +210,6 @@ class DashboardController extends Controller
                 }
             }
 
-            // Ambil plan disetujui di kuartal tersebut (berdasarkan rentang tanggal)
             $start = Carbon::createFromDate($fiscalInfo['start_year'], $fiscalInfo['start_month'], 1)->startOfDay();
             $end = Carbon::createFromDate($fiscalInfo['end_year'], $fiscalInfo['end_month'], 1)->endOfMonth()->endOfDay();
 
@@ -93,7 +230,9 @@ class DashboardController extends Controller
                             'target_qty' => 0,
                             'plan_qty' => 0,
                             'real_qty' => 0,
+                            'weight' => (int) $detail->type->weight ?? 0,
                         ];
+                        $total_weight += $summary[$type_id]['weight'];
                     }
 
                     $summary[$type_id]['plan_qty'] += 1;
@@ -109,6 +248,8 @@ class DashboardController extends Controller
 
             foreach ($activities as $activity) {
                 $type_id = $activity->type_id;
+                $weight = (int) $activity->type->weight ?? 0;
+
                 if (!isset($summary[$type_id])) {
                     $summary[$type_id] = [
                         'type_id' => $type_id,
@@ -116,10 +257,94 @@ class DashboardController extends Controller
                         'target_qty' => 0,
                         'plan_qty' => 0,
                         'real_qty' => 0,
+                        'weight' => $weight,
                     ];
+                    $total_weight += $weight;
                 }
+
                 $summary[$type_id]['real_qty'] += 1;
                 $total_completed += 1;
+            }
+
+            if ($total_weight > 0) {
+                foreach ($summary as $row) {
+                    $target = $row['target_qty'];
+                    $real = $row['real_qty'];
+                    $weight = $row['weight'];
+
+                    if ($target > 0) {
+                        $progress = min($real / $target, 1);
+                        $normalized_weight = $weight / $total_weight;
+                        $weighted_progress += $progress * $normalized_weight;
+                    }
+                }
+            }
+
+            // === HITUNG PROGRES KUARTALAN ===
+
+            $quarter_summary = [];
+            $total_quarter_target = 0;
+            $total_quarter_completed = 0;
+            $total_quarter_weight = 0;
+            $quarter_weighted_progress = 0;
+
+            foreach ($targets as $target) {
+                foreach ($target->details as $detail) {
+                    $type_id = $detail->type_id;
+                    $weight = (int) $detail->type->weight ?? 0;
+
+                    if (!isset($quarter_summary[$type_id])) {
+                        $quarter_summary[$type_id] = [
+                            'type_id' => $type_id,
+                            'type_name' => $detail->type->code ?? $detail->type->name,
+                            'target_qty' => 0,
+                            'real_qty' => 0,
+                            'weight' => $weight,
+                        ];
+                        $total_quarter_weight += $weight;
+                    }
+
+                    $qty =
+                        (int) $detail->month1_qty +
+                        (int) $detail->month2_qty +
+                        (int) $detail->month3_qty;
+
+                    $quarter_summary[$type_id]['target_qty'] += $qty;
+                    $total_quarter_target += $qty;
+                }
+            }
+
+            foreach ($activities as $activity) {
+                $type_id = $activity->type_id;
+                $weight = (int) $activity->type->weight ?? 0;
+
+                if (!isset($quarter_summary[$type_id])) {
+                    $quarter_summary[$type_id] = [
+                        'type_id' => $type_id,
+                        'type_name' => $activity->type->name,
+                        'target_qty' => 0,
+                        'real_qty' => 0,
+                        'weight' => $weight,
+                    ];
+                    $total_quarter_weight += $weight;
+                }
+
+                $quarter_summary[$type_id]['real_qty'] += 1;
+                $total_quarter_completed += 1;
+            }
+
+            if ($total_quarter_weight > 0) {
+                foreach ($quarter_summary as $row) {
+                    $target = $row['target_qty'];
+                    $real = $row['real_qty'];
+                    $weight = $row['weight'];
+
+                    if ($target > 0) {
+                        $progress = min($real / $target, 1);
+                        $normalized_weight = $weight / $total_quarter_weight;
+                        $quarter_weighted_progress += $progress * $normalized_weight;
+                    }
+                }
             }
 
             return inertia('admin/dashboard/Index', [
@@ -127,7 +352,8 @@ class DashboardController extends Controller
                     'targets' => array_values($summary),
                     'total_target' => $total_target,
                     'total_completed' => $total_completed,
-
+                    'total_progress' => round($weighted_progress * 100), // Bulanan
+                    'total_quarter_progress' => round($quarter_weighted_progress * 100),
                 ],
                 'period' => [
                     'label' => \Illuminate\Support\Str::headline(str_replace('_', ' ', $period)),
@@ -136,6 +362,8 @@ class DashboardController extends Controller
                 ],
             ]);
         }
+
+
 
 
         // $labels = [];

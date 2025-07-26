@@ -7,24 +7,34 @@ import RecentClosingsCard from "./cards/RecentClosingsCard.vue";
 import RecentCustomersCard from "./cards/RecentCustomersCard.vue";
 import { router, usePage } from "@inertiajs/vue3";
 
-import { ref } from "vue";
-import { getQueryParams } from "@/helpers/utils";
+import { reactive, ref } from "vue";
+import { create_month_options, current_month, current_quarter, current_year, getQueryParams } from "@/helpers/utils";
 import BsTargetCard from "./cards/BsTargetCard.vue";
+import { usePageStorage } from "@/helpers/usePageStorage";
 
+const query = getQueryParams();
+const currentYear = current_year();
+const currentMonth = current_month();
 const title = "Dashboard";
 const showFilter = ref(true);
-const selected_period = ref(getQueryParams()["period"] ?? "this_month");
+const filter = reactive({
+  year: Number(query.year ?? currentYear),
+  month: Number(query.month ?? currentMonth),
+});
 
-const page = usePage();
+const years = [
+  ...Array.from({ length: 3 }, (_, i) => {
+    const year = currentYear - 1 + i;
+    return { value: year, label: String(year) + " / " + String(year + 1) };
+  }),
+];
 
-const period_options = ref([
-  { value: "last_month", label: "Bulan Lalu" },
-  { value: "this_month", label: "Bulan Ini" },
-  { value: "next_month", label: "Bulan Depan" },
-]);
+const months = create_month_options();
+
 const onFilterChange = () => {
-  router.visit(route("admin.dashboard", { period: selected_period.value }));
+  router.visit(route("admin.dashboard", filter));
 };
+
 </script>
 
 <template>
@@ -44,14 +54,26 @@ const onFilterChange = () => {
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
-            class="custom-select col-12"
-            style="min-width: 150px"
-            v-model="selected_period"
-            :options="period_options"
-            label="Periode"
+            class="custom-select col-xs-12 col-sm-6"
+            style="min-width: 120px"
+            v-model="filter.year"
+            :options="years"
+            label="Tahun"
             dense
-            map-options
             emit-value
+            map-options
+            outlined
+            @update:model-value="onFilterChange"
+          />
+          <q-select
+            class="custom-select col-xs-12 col-sm-6"
+            style="min-width: 120px"
+            v-model="filter.month"
+            :options="months"
+            label="Buan"
+            dense
+            emit-value
+            map-options
             outlined
             @update:model-value="onFilterChange"
           />
@@ -59,9 +81,6 @@ const onFilterChange = () => {
       </q-toolbar>
     </template>
     <div class="q-pa-sm" v-if="$page.props.auth.user.role === 'bs'">
-      <div class="q-mb-md text-grey-8 text-italic text-subtitle2">
-        Ket: T = Target, P = Plan, R = Realisasi
-      </div>
       <BsTargetCard />
     </div>
     <div class="q-pa-sm" v-if="$page.props.auth.user.role === 'admin'">
@@ -77,8 +96,7 @@ const onFilterChange = () => {
       </div>
       <div class="q-pt-md">
         <div class="text-subtitle1 text-bold text-grey-8">
-          Statistik
-          {{ period_options.find((a) => a.value == selected_period).label }}
+          Statistik Keseluruhan
         </div>
         <p class="text-grey-8">Belum Tersedia</p>
         <!-- <stat-cards class="q-py-none" /> -->
