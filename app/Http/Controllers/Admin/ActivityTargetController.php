@@ -69,90 +69,7 @@ class ActivityTargetController extends Controller
             ->withQueryString()
             ->toArray();
 
-        // Mapping fiscal quarters mulai dari April
-        $fiscalQuarterMonths = [
-            1 => [4, 5, 6],    // Q1: Apr–Jun
-            2 => [7, 8, 9],    // Q2: Jul–Sep
-            3 => [10, 11, 12], // Q3: Oct–Dec
-            4 => [1, 2, 3],    // Q4: Jan–Mar (tahun berikutnya)
-        ];
-
-        foreach ($items['data'] as $index => $item) {
-            $year = $item['year'];         // fiscal year
-            $quarter = $item['quarter'];   // 1-4
-            $months = $fiscalQuarterMonths[$quarter];
-
-            // Jika Q4, berarti tahun awalnya naik 1 (karena Jan–Mar tahun berikutnya)
-            $startYear = ($quarter == 4) ? $year + 1 : $year;
-
-            $start = Carbon::createFromDate($startYear, $months[0], 1)->startOfDay();
-            $end = Carbon::createFromDate($startYear, $months[2], 1)->endOfMonth()->endOfDay();
-
-            $plans = ActivityPlan::with('details')
-                ->where('user_id', $item['user_id'])
-                ->where('status', ActivityPlan::Status_Approved)
-                ->whereBetween('date', [$start, $end])
-                ->get();
-
-            $plan_details_by_type_ids = [];
-
-            foreach ($plans as $plan) {
-                $planMonth = Carbon::parse($plan->date)->month;
-                $monthIndex = array_search($planMonth, $months);
-
-                if ($monthIndex === false) continue;
-
-                foreach ($plan->details as $detail) {
-                    $typeId = $detail->type_id;
-
-                    if (!isset($plan_details_by_type_ids[$typeId])) {
-                        $plan_details_by_type_ids[$typeId] = [
-                            'quarter_qty' => 0,
-                            'month1_qty' => 0,
-                            'month2_qty' => 0,
-                            'month3_qty' => 0,
-                        ];
-                    }
-
-                    $plan_details_by_type_ids[$typeId]['quarter_qty'] += 1;
-                    $monthKey = 'month' . ($monthIndex + 1) . '_qty';
-                    $plan_details_by_type_ids[$typeId][$monthKey] += 1;
-                }
-            }
-
-            $activities = Activity::query()
-                ->where('user_id', $item['user_id'])
-                ->where('status', Activity::Status_Approved)
-                ->whereBetween('date', [$start, $end])
-                ->get();
-
-            $actvities_by_type_ids = [];
-
-            foreach ($activities as $activity) {
-                $activityMonth = Carbon::parse($activity->date)->month;
-                $monthIndex = array_search($activityMonth, $months);
-
-                if ($monthIndex === false) continue;
-
-                $typeId = $activity->type_id;
-
-                if (!isset($actvities_by_type_ids[$typeId])) {
-                    $actvities_by_type_ids[$typeId] = [
-                        'quarter_qty' => 0,
-                        'month1_qty' => 0,
-                        'month2_qty' => 0,
-                        'month3_qty' => 0,
-                    ];
-                }
-
-                $actvities_by_type_ids[$typeId]['quarter_qty'] += 1;
-                $monthKey = 'month' . ($monthIndex + 1) . '_qty';
-                $actvities_by_type_ids[$typeId][$monthKey] += 1;
-            }
-
-            $items['data'][$index]['plans'] = $plan_details_by_type_ids;
-            $items['data'][$index]['activities'] = $actvities_by_type_ids;
-        }
+        $items = $this->_processItems($items);
 
         return response()->json($items);
     }
@@ -286,12 +203,17 @@ class ActivityTargetController extends Controller
      */
     public function export(Request $request)
     {
-        $items = $this->createQuery($request)->orderBy('id', 'desc')->get();
+        $items = $this->createQuery($request)
+            ->orderBy('id', 'desc')->get();
 
-        $title = 'Laporan Kegiatan';
+        $items = $this->_processItems($items);
+
+        $title = 'Laporan Target Kegiatan';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
+            return view('export.activity-target-list-pdf', compact('items', 'title'));
+
             $pdf = Pdf::loadView('export.activity-target-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
             return $pdf->download($filename . '.pdf');
@@ -394,5 +316,94 @@ class ActivityTargetController extends Controller
                 ->orderBy('username', 'asc')
                 ->get(),
         ]);
+    }
+
+    private function _processItems($items)
+    {
+        $fiscalQuarterMonths = [
+            1 => [4, 5, 6],    // Q1: Apr–Jun
+            2 => [7, 8, 9],    // Q2: Jul–Sep
+            3 => [10, 11, 12], // Q3: Oct–Dec
+            4 => [1, 2, 3],    // Q4: Jan–Mar (tahun berikutnya)
+        ];
+
+        foreach ($items['data'] as $index => $item) {
+            $year = $item['year'];         // fiscal year
+            $quarter = $item['quarter'];   // 1-4
+            $months = $fiscalQuarterMonths[$quarter];
+
+            // Jika Q4, berarti tahun awalnya naik 1 (karena Jan–Mar tahun berikutnya)
+            $startYear = ($quarter == 4) ? $year + 1 : $year;
+
+            $start = Carbon::createFromDate($startYear, $months[0], 1)->startOfDay();
+            $end = Carbon::createFromDate($startYear, $months[2], 1)->endOfMonth()->endOfDay();
+
+            $plans = ActivityPlan::with('details')
+                ->where('user_id', $item['user_id'])
+                ->where('status', ActivityPlan::Status_Approved)
+                ->whereBetween('date', [$start, $end])
+                ->get();
+
+            $plan_details_by_type_ids = [];
+
+            foreach ($plans as $plan) {
+                $planMonth = Carbon::parse($plan->date)->month;
+                $monthIndex = array_search($planMonth, $months);
+
+                if ($monthIndex === false) continue;
+
+                foreach ($plan->details as $detail) {
+                    $typeId = $detail->type_id;
+
+                    if (!isset($plan_details_by_type_ids[$typeId])) {
+                        $plan_details_by_type_ids[$typeId] = [
+                            'quarter_qty' => 0,
+                            'month1_qty' => 0,
+                            'month2_qty' => 0,
+                            'month3_qty' => 0,
+                        ];
+                    }
+
+                    $plan_details_by_type_ids[$typeId]['quarter_qty'] += 1;
+                    $monthKey = 'month' . ($monthIndex + 1) . '_qty';
+                    $plan_details_by_type_ids[$typeId][$monthKey] += 1;
+                }
+            }
+
+            $activities = Activity::query()
+                ->where('user_id', $item['user_id'])
+                ->where('status', Activity::Status_Approved)
+                ->whereBetween('date', [$start, $end])
+                ->get();
+
+            $actvities_by_type_ids = [];
+
+            foreach ($activities as $activity) {
+                $activityMonth = Carbon::parse($activity->date)->month;
+                $monthIndex = array_search($activityMonth, $months);
+
+                if ($monthIndex === false) continue;
+
+                $typeId = $activity->type_id;
+
+                if (!isset($actvities_by_type_ids[$typeId])) {
+                    $actvities_by_type_ids[$typeId] = [
+                        'quarter_qty' => 0,
+                        'month1_qty' => 0,
+                        'month2_qty' => 0,
+                        'month3_qty' => 0,
+                    ];
+                }
+
+                $actvities_by_type_ids[$typeId]['quarter_qty'] += 1;
+                $monthKey = 'month' . ($monthIndex + 1) . '_qty';
+                $actvities_by_type_ids[$typeId][$monthKey] += 1;
+            }
+
+            $items['data'][$index]['plans'] = $plan_details_by_type_ids;
+            $items['data'][$index]['activities'] = $actvities_by_type_ids;
+        }
+
+        return $items;
     }
 }

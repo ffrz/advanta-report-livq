@@ -70,7 +70,7 @@ const onFilterChange = () => {
             style="min-width: 120px"
             v-model="filter.month"
             :options="months"
-            label="Buan"
+            label="Bulan"
             dense
             emit-value
             map-options

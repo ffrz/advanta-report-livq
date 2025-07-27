@@ -99,7 +99,8 @@ class ActivityTypeController extends Controller
     {
 
         $item = ActivityType::findOrFail($id);
-        $item->delete();
+        $item->active = false;
+        $item->save();
 
         return response()->json([
             'message' => "Jenis kegiatan $item->name telah dihapus."

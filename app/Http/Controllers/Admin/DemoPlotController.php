@@ -121,6 +121,7 @@ class DemoPlotController extends Controller
             'latlong'          => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',
             'image_path'       => 'nullable|string',
+            'active'           => 'nullable|boolean',
         ]);
 
         $item = !$request->id

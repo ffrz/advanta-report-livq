@@ -394,12 +394,14 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
               <template v-if="$q.screen.lt.md">
                 <div class="flex items-center q-gutter-sm">
                   <q-badge :color="plant_status_colors[props.row.plant_status]">
-                    Status:
                     {{
                       $CONSTANTS.DEMO_PLOT_PLANT_STATUSES[
                         props.row.plant_status
                       ]
                     }}
+                  </q-badge>
+                  <q-badge :color="props.row.active ? 'green' : 'grey'">
+                    {{ props.row.active ? "Aktif" : "Tidak Aktif" }}
                   </q-badge>
                 </div>
                 <div

@@ -122,11 +122,14 @@ function calculateQuarterProgress(types, row) {
   if (calculated_progress[row.id]) {
     return calculated_progress[row.id];
   }
-  const percent = calculateQuarterActivityProgress(types, row.details, row.activities);
+  const percent = calculateQuarterActivityProgress(
+    types,
+    row.details,
+    row.activities
+  );
   calculated_progress[row.id] = percent;
   return percent;
 }
-
 </script>
 
 <template>
@@ -303,23 +306,10 @@ function calculateQuarterProgress(types, row) {
                   {{ props.row.user.name }} ({{ props.row.user.username }})
                 </div>
 
-                <!-- Detail Target dan Realisasi -->
-                <ActivityTable
-                  :types="types"
-                  :targets="props.row.details"
-                  :plans="props.row.plans"
-                  :activities="props.row.activities"
-                  />
-
-                <!-- Notes -->
-                <div v-if="props.row.notes" class="text-grey-8">
-                  <q-icon name="notes" />
-                  {{ props.row.notes }}
-                </div>
-
                 <!-- Progress Keseluruhan -->
                 <div class="q-mt-sm">
-                  Total Progress: {{ calculateQuarterProgress(types, props.row).toFixed(2) }}%
+                  Progress:
+                  {{ calculateQuarterProgress(types, props.row).toFixed(2) }}%
                   <q-linear-progress
                     :value="calculateQuarterProgress(types, props.row) / 100"
                     size="10px"
@@ -329,6 +319,20 @@ function calculateQuarterProgress(types, row) {
                     stripe
                     animated
                   />
+                </div>
+
+                <!-- Detail Target dan Realisasi -->
+                <ActivityTable
+                  :types="types"
+                  :targets="props.row.details"
+                  :plans="props.row.plans"
+                  :activities="props.row.activities"
+                />
+
+                <!-- Notes -->
+                <div v-if="props.row.notes" class="text-grey-8">
+                  <q-icon name="notes" />
+                  {{ props.row.notes }}
                 </div>
               </template>
             </q-td>
