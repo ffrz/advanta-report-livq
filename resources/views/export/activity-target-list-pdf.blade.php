@@ -115,9 +115,9 @@
             <td>{{ $type->name }}</td>
 
             @php
-              $t = $item->targets[$type->id] ?? ['quarter_qty' => 0, 'month1_qty' => 0, 'month2_qty' => 0, 'month3_qty' => 0];
-              $p = $item->plans[$type->id] ?? ['quarter_qty' => 0, 'month1_qty' => 0, 'month2_qty' => 0, 'month3_qty' => 0];
-              $r = $item->activities[$type->id] ?? ['quarter_qty' => 0, 'month1_qty' => 0, 'month2_qty' => 0, 'month3_qty' => 0];
+              $t = $item['targets'][$type->id] ?? ['quarter_qty' => 0, 'month1_qty' => 0, 'month2_qty' => 0, 'month3_qty' => 0];
+              $p = $item['plans'][$type->id] ?? ['quarter_qty' => 0, 'month1_qty' => 0, 'month2_qty' => 0, 'month3_qty' => 0];
+              $r = $item['activities'][$type->id] ?? ['quarter_qty' => 0, 'month1_qty' => 0, 'month2_qty' => 0, 'month3_qty' => 0];
             @endphp
 
             <td align="right">{{ $t['quarter_qty'] }}</td>
