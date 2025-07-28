@@ -133,7 +133,7 @@ function calculateQuarterProgress(types, row) {
 
 const exportPdf = () => {
   const url = route("admin.activity-target.export", {
-    format,
+    format: "pdf",
     filter: filter,
   });
   window.open(url, "_blank");
