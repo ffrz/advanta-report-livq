@@ -69,12 +69,10 @@ class ActivityTargetController extends Controller
             ->withQueryString()
             ->toArray();
 
-        $items = $this->_processItems($items);
+        $items = $this->_processItems($items, true);
 
         return response()->json($items);
     }
-
-
 
     public function duplicate(Request $request, $id)
     {
@@ -204,18 +202,23 @@ class ActivityTargetController extends Controller
     public function export(Request $request)
     {
         $items = $this->createQuery($request)
-            ->orderBy('id', 'desc')->get();
+            ->orderBy('id', 'desc')
+            ->get()
+            ->toArray();
 
         $items = $this->_processItems($items);
 
+        $types = ActivityType::where('active', true)
+            ->select(['id', 'name', 'weight'])
+            ->orderBy('name', 'asc')
+            ->get();
         $title = 'Laporan Target Kegiatan';
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            return view('export.activity-target-list-pdf', compact('items', 'title'));
-
-            $pdf = Pdf::loadView('export.activity-target-list-pdf', compact('items', 'title'))
-                ->setPaper('A4', 'landscape');
+            //return view('export.activity-target-list-pdf', compact('items', 'title', 'types'));
+            $pdf = Pdf::loadView('export.activity-target-list-pdf', compact('items', 'title', 'types'))
+                ->setPaper('A4', 'portrait');
             return $pdf->download($filename . '.pdf');
         }
 
@@ -318,8 +321,15 @@ class ActivityTargetController extends Controller
         ]);
     }
 
-    private function _processItems($items)
+    private function _processItems($items, $paginated = false)
     {
+        // untuk acuan weight
+        $types_by_ids = ActivityType::where('active', true)
+            ->select(['id', 'weight'])
+            ->orderBy('name', 'asc')
+            ->get()
+            ->keyBy('id');
+
         $fiscalQuarterMonths = [
             1 => [4, 5, 6],    // Q1: Apr–Jun
             2 => [7, 8, 9],    // Q2: Jul–Sep
@@ -327,7 +337,14 @@ class ActivityTargetController extends Controller
             4 => [1, 2, 3],    // Q4: Jan–Mar (tahun berikutnya)
         ];
 
+        if (!$paginated) {
+            $temp = $items;
+            unset($items);
+            $items['data'] = $temp;
+        }
+
         foreach ($items['data'] as $index => $item) {
+
             $year = $item['year'];         // fiscal year
             $quarter = $item['quarter'];   // 1-4
             $months = $fiscalQuarterMonths[$quarter];
@@ -337,6 +354,21 @@ class ActivityTargetController extends Controller
 
             $start = Carbon::createFromDate($startYear, $months[0], 1)->startOfDay();
             $end = Carbon::createFromDate($startYear, $months[2], 1)->endOfMonth()->endOfDay();
+
+            $targets_by_type_ids = [];
+
+            foreach ($item['details'] as $detail) {
+                $typeId = $detail['type_id'];
+
+                if (!isset($targets_by_type_ids[$typeId])) {
+                    $targets_by_type_ids[$typeId] = [
+                        'quarter_qty' => $detail['quarter_qty'],
+                        'month1_qty' => $detail['month1_qty'],
+                        'month2_qty' => $detail['month2_qty'],
+                        'month3_qty' => $detail['month3_qty'],
+                    ];
+                }
+            }
 
             $plans = ActivityPlan::with('details')
                 ->where('user_id', $item['user_id'])
@@ -402,6 +434,55 @@ class ActivityTargetController extends Controller
 
             $items['data'][$index]['plans'] = $plan_details_by_type_ids;
             $items['data'][$index]['activities'] = $actvities_by_type_ids;
+            $items['data'][$index]['targets'] = $targets_by_type_ids;
+
+            // hithung progress
+            $totalQuarterProgress = 0;
+            $totalMonth1Progress = 0;
+            $totalMonth2Progress = 0;
+            $totalMonth3Progress = 0;
+
+            foreach ($targets_by_type_ids as $typeId => $target) {
+                $weight = $types_by_ids[$typeId]->weight ?? 0;
+                $actual = $actvities_by_type_ids[$typeId] ?? [
+                    'quarter_qty' => 0,
+                    'month1_qty' => 0,
+                    'month2_qty' => 0,
+                    'month3_qty' => 0,
+                ];
+
+                // Hitung per periode
+                $qProgress = $target['quarter_qty'] > 0
+                    ? ($actual['quarter_qty'] / $target['quarter_qty']) * $weight
+                    : 0;
+
+                $m1Progress = $target['month1_qty'] > 0
+                    ? ($actual['month1_qty'] / $target['month1_qty']) * $weight
+                    : 0;
+
+                $m2Progress = $target['month2_qty'] > 0
+                    ? ($actual['month2_qty'] / $target['month2_qty']) * $weight
+                    : 0;
+
+                $m3Progress = $target['month3_qty'] > 0
+                    ? ($actual['month3_qty'] / $target['month3_qty']) * $weight
+                    : 0;
+
+                $totalQuarterProgress += $qProgress;
+                $totalMonth1Progress += $m1Progress;
+                $totalMonth2Progress += $m2Progress;
+                $totalMonth3Progress += $m3Progress;
+            }
+
+            // Set hasil ke item
+            $items['data'][$index]['total_quarter_progress'] = round($totalQuarterProgress, 2);
+            $items['data'][$index]['total_month1_progress'] = round($totalMonth1Progress, 2);
+            $items['data'][$index]['total_month2_progress'] = round($totalMonth2Progress, 2);
+            $items['data'][$index]['total_month3_progress'] = round($totalMonth3Progress, 2);
+        }
+
+        if (!$paginated) {
+            $items = $items['data'];
         }
 
         return $items;

@@ -130,6 +130,14 @@ function calculateQuarterProgress(types, row) {
   calculated_progress[row.id] = percent;
   return percent;
 }
+
+const exportPdf = () => {
+  const url = route("admin.activity-target.export", {
+    format,
+    filter: filter,
+  });
+  window.open(url, "_blank");
+};
 </script>
 
 <template>
@@ -167,23 +175,13 @@ function calculateQuarterProgress(types, row) {
           transition-hide="scale"
         >
           <q-list style="width: 200px">
-            <q-item
-              clickable
-              v-ripple
-              v-close-popup
-              :href="
-                route('admin.activity-target.export', {
-                  format: 'pdf',
-                  filter: filter,
-                })
-              "
-            >
+            <q-item clickable v-ripple v-close-popup @click.stop="exportPdf()">
               <q-item-section avatar>
                 <q-icon name="picture_as_pdf" color="red-9" />
               </q-item-section>
               <q-item-section>Export PDF</q-item-section>
             </q-item>
-            <q-item
+            <!-- <q-item
               clickable
               v-ripple
               v-close-popup
@@ -198,7 +196,7 @@ function calculateQuarterProgress(types, row) {
                 <q-icon name="csv" color="green-9" />
               </q-item-section>
               <q-item-section>Export Excel</q-item-section>
-            </q-item>
+            </q-item> -->
           </q-list>
         </q-menu>
       </q-btn>
