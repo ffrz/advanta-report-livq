@@ -12,7 +12,6 @@
         <th>Pemilik</th>
         <th>No HP</th>
         <th>Lokasi</th>
-        <th>Tgl Tanam</th>
         <th>Umur Tanam</th>
         <th>Last Visit</th>
         <th>Status Tanaman</th>
@@ -29,7 +28,6 @@
           <td>{{ $item->owner_name }}</td>
           <td>{{ $item->owner_phone }}</td>
           <td>{{ $item->field_location }}</td>
-          <td>{{ \Carbon\Carbon::parse($item->plant_date)->translatedFormat('j F Y') }}</td>
           <td align="right">
             @if ($item->plant_date && $item->active)
               {{ (int) \Carbon\Carbon::parse($item->plant_date)->diffInDays(\Carbon\Carbon::now()) }} hari
@@ -44,7 +42,7 @@
         </tr>
       @empty
         <tr>
-          <td colspan="8" align="center">Tidak ada data</td>
+          <td colspan="11" align="center">Tidak ada data</td>
         </tr>
       @endforelse
     </tbody>

@@ -232,12 +232,11 @@ class DemoPlotController extends Controller
             $sheet->setCellValue('D1', 'Pemilik');
             $sheet->setCellValue('E1', 'No HP');
             $sheet->setCellValue('F1', 'Lokasi');
-            $sheet->setCellValue('G1', 'Tgl Tanam');
-            $sheet->setCellValue('H1', 'Umur');
-            $sheet->setCellValue('I1', 'Last Visit');
-            $sheet->setCellValue('J1', 'Status Tanaman');
-            $sheet->setCellValue('K1', 'Status Demplot');
-            $sheet->setCellValue('L1', 'Catatan');
+            $sheet->setCellValue('G1', 'Umur');
+            $sheet->setCellValue('H1', 'Last Visit');
+            $sheet->setCellValue('I1', 'Status Tanaman');
+            $sheet->setCellValue('J1', 'Status Demplot');
+            $sheet->setCellValue('K1', 'Catatan');
 
             // Tambahkan data ke Excel
             $row = 2;
@@ -248,12 +247,11 @@ class DemoPlotController extends Controller
                 $sheet->setCellValue('D' . $row, $item->owner_name);
                 $sheet->setCellValue('E' . $row, $item->owner_phone);
                 $sheet->setCellValue('F' . $row, $item->field_location);
-                $sheet->setCellValue('G' . $row, Carbon::parse($item->plant_date)->format('d-m-Y'));
-                $sheet->setCellValue('H' . $row, $item->plant_date && $item->active ? (int) \Carbon\Carbon::parse($item->plant_date)->diffInDays(\Carbon\Carbon::now()) : '');
-                $sheet->setCellValue('I' . $row, $item->last_visit ? Carbon::parse($item->last_visit)->format('d-m-Y') : '');
-                $sheet->setCellValue('J' . $row, DemoPlot::PlantStatuses[$item->plant_status]);
-                $sheet->setCellValue('K' . $row, $item->activ ? 'Aktif' : 'Tidak Aktif');
-                $sheet->setCellValue('L' . $row, $item->notes);
+                $sheet->setCellValue('G' . $row, $item->plant_date && $item->active ? (int) \Carbon\Carbon::parse($item->plant_date)->diffInDays(\Carbon\Carbon::now()) : '');
+                $sheet->setCellValue('H' . $row, $item->last_visit ? Carbon::parse($item->last_visit)->format('d-m-Y') : '');
+                $sheet->setCellValue('I' . $row, DemoPlot::PlantStatuses[$item->plant_status]);
+                $sheet->setCellValue('J' . $row, $item->activ ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('K' . $row, $item->notes);
                 $row++;
             }
 
