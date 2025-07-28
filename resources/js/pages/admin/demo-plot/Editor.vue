@@ -219,7 +219,12 @@ function removeLocation() {
                 />
               </div>
               <div class="q-pt-md">
-                <div class="text-subtitle2 text-bold text-grey-9">Foto:</div>
+                <div class="text-subtitle2 text-bold text-grey-9">
+                  Foto:
+                  <span class="text-negative" v-if="form.errors.image">{{
+                    form.errors.image
+                  }}</span>
+                </div>
                 <q-btn
                   label="Ambil Foto"
                   size="sm"

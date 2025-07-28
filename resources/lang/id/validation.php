@@ -12,6 +12,7 @@ return [
     'after_or_equal' => ':attribute tidak valid.',
     'max' => [
         'string' => ':attribute terlalu panjang, maksimal :max karakter.',
+        'file' => ':attribute terlalu besar, maksimal :max kb',
     ],
     'min' => [
         'string' => ':attribute terlalu pendek, minimal :min karakter.',
