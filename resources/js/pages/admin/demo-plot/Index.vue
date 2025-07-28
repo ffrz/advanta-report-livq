@@ -179,7 +179,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-list style="width: 200px">
+          <q-list style="width: 270px">
             <q-item
               clickable
               v-ripple
@@ -195,6 +195,22 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 <q-icon name="picture_as_pdf" color="red-9" />
               </q-item-section>
               <q-item-section>Export PDF</q-item-section>
+            </q-item>
+            <q-item
+              clickable
+              v-ripple
+              v-close-popup
+              :href="
+                route('admin.demo-plot.export', {
+                  format: 'pdf-with-photo',
+                  filter: filter,
+                })
+              "
+            >
+              <q-item-section avatar>
+                <q-icon name="picture_as_pdf" color="red-9" />
+              </q-item-section>
+              <q-item-section>Export PDF with Photo</q-item-section>
             </q-item>
             <q-item
               clickable

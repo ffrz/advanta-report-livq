@@ -60,8 +60,7 @@ class DemoPlotController extends Controller
     public function data(Request $request)
     {
         $items = $this->createQuery($request)
-            ->orderBy('last_visit', 'desc')
-            ->orderBy('id', 'desc')
+            ->orderBy('demo_plots.id', 'desc')
             ->paginate($request->get('per_page', 10))
             ->withQueryString();
 
@@ -217,6 +216,13 @@ class DemoPlotController extends Controller
         if ($request->get('format') == 'pdf') {
             $pdf = Pdf::loadView('export.demo-plot-list-pdf', compact('items', 'title'))
                 ->setPaper('A4', 'landscape');
+            return $pdf->download($filename . '.pdf');
+        }
+
+        if ($request->get('format') == 'pdf-with-photo') {
+            //return view('export.demo-plot-list-w-photo-pdf', compact('items', 'title'));
+            $pdf = Pdf::loadView('export.demo-plot-list-w-photo-pdf', compact('items', 'title'))
+                ->setPaper('A4', 'portrait');
             return $pdf->download($filename . '.pdf');
         }
 
