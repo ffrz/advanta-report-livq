@@ -47,7 +47,7 @@
           </td>
           <td>
             @if ($src)
-              <img src="{{ $src }}" alt="Demo Plot Photo" style="max-height: 300px; width: auto;" />
+              <img src="{{ $src }}" alt="Demo Plot Photo" style="max-height: 300px; max-width:600px;" />
               <br>
             @endif
           </td>
