@@ -5,6 +5,7 @@ import { scrollToFirstErrorField } from "@/helpers/utils";
 import DatePicker from "@/components/DatePicker.vue";
 import dayjs from "dayjs";
 import { ref, onMounted } from "vue";
+import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
 
 const page = usePage();
 const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Demo Plot";
@@ -34,6 +35,7 @@ const form = useForm({
   owner_name: page.props.data.owner_name,
   owner_phone: page.props.data.owner_phone,
   field_location: page.props.data.field_location,
+  population: page.props.data.population,
   plant_date: dayjs(page.props.data.plant_date).format("YYYY-MM-DD"),
   // plant_status: page.props.data.plant_status,
   notes: page.props.data.notes,
@@ -196,6 +198,15 @@ function removeLocation() {
                 :rules="[
                   (val) => (val && val.length > 0) || 'Lokasi harus diisi.',
                 ]"
+              />
+              <LocaleNumberInput
+                v-model.trim="form.population"
+                type="text"
+                label="Populasi"
+                lazy-rules
+                :disable="form.processing"
+                :error="!!form.errors.population"
+                :error-message="form.errors.population"
               />
               <q-input
                 v-model.trim="form.notes"

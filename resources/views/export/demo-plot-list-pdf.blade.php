@@ -13,6 +13,7 @@
         <th>No HP</th>
         <th>Lokasi</th>
         <th>Umur Tanam</th>
+        <th>Populasi</th>
         <th>Last Visit</th>
         <th>Status Tanaman</th>
         <th>Status Demplot</th>
@@ -35,6 +36,7 @@
               -
             @endif
           </td>
+          <td align="right">{{ format_number($item->population) }}</td>
           <td>{{ $item->last_visit ? \Carbon\Carbon::parse($item->last_visit)->translatedFormat('j F Y') : '' }}</td>
           <td>{{ \App\Models\DemoPlot::PlantStatuses[$item->plant_status] }}</td>
           <td>{{ $item->active ? 'Aktif' : 'Tidak Aktif' }}</td>
@@ -42,7 +44,7 @@
         </tr>
       @empty
         <tr>
-          <td colspan="11" align="center">Tidak ada data</td>
+          <td colspan="12" align="center">Tidak ada data</td>
         </tr>
       @endforelse
     </tbody>

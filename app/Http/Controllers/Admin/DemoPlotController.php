@@ -117,6 +117,7 @@ class DemoPlotController extends Controller
             'owner_phone'      => 'nullable|string|max:30',
             'notes'            => 'nullable|string|max:500',
             'field_location'   => 'nullable|string|max:100',
+            'population'       => 'nullable|numeric',
             'latlong'          => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',
             'image_path'       => 'nullable|string',
@@ -178,6 +179,8 @@ class DemoPlotController extends Controller
                 @unlink(public_path($item->image_path)); // pakai @ untuk suppress error jika file tidak ada
             }
         }
+
+        $validated['population'] = $validated['population'] ?: 0;
 
         $item->fill($validated);
         $item->save();

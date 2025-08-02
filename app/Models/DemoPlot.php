@@ -17,9 +17,9 @@ class DemoPlot extends Model
         'owner_name',
         'owner_phone',
         'field_location',
+        'population',
         'active',
         'notes',
-
         'plant_status',
         'last_visit',
     ];
@@ -29,6 +29,7 @@ class DemoPlot extends Model
         'product_id' => 'integer',
         'plant_date' => 'date',
         'active' => 'boolean',
+        'population' => 'integer',
         'created_by_uid' => 'integer',
         'updated_by_uid' => 'integer',
         'last_visit' => 'datetime',

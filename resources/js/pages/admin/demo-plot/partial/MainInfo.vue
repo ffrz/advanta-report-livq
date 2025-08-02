@@ -1,7 +1,7 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { plantAge, wa_send_url } from "@/helpers/utils";
+import { formatNumber, plantAge, wa_send_url } from "@/helpers/utils";
 import ImageViewer from "@/components/ImageViewer.vue";
 const page = usePage();
 const showViewer = ref(false);
@@ -69,6 +69,11 @@ const showViewer = ref(false);
         <td>Lokasi</td>
         <td>:</td>
         <td>{{ page.props.data.field_location }}</td>
+      </tr>
+      <tr>
+        <td>Populasi</td>
+        <td>:</td>
+        <td>{{ formatNumber(page.props.data.population) }}</td>
       </tr>
       <tr>
         <td>Status Terkini</td>

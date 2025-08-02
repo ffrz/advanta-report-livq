@@ -2,7 +2,12 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { check_role, getQueryParams, plantAge } from "@/helpers/utils";
+import {
+  check_role,
+  formatNumber,
+  getQueryParams,
+  plantAge,
+} from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 
@@ -392,6 +397,9 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                 <div v-if="props.row.product">
                   <q-icon name="potted_plant" />
                   {{ props.row.product.name }}
+                  <template v-if="props.row.population"
+                    >({{ formatNumber(props.row.population) }} pohon)</template
+                  >
                 </div>
                 <template v-if="props.row.active">
                   <div>
@@ -439,6 +447,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             </q-td>
             <q-td key="product" :props="props">
               {{ props.row.product.name }}
+              <br />Populasi: {{ formatNumber(props.row.population) }} pohon
             </q-td>
             <q-td key="plant_date" :props="props">
               {{ $dayjs(props.row.plant_date).format("D MMMM YYYY") }}
