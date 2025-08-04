@@ -109,6 +109,13 @@ return [
         'admin.activity-target.delete',
         'admin.activity-target.save',
         'admin.activity-target.export',
+
+        'admin.report.index',
+        'admin.report.demo-plot-detail',
+        'admin.report.demo-plot-detail-with-photo',
+        'admin.report.demo-activity-plan-detail',
+        'admin.report.demo-activity-realization-detail',
+        'admin.report.demo-activity-target-detail',
     ],
     User::Role_ASM => [
         'admin.user.index',
