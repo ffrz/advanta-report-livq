@@ -6,37 +6,29 @@ import { useApiForm } from "@/helpers/useApiForm";
 import { ref, watch, reactive, onMounted } from "vue";
 
 const page = usePage();
-const title = 'Laporan';
+const title = "Laporan";
 const form = useApiForm({
   preview: true,
   report_type: page.props.report_type ?? null,
-  user_id: 'all',
-  period: 'this_month',
-  start_date: dayjs().format('YYYY-MM-DD'),
-  end_date: dayjs().format('YYYY-MM-DD'),
+  user_id: "all",
+  product_id: "all",
+  period: "this_month",
+  start_date: dayjs().format("YYYY-MM-DD"),
+  end_date: dayjs().format("YYYY-MM-DD"),
 });
 
 const filter_options = reactive({
   show_user: false,
+  show_product: false,
   show_period: false,
 });
 
 const report_types = [
-  { value: 'activity', label: 'Laporan Kegiatan' },
-  { value: 'demplot', label: 'Laporan Demplot' },
-  { value: 'target', label: 'Laporan Target' },
-  // { value: 'closing-detail', label: 'Laporan Closing Penjualan' },
-  // { value: 'closing-by-sales', label: 'Laporan Rekapitulasi Closing Sales' },
-  // { value: 'closing-by-services', label: 'Laporan Rekap Closing Layanan' },
-  // { value: 'customer-services-active', label: 'Laporan Layanan Pelanggan Aktif' },
-  // { value: 'customer-services-new', label: 'Laporan Layanan Pelanggan Baru' },
-  // { value: 'customer-services-ended', label: 'Laporan Layanan Pelanggan Berakhir' },
-  // { value: 'sales-performance', label: 'Laporan Rekapitulasi Kinerja Sales' },
-  // { value: 'sales-activity', label: 'Laporan Rekap Aktivitas Sales' },
-  // { value: 'sales-activity-detail', label: 'Laporan Rincian Aktivitas Sales' },
-  // { value: 'client-new', label: 'Laporan Klien Baru' },
-  // { value: 'client-active-inactive', label: 'Laporan Klien Aktif / Nonaktif' },
-  // { value: 'client-history', label: 'Laporan Riwayat Klien' },
+  { value: "demo-plot-detail", label: "Laporan Demo Plot" },
+  { value: "demo-plot-with-photo", label: "Laporan Demo Plot dengan Foto" },
+  { value: "activity-plan-detail", label: "Laporan Rencana Kegiatan" },
+  { value: "activity-realization-detail", label: "Laporan Realisasi Kegiatan" },
+  { value: "activity-target-detail", label: "Laporan KPI Kegiatan" },
 ];
 
 const period_options = ref([
@@ -53,28 +45,20 @@ const period_options = ref([
   { value: "last_30_days", label: "30 Hari Terakhir" },
 ]);
 
-const services = [
-  { value: 'all', label: 'Semua' },
-  ...page.props.services.map(service => ({
-    value: service.id,
-    label: `${service.name}`,
-  }))
+const products = [
+  { value: "all", label: "Semua" },
+  ...page.props.products.map((product) => ({
+    value: product.id,
+    label: `${product.name}`,
+  })),
 ];
 
 const users = [
-  { value: 'all', label: 'Semua' },
-  ...page.props.users.map(user => ({
+  { value: "all", label: "Semua" },
+  ...page.props.users.map((user) => ({
     value: user.id,
     label: `${user.name} (${user.username})`,
-  }))
-];
-
-const clients = [
-  { value: 'all', label: 'Semua' },
-  ...page.props.clients.map(client => ({
-    value: client.id,
-    label: `${client.name} - ${client.company} [${client.id}]`,
-  }))
+  })),
 ];
 
 const submit = () => {
@@ -82,22 +66,26 @@ const submit = () => {
 
   const query = new URLSearchParams();
   if (filter_options.show_user) {
-    query.append('user_id', form.user_id);
+    query.append("user_id", form.user_id);
   }
 
   if (filter_options.show_period) {
-    query.append('period', form.period);
+    query.append("period", form.period);
   }
 
-  if (form.period == 'custom') {
-    query.append('start_date', form.start_date);
-    query.append('end_date', form.end_date);
+  if (filter_options.show_product) {
+    query.append("product_id", form.product_id);
   }
 
-  const base_url = route('admin.report.' + form.report_type)
+  if (form.period == "custom") {
+    query.append("start_date", form.start_date);
+    query.append("end_date", form.end_date);
+  }
+
+  const base_url = route("admin.report." + form.report_type);
 
   const downloadLink = `${base_url}?${query.toString()}`;
-  window.open(downloadLink, '_blank');
+  window.open(downloadLink, "_blank");
 };
 
 const validate = () => {
@@ -107,10 +95,10 @@ const validate = () => {
 
   if (!form.report_type) {
     is_valid = false;
-    form.errors.report_type = 'Pilih jenis laporan!';
+    form.errors.report_type = "Pilih jenis laporan!";
   }
 
-  if (form.period === 'custom') {
+  if (form.period === "custom") {
     form.errors.start_date = null;
     form.errors.end_date = null;
 
@@ -119,13 +107,13 @@ const validate = () => {
 
     // Validasi start_date
     if (!form.start_date || isNaN(start.getTime())) {
-      form.errors.start_date = 'Tanggal awal tidak valid atau kosong!';
+      form.errors.start_date = "Tanggal awal tidak valid atau kosong!";
       is_valid = false;
     }
 
     // Validasi end_date
     if (!form.end_date || isNaN(end.getTime())) {
-      form.errors.end_date = 'Tanggal akhir tidak valid atau kosong!';
+      form.errors.end_date = "Tanggal akhir tidak valid atau kosong!";
       is_valid = false;
     }
 
@@ -137,7 +125,7 @@ const validate = () => {
       !isNaN(end.getTime())
     ) {
       if (end < start) {
-        form.errors.end_date = 'Tanggal akhir harus setelah tanggal awal!';
+        form.errors.end_date = "Tanggal akhir harus setelah tanggal awal!";
         is_valid = false;
       }
     }
@@ -157,20 +145,27 @@ const validate = () => {
 const reset = () => {
   form.reset();
   form.report_type = null;
-}
+};
 
 function updateState() {
   for (const key of Object.keys(filter_options)) {
     filter_options[key] = false;
   }
 
-  if ([
-    'activity',
-    'demplot',
-    'target',
-  ].includes(form.report_type)) {
+  if (["demo-plot-detail", "demo-plot-with-photo"].includes(form.report_type)) {
+    filter_options.show_user = true;
+    // filter_options.show_product = true;
+  }
+  if (
+    [
+      "activity-plan-detail",
+      "activity-realization-detail",
+      "activity-target-detail",
+    ].includes(form.report_type)
+  ) {
     filter_options.show_period = true;
     filter_options.show_user = true;
+    // filter_options.show_product = true;
   }
   // else if ([
   // ].includes(form.report_type)
@@ -186,13 +181,20 @@ function updateState() {
   validate();
 }
 
-onMounted(() => updateState())
+onMounted(() => updateState());
 // Watch perubahan pada form
 watch(
-  () => [form.report_type, form.user_id, form.service_id, form.period, form.start_date, form.end_date, form.client_id],
+  () => [
+    form.report_type,
+    form.user_id,
+    form.service_id,
+    form.period,
+    form.start_date,
+    form.end_date,
+    form.client_id,
+  ],
   () => updateState()
 );
-
 </script>
 
 <template>
@@ -207,35 +209,99 @@ watch(
               <q-spinner size="50px" color="primary" />
             </q-inner-loading>
             <q-card-section class="q-pt-none">
-              <q-select v-model="form.report_type" label="Jenis Laporan" :options="report_types" map-options emit-value
-                :error="!!form.errors.report_type" :disable="form.processing" behavior="menu"
-                :error-message="form.errors.report_type" />
-              <q-select v-if="filter_options.show_user" v-model="form.user_id" label="Sales" :options="users"
-                map-options emit-value :error="!!form.errors.user_id" :disable="form.processing"
-                :error-message="form.errors.user_id" />
-              <q-select v-if="filter_options.show_period" class="custom-select col-12" style="min-width: 150px"
-                v-model="form.period" :options="period_options" label="Periode" map-options emit-value
-                :error="!!form.errors.period" :disable="form.processing" />
+              <q-select
+                v-model="form.report_type"
+                label="Jenis Laporan"
+                :options="report_types"
+                map-options
+                emit-value
+                :error="!!form.errors.report_type"
+                :disable="form.processing"
+                behavior="menu"
+                :error-message="form.errors.report_type"
+              />
+              <q-select
+                v-if="filter_options.show_user"
+                v-model="form.user_id"
+                label="BS"
+                :options="users"
+                map-options
+                emit-value
+                :error="!!form.errors.user_id"
+                :disable="form.processing"
+                :error-message="form.errors.user_id"
+              />
+              <q-select
+                v-if="filter_options.show_product"
+                v-model="form.product_id"
+                label="Varietas"
+                :options="products"
+                map-options
+                emit-value
+                :error="!!form.errors.product_id"
+                :disable="form.processing"
+                :error-message="form.errors.product_id"
+              />
+              <q-select
+                v-if="filter_options.show_period"
+                class="custom-select col-12"
+                style="min-width: 150px"
+                v-model="form.period"
+                :options="period_options"
+                label="Periode"
+                map-options
+                emit-value
+                :error="!!form.errors.period"
+                :disable="form.processing"
+              />
               <div class="row q-gutter-md" v-if="form.period == 'custom'">
                 <div class="col">
-                  <date-picker v-model="form.start_date" label="Dari Tanggal" :error="!!form.errors.start_date"
-                    clearable :disable="form.processing" :error-message="form.errors.start_date" :rules="[
-                      (val) => (val && val.length > 0) || 'Tanggal awal harus diisi.',
-                    ]" />
+                  <date-picker
+                    v-model="form.start_date"
+                    label="Dari Tanggal"
+                    :error="!!form.errors.start_date"
+                    clearable
+                    :disable="form.processing"
+                    :error-message="form.errors.start_date"
+                    :rules="[
+                      (val) =>
+                        (val && val.length > 0) || 'Tanggal awal harus diisi.',
+                    ]"
+                  />
                 </div>
                 <div class="col">
-                  <date-picker v-model="form.end_date" label="s.d. Tanggal" :error="!!form.errors.end_date" clearable
-                    :disable="form.processing" :error-message="form.errors.end_date" :rules="[
-                      (val) => (val && val.length > 0) || 'Tanggal akhir harus diisi.',
-                    ]" />
+                  <date-picker
+                    v-model="form.end_date"
+                    label="s.d. Tanggal"
+                    :error="!!form.errors.end_date"
+                    clearable
+                    :disable="form.processing"
+                    :error-message="form.errors.end_date"
+                    :rules="[
+                      (val) =>
+                        (val && val.length > 0) || 'Tanggal akhir harus diisi.',
+                    ]"
+                  />
                 </div>
               </div>
             </q-card-section>
             <q-card-section class="row q-gutter-sm">
-              <q-btn icon="download" type="submit" label="Download PDF" color="primary" :disable="form.processing"
-                @click="submit" />
-              <q-btn icon="cancel" type="reset" label="Reset" class="text-black" :disable="form.processing"
-                @click="reset" />
+              <q-btn
+                icon="download"
+                type="submit"
+                label="Download PDF"
+                color="primary"
+                :disable="form.processing"
+                @click="submit"
+              />
+              <q-btn
+                icon="cancel"
+                type="reset"
+                label="Reset"
+                class="text-black"
+                :disable="form.processing"
+                @click="reset"
+              />
             </q-card-section>
           </q-card>
         </q-form>

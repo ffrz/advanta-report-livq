@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\DemoPlotVisitController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController;
 
 use App\Http\Middleware\Auth;
@@ -55,6 +56,16 @@ Route::middleware([Auth::class])->group(function () {
         Route::redirect('', 'admin/dashboard', 301);
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+        Route::prefix('reports')->group(function () {
+            Route::get('', [ReportController::class, 'index'])->name('admin.report.index');
+
+            Route::get('demo-plot-detail', [ReportController::class, 'demoPlotDetail'])->name('admin.report.demo-plot-detail');
+            Route::get('demo-plot-with-photo', [ReportController::class, 'demoPlotWithPhoto'])->name('admin.report.demo-plot-with-photo');
+            Route::get('activity-plan-detail', [ReportController::class, 'activityPlanDetail'])->name('admin.report.activity-plan-detail');
+            Route::get('activity-realization-detail', [ReportController::class, 'activityRealizationDetail'])->name('admin.report.activity-realization-detail');
+            Route::get('activity-target-detail', [ReportController::class, 'activiyTargetDetail'])->name('admin.report.activity-target-detail');
+        });
 
         Route::middleware('auto-permission')->group(function () {
             Route::prefix('products')->group(function () {

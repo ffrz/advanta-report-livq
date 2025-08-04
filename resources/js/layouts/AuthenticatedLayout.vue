@@ -185,6 +185,20 @@ onMounted(() => {
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item
+            v-if="$can('admin.report.index')"
+            clickable
+            v-ripple
+            :active="$page.url.startsWith('/admin/reports')"
+            @click="router.get(route('admin.report.index'))"
+          >
+            <q-item-section avatar>
+              <q-icon name="docs" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Laporan</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-separator />
           <q-item
             v-if="$can('admin.activity.index')"
