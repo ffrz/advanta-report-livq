@@ -51,5 +51,6 @@ return [
         'model' => 'Model',
         'start_date' => 'Tanggal Awal',
         'end_date' => 'Tanggal Akhir',
+        'population' => 'Populasi',
     ],
 ];

@@ -117,7 +117,7 @@ class DemoPlotController extends Controller
             'owner_phone'      => 'nullable|string|max:30',
             'notes'            => 'nullable|string|max:500',
             'field_location'   => 'nullable|string|max:100',
-            'population'       => 'nullable|numeric',
+            'population'       => 'required|numeric|gt:0',
             'latlong'          => 'nullable|string|max:100',
             'image'            => 'nullable|image|max:5120',
             'image_path'       => 'nullable|string',

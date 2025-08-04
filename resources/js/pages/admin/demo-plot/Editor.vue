@@ -207,6 +207,13 @@ function removeLocation() {
                 :disable="form.processing"
                 :error="!!form.errors.population"
                 :error-message="form.errors.population"
+                :rules="[
+                  (val) => !!val || 'Populasi harus diisi.',
+                  (val) => {
+                    const number = parseInt(String(val).replace(/\D/g, ''), 10);
+                    return number > 0 || 'Populasi harus lebih dari 0.';
+                  },
+                ]"
               />
               <q-input
                 v-model.trim="form.notes"
