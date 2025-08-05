@@ -25,6 +25,7 @@ const filter_options = reactive({
 
 const report_types = [
   { value: "demo-plot-detail", label: "Laporan Demo Plot" },
+  { value: "new-demo-plot-detail", label: "Laporan Demo Plot Baru" },
   { value: "demo-plot-with-photo", label: "Laporan Demo Plot dengan Foto" },
   { value: "activity-plan-detail", label: "Laporan Rencana Kegiatan" },
   { value: "activity-realization-detail", label: "Laporan Realisasi Kegiatan" },
@@ -158,6 +159,7 @@ function updateState() {
   }
   if (
     [
+      "new-demo-plot-detail",
       "activity-plan-detail",
       "activity-realization-detail",
       "activity-target-detail",

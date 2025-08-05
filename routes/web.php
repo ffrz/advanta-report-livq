@@ -61,6 +61,7 @@ Route::middleware([Auth::class])->group(function () {
             Route::get('', [ReportController::class, 'index'])->name('admin.report.index');
 
             Route::get('demo-plot-detail', [ReportController::class, 'demoPlotDetail'])->name('admin.report.demo-plot-detail');
+            Route::get('new-demo-plot-detail', [ReportController::class, 'newDemoPlotDetail'])->name('admin.report.new-demo-plot-detail');
             Route::get('demo-plot-with-photo', [ReportController::class, 'demoPlotWithPhoto'])->name('admin.report.demo-plot-with-photo');
             Route::get('activity-plan-detail', [ReportController::class, 'activityPlanDetail'])->name('admin.report.activity-plan-detail');
             Route::get('activity-realization-detail', [ReportController::class, 'activityRealizationDetail'])->name('admin.report.activity-realization-detail');

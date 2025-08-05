@@ -82,6 +82,54 @@ class ReportController extends Controller
         }
     }
 
+    public function newDemoPlotDetail(Request $request)
+    {
+        [$start_date, $end_date] = resolve_period(
+            $request->get('period'),
+            $request->get('start_date'),
+            $request->get('end_date')
+        );
+        $user_id = $request->get('user_id');
+
+        if (isset($user_id)) {
+            $current_user = Auth::user();
+
+            $q = DemoPlot::select('demo_plots.*')
+                ->leftJoin('users', 'users.id', '=', 'demo_plots.user_id')
+                ->leftJoin('products', 'products.id', '=', 'demo_plots.product_id')
+                ->with([
+                    'user:id,username,name',
+                    'product:id,name',
+                ]);
+
+            if ($current_user->role == User::Role_Agronomist) {
+                if ($user_id == 'all') {
+                    $q->whereHas('user', function ($query) use ($current_user) {
+                        $query->where('parent_id', $current_user->id);
+                    });
+                } else {
+                    $q->where('demo_plots.user_id', $user_id);
+                }
+            }
+
+            $items = $q->where('demo_plots.active', true)
+                ->whereBetween('plant_date', [$start_date, $end_date])
+                ->orderBy('users.name', 'asc')
+                ->orderBy('products.name', 'asc')
+                ->get();
+
+            [$title, $user] = $this->resolveTitle('Laporan Demo Plot Baru', $user_id);
+
+            return $this->generatePdfReport('report.new-demo-plot-detail', 'landscape', compact(
+                'items',
+                'title',
+                'user',
+                'start_date',
+                'end_date',
+            ));
+        }
+    }
+
     // public function salesActivity(Request $request)
     // {
     //     [$start_date, $end_date] = resolve_period(
