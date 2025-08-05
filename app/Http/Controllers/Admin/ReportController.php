@@ -65,6 +65,10 @@ class ReportController extends Controller
                 } else {
                     $q->where('demo_plots.user_id', $user_id);
                 }
+            } else if ($current_user->role == User::Role_Admin) {
+                if ($user_id != 'all') {
+                    $q->where('demo_plots.user_id', $user_id);
+                }
             }
 
             $items = $q->where('demo_plots.active', true)
@@ -75,6 +79,50 @@ class ReportController extends Controller
             [$title, $user] = $this->resolveTitle('Laporan Demo Plot', $user_id);
 
             return $this->generatePdfReport('report.demo-plot-detail', 'landscape', compact(
+                'items',
+                'title',
+                'user'
+            ));
+        }
+    }
+
+    public function demoPlotWithPhoto(Request $request)
+    {
+        $user_id = $request->get('user_id');
+
+        if (isset($user_id)) {
+            $current_user = Auth::user();
+
+            $q = DemoPlot::select('demo_plots.*')
+                ->leftJoin('users', 'users.id', '=', 'demo_plots.user_id')
+                ->leftJoin('products', 'products.id', '=', 'demo_plots.product_id')
+                ->with([
+                    'user:id,username,name',
+                    'product:id,name',
+                ]);
+
+            if ($current_user->role == User::Role_Agronomist) {
+                if ($user_id == 'all') {
+                    $q->whereHas('user', function ($query) use ($current_user) {
+                        $query->where('parent_id', $current_user->id);
+                    });
+                } else {
+                    $q->where('demo_plots.user_id', $user_id);
+                }
+            } else if ($current_user->role == User::Role_Admin) {
+                if ($user_id != 'all') {
+                    $q->where('demo_plots.user_id', $user_id);
+                }
+            }
+
+            $items = $q->where('demo_plots.active', true)
+                ->orderBy('users.name', 'asc')
+                ->orderBy('products.name', 'asc')
+                ->get();
+
+            [$title, $user] = $this->resolveTitle('Laporan Foto Demo Plot', $user_id);
+
+            return $this->generatePdfReport('report.demo-plot-with-photo', 'landscape', compact(
                 'items',
                 'title',
                 'user'
