@@ -60,7 +60,7 @@ class DemoPlotController extends Controller
     public function data(Request $request)
     {
         $items = $this->createQuery($request)
-            ->orderBy('demo_plots.id', 'desc')
+            ->orderBy('demo_plots.updated_datetime', 'desc')
             ->paginate($request->get('per_page', 10))
             ->withQueryString();
 
