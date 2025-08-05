@@ -102,10 +102,10 @@ class ReportController extends Controller
                             SELECT dpv1.demo_plot_id, dpv1.image_path
                             FROM demo_plot_visits dpv1
                             INNER JOIN (
-                                SELECT demo_plot_id, MAX(created_at) AS max_created_at
+                                SELECT demo_plot_id, MAX(created_datetime) AS max_created_datetime
                                 FROM demo_plot_visits
                                 GROUP BY demo_plot_id
-                            ) dpv2 ON dpv1.demo_plot_id = dpv2.demo_plot_id AND dpv1.created_at = dpv2.max_created_at
+                            ) dpv2 ON dpv1.demo_plot_id = dpv2.demo_plot_id AND dpv1.created_datetime = dpv2.max_created_datetime
                         ) AS latest_visits
                     '),
                     'latest_visits.demo_plot_id',
