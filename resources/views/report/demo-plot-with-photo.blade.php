@@ -14,30 +14,35 @@
         <th style="width:1%">No</th>
         <th colspan="2">Info</th>
         <th style="width:20%">Catatan</th>
-        <th>Foto</th>
+        <th>Foto Terkini</th>
       </tr>
     </thead>
     <tbody>
       @forelse ($items as $index => $item)
         @php
           $src = null;
-          if ($item->image_path) {
-              $imagePath = public_path($item->image_path);
-              if ($item->image_path && file_exists($imagePath)) {
-                  $imageData = base64_encode(file_get_contents($imagePath));
-                  $src = 'data:image/png;base64,' . $imageData;
+
+          $tryPaths = [$item->latest_image_path ?? null, $item->image_path ?? null];
+
+          foreach ($tryPaths as $path) {
+              if ($path) {
+                  $fullPath = public_path($path);
+                  if (file_exists($fullPath)) {
+                      $imageData = base64_encode(file_get_contents($fullPath));
+                      $src = 'data:image/png;base64,' . $imageData;
+                      break;
+                  }
               }
           }
-
         @endphp
         <tr>
           <td align="right">{{ $index + 1 }}</td>
-          <td style="width:20%">
+          <td style="width:15%">
             BS: {{ $item->user->name }}<br />
             Petani: {{ $item->owner_name }}<br />
             Lokasi: {{ $item->field_location }}
           </td>
-          <td style="width:20%;white-space: nowrap">
+          <td style="width:15%;white-space: nowrap">
             Populasi: {{ format_number($item->population) }}<br />
             Umur: {{ (int) \Carbon\Carbon::parse($item->plant_date)->diffInDays(\Carbon\Carbon::now()) }}<br />
             Kondisi: {{ \App\Models\DemoPlot::PlantStatuses[$item->plant_status] }}

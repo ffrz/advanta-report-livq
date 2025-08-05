@@ -96,6 +96,22 @@ class ReportController extends Controller
             $q = DemoPlot::select('demo_plots.*')
                 ->leftJoin('users', 'users.id', '=', 'demo_plots.user_id')
                 ->leftJoin('products', 'products.id', '=', 'demo_plots.product_id')
+                ->leftJoin(
+                    DB::raw('
+                        (
+                            SELECT dpv1.demo_plot_id, dpv1.image_path
+                            FROM demo_plot_visits dpv1
+                            INNER JOIN (
+                                SELECT demo_plot_id, MAX(created_at) AS max_created_at
+                                FROM demo_plot_visits
+                                GROUP BY demo_plot_id
+                            ) dpv2 ON dpv1.demo_plot_id = dpv2.demo_plot_id AND dpv1.created_at = dpv2.max_created_at
+                        ) AS latest_visits
+                    '),
+                    'latest_visits.demo_plot_id',
+                    '=',
+                    'demo_plots.id'
+                )
                 ->with([
                     'user:id,username,name',
                     'product:id,name',
