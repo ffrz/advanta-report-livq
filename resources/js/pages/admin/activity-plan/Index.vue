@@ -3,10 +3,8 @@ import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import {
-  check_role,
   formatNumber,
   getQueryParams,
-  plantAge,
   create_year_options,
   create_month_options,
 } from "@/helpers/utils";

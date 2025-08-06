@@ -51,6 +51,14 @@ return [
         'admin.activity.save',
         'admin.activity.delete',
         'admin.activity.detail',
+
+        'admin.customer.index',
+        'admin.customer.data',
+        'admin.customer.detail',
+        'admin.customer.add',
+        'admin.customer.edit',
+        'admin.customer.save',
+        'admin.customer.duplicate',
     ],
     User::Role_Agronomist => [
         'admin.user.index',

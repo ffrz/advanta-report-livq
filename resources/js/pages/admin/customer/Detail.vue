@@ -2,7 +2,6 @@
 import { router, usePage } from "@inertiajs/vue3";
 import { ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
-import { check_role } from "@/helpers/utils";
 //import OrderHistory from "./partial/OrderHistory.vue";
 
 const page = usePage();
@@ -33,12 +32,6 @@ const tab = ref("main");
           icon="edit"
           dense
           color="primary"
-          :disabled="
-            !check_role([
-              $CONSTANTS.USER_ROLE_AGRONOMIST,
-              $CONSTANTS.USER_ROLE_ADMIN,
-            ])
-          "
           @click="
             router.get(route('admin.customer.edit', { id: page.props.data.id }))
           "
