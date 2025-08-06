@@ -129,6 +129,11 @@ class DemoPlotVisitController extends Controller
 
         $this->authorize('update', $item);
 
+        // image wajib diisi
+        if (!$request->hasFile('image') && empty($request->input('image_path'))) {
+            return back()->withErrors(['image' => 'Foto harus diunggah.']);
+        }
+
         // Handle image upload jika ada
         if ($request->hasFile('image')) {
             // Hapus file lama jika ada

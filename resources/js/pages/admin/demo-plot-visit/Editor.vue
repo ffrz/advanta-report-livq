@@ -36,12 +36,21 @@ const form = useForm({
   image: null,
 });
 
-const submit = () =>
+const submit = () => {
+  // Client-side validation untuk image
+  if (!form.image && !form.image_path) {
+    form.errors.image = "Foto harus diisi.";
+    scrollToFirstErrorField(); // agar scroll ke atas saat error
+    return;
+  }
+
+  // Jika lolos validasi, lanjut submit
   handleSubmit({
     form,
     forceFormData: true,
     url: route("admin.demo-plot-visit.save"),
   });
+};
 
 const fileInput = ref(null);
 const imagePreview = ref("");
@@ -190,6 +199,13 @@ function removeLocation() {
                   style="display: none"
                   @change="onFileChange"
                 />
+                <div
+                  v-if="form.errors.image || form.errors.image_path"
+                  class="text-negative q-mt-sm"
+                >
+                  {{ form.errors.image }}
+                  {{ form.errors.image_path }}
+                </div>
                 <div>
                   <q-img
                     v-if="imagePreview"
