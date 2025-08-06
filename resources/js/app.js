@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/id'; // Import the Indonesian locale
 import i18n from './i18n';
-
+import GlobalPlugin from '@/plugins';
 
 dayjs.extend(relativeTime)
 // Set Indonesian as the global locale
@@ -48,27 +48,8 @@ createInertiaApp({
       .component('guest-layout', GuestLayout)
       .component('authenticated-layout', AuthenticatedLayout);
 
-    // 🧠 Inject global $can() method
-    VueApp.config.globalProperties.$can = function (permissionName) {
-      const user = this.$page.props.auth?.user
-      const permissions = this.$page.props.auth?.permissions || []
-      const isAdmin = user?.role === 'admin'
-      if (isAdmin) return true
-      return permissions.includes(permissionName)
-    }
+    VueApp.use(GlobalPlugin);
 
-    VueApp.config.globalProperties.$dayjs = dayjs;
-    VueApp.config.globalProperties.$config = window.CONFIG;
-    VueApp.config.globalProperties.$CONSTANTS = window.CONSTANTS;
-    VueApp.config.globalProperties.$goBack = () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        // import('@inertiajs/inertia').then(({ Inertia }) => {
-        //   Inertia.visit('/dashboard'); // Ganti fallback ini sesuai kebutuhan
-        // });
-      }
-    };
     VueApp.mount(el);
   },
   progress: {
