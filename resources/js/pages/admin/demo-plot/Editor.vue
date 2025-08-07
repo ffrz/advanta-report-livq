@@ -1,5 +1,5 @@
 <script setup>
-import { router, useForm, usePage } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import { handleSubmit } from "@/helpers/client-req-handler";
 import { scrollToFirstErrorField } from "@/helpers/utils";
 import DatePicker from "@/components/DatePicker.vue";
@@ -9,12 +9,12 @@ import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
 
 const page = usePage();
 const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Demo Plot";
-const plant_statuses = Object.entries(
-  window.CONSTANTS.DEMO_PLOT_PLANT_STATUSES
-).map(([value, label]) => ({
-  label,
-  value,
-}));
+// const plant_statuses = Object.entries(
+//   window.CONSTANTS.DEMO_PLOT_PLANT_STATUSES
+// ).map(([value, label]) => ({
+//   label,
+//   value,
+// }));
 
 const users = page.props.users.map((user) => ({
   value: user.id,

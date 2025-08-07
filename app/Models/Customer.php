@@ -27,6 +27,16 @@ class Customer extends Model
         'updated_by_uid' => 'integer',
     ];
 
+    const Type_R1 = 'R1';
+    const Type_Distributor = 'Distributor';
+    const Type_R2 = 'R2';
+
+    const Types = [
+        self::Type_R1 => 'R1',
+        self::Type_R2 => 'R2',
+        self::Type_Distributor => 'Distributor',
+    ];
+
     public static function activeCustomerCount()
     {
         return DB::select(

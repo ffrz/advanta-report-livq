@@ -207,7 +207,6 @@ class ActivityTargetController extends Controller
             ->toArray();
 
         $items = $this->_processItems($items);
-
         $types = ActivityType::where('active', true)
             ->select(['id', 'name', 'weight'])
             ->orderBy('name', 'asc')
@@ -216,7 +215,7 @@ class ActivityTargetController extends Controller
         $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
         if ($request->get('format') == 'pdf') {
-            //return view('export.activity-target-list-pdf', compact('items', 'title', 'types'));
+            return view('export.activity-target-list-pdf', compact('items', 'title', 'types'));
             $pdf = Pdf::loadView('export.activity-target-list-pdf', compact('items', 'title', 'types'))
                 ->setPaper('A4', 'portrait');
             return $pdf->download($filename . '.pdf');

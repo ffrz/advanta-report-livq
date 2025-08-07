@@ -16,9 +16,17 @@ const loading = ref(true);
 const filter = reactive(
   storage.get("filter", {
     status: "all",
+    type: "all",
     ...getQueryParams(),
   })
 );
+
+const types = [
+  { value: "all", label: "Semua" },
+  { value: "Distributor", label: "Distributor" },
+  { value: "R1", label: "R1" },
+  { value: "R2", label: "R2" },
+];
 
 const pagination = ref(
   storage.get("pagination", {
@@ -35,6 +43,13 @@ const columns = [
     name: "type",
     label: "Jenis",
     field: "type",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "user",
+    label: "Assigned to",
+    field: "user",
     align: "left",
     sortable: true,
   },
@@ -165,6 +180,18 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             outlined
             @update:model-value="onFilterChange"
           />
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.type"
+            :options="types"
+            label="Jenis"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
           <q-input
             class="col"
             outlined
@@ -224,6 +251,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             <q-td key="type" :props="props">
               {{ props.row.type }}
             </q-td>
+            <q-td key="user" :props="props">
+              {{ props.row.assigned_user?.name }}
+            </q-td>
             <q-td key="name" :props="props" class="wrap-column">
               <div>
                 <q-icon name="domain" v-if="$q.screen.lt.md" />
@@ -251,6 +281,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
                   {{ props.row.shipping_address }}
                 </div>
                 <div><q-icon name="category" /> {{ props.row.type }}</div>
+                <div v-if="props.row.assigned_user">
+                  <q-icon name="person" /> {{ props.row.assigned_user?.name }}
+                </div>
                 <div
                   v-if="props.row.notes"
                   style="

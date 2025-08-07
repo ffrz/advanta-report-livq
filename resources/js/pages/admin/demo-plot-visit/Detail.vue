@@ -5,7 +5,7 @@ import ImageViewer from "@/components/ImageViewer.vue";
 
 const page = usePage();
 const title = "Rincian Kunjungan Demplot";
-const tab = ref("main");
+// const tab = ref("main");
 const showViewer = ref(false);
 </script>
 

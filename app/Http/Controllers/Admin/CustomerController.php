@@ -8,6 +8,8 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -32,6 +34,7 @@ class CustomerController extends Controller
 
     public function data(Request $request)
     {
+        $current_user = Auth::user();
         $orderBy = $request->get('order_by', 'name');
         $orderType = $request->get('order_type', 'asc');
         $filter = $request->get('filter', []);
@@ -47,8 +50,22 @@ class CustomerController extends Controller
             });
         }
 
+        if ($current_user->role == User::Role_Agronomist) {
+            $q->where(function ($qq) use ($current_user) {
+                $qq->where('assigned_user_id', $current_user->id);
+                $qq->orWhereHas('assigned_user', function ($query) use ($current_user) {
+                    $query->where('parent_id', $current_user->id);
+                });
+            });
+        } else if ($current_user->role == User::Role_BS) {
+            $q->where('assigned_user_id', $current_user->id);
+        }
+
         if (!empty($filter['status']) && (in_array($filter['status'], ['active', 'inactive']))) {
             $q->where('active', '=', $filter['status'] == 'active' ? true : false);
+        }
+        if (!empty($filter['type']) && $filter['type'] != 'all' && (in_array($filter['type'], array_keys(Customer::Types)))) {
+            $q->where('type', '=', $filter['type']);
         }
 
         $q->orderBy($orderBy, $orderType);
@@ -71,10 +88,36 @@ class CustomerController extends Controller
 
     public function editor($id = 0)
     {
+        $user = Auth::user();
         $item = $id ? Customer::findOrFail($id) : new Customer(['active' => true]);
+
+        if (!$id && ($user->role == User::Role_Agronomist || $user->role == User::Role_BS)) {
+            $item->assigned_user_id = $user->id;
+        }
+
+        $q = User::where('active', true);
+
+        if ($user->role == User::Role_BS) {
+            $q->where('id', '=', $user->id);
+        } else if ($user->role == User::Role_Agronomist) {
+            $q->where(function ($query) use ($user) {
+                $query->where(function ($q1) use ($user) {
+                    $q1->where('role', User::Role_BS)
+                        ->where('parent_id', $user->id); // BS yang menjadi anak dari Agronomist
+                })
+                    ->orWhere(function ($q2) use ($user) {
+                        $q2->where('id', $user->id); // diri sendiri
+                    });
+            });
+        } else {
+            $q->whereIn('role', [User::Role_BS, User::Role_Agronomist]);
+        }
+
+        $users = $q->orderBy('username', 'asc')->get();
+
         return inertia('admin/customer/Editor', [
             'data' => $item,
-            'users' => User::where('active', true)->orderBy('username', 'asc')->get(),
+            'users' => $users,
         ]);
     }
 
@@ -83,7 +126,7 @@ class CustomerController extends Controller
         $validated =  $request->validate([
             'name'           => 'required|string|max:255',
             'phone'          => 'nullable|string|max:50',
-            'type'           => 'nullable|string|max:255',
+            'type'              => ['required', 'string', Rule::in(Customer::Types)],
             'address'        => 'nullable|string|max:500',
             'shipping_address' => 'nullable|string|max:255',
             'active'         => 'required|boolean',
