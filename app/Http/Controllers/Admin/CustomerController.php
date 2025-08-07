@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CustomerController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         return inertia('admin/customer/Index');
@@ -23,12 +26,14 @@ class CustomerController extends Controller
 
     public function detail($id = 0)
     {
+        $item = Customer::with([
+            'assigned_user:id,username,name',
+            'created_by_user:id,username,name',
+            'updated_by_user:id,username,name',
+        ])->findOrFail($id);
+        $this->authorize('view', $item);
         return inertia('admin/customer/Detail', [
-            'data' => Customer::with([
-                'assigned_user:id,username,name',
-                'created_by_user:id,username,name',
-                'updated_by_user:id,username,name',
-            ])->findOrFail($id),
+            'data' => $item,
         ]);
     }
 
@@ -91,6 +96,8 @@ class CustomerController extends Controller
         $user = Auth::user();
         $item = $id ? Customer::findOrFail($id) : new Customer(['active' => true]);
 
+        $this->authorize('update', $item);
+
         if (!$id && ($user->role == User::Role_Agronomist || $user->role == User::Role_BS)) {
             $item->assigned_user_id = $user->id;
         }
@@ -135,6 +142,9 @@ class CustomerController extends Controller
         ]);
 
         $item = !$request->id ? new Customer() : Customer::findOrFail($request->post('id', 0));
+
+        $this->authorize('update', $item);
+
         $item->fill($validated);
         $item->save();
 
