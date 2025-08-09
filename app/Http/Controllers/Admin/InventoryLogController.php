@@ -22,7 +22,6 @@ class InventoryLogController extends Controller
     public function index()
     {
         return inertia('admin/inventory-log/Index', [
-            // 'categories' => ProductCategory::all(['id', 'name']),
             'products' => Product::all(['id', 'name']),
             'customers' => Customer::all(['id', 'name']),
             'users' => User::all(['id', 'name']),

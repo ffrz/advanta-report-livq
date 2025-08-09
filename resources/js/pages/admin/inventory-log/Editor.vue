@@ -8,9 +8,7 @@ import { useCustomerFilter } from "@/helpers/useCustomerFilter";
 
 const page = usePage();
 const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Log Inventori";
-console.log(
-  page.props.data.quantity ? parseFloat(page.props.data.quantity) : 0.0
-);
+
 const form = useForm({
   id: page.props.data.id,
   product_id: page.props.data.product_id,
@@ -35,6 +33,8 @@ const { filteredProducts, filterProducts } = useProductFilter(
 const { filteredCustomers, filterCustomers } = useCustomerFilter(
   page.props.customers
 );
+
+console.log(filterCustomers);
 </script>
 
 <template>
@@ -82,8 +82,6 @@ const { filteredCustomers, filterCustomers } = useCustomerFilter(
                 map-options
                 emit-value
                 @filter="filterProducts"
-                option-label="label"
-                option-value="value"
                 :error="!!form.errors.product_id"
                 :disable="form.processing"
                 :error-message="form.errors.product_id"
@@ -104,8 +102,6 @@ const { filteredCustomers, filterCustomers } = useCustomerFilter(
                 map-options
                 emit-value
                 @filter="filterCustomers"
-                option-label="label"
-                option-value="value"
                 :error="!!form.errors.customer_id"
                 :disable="form.processing"
                 :error-message="form.errors.customer_id"

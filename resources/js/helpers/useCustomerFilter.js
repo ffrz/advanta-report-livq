@@ -1,30 +1,34 @@
 import { ref } from 'vue';
 
-export function useCustomerFilter(customersRaw, includeAllOption = false) {
-  const baseCustomers = customersRaw.map((c) => {
-    return {
-      value: c.id,
-      label: `${c.name}`
-    };
-  });
+export function useCustomerFilter(rawItems, includeAllOption = false) {
+  const baseItems = rawItems.map(item => ({
+    value: item.id,
+    label: item.name
+  }));
 
-  const customers = includeAllOption
-    ? [{ value: 'all', label: 'Semua' }, ...baseCustomers]
-    : baseCustomers;
+  const items = includeAllOption
+    ? [{ value: 'all', label: 'Semua' }, ...baseItems]
+    : baseItems;
 
-  const filteredCustomers = ref([...customers]);
+  const filteredItems = ref([...items]);
 
-  const filterCustomerFn = (val, update) => {
+  const filterItems = (val, update) => {
+    const search = val.toLowerCase();
     update(() => {
-      filteredCustomers.value = customers.filter(item =>
-        item.label.toLowerCase().includes(val.toLowerCase())
+      console.log('updating...');
+      filteredItems.value = items.filter(item =>
+        item.label.toLowerCase().includes(search)
       );
     });
   };
 
+  const filteredCustomers = filteredItems;
+  const filterCustomers = filterItems;
+  const customers = items;
+
   return {
     filteredCustomers,
-    filterCustomerFn,
-    customers,
+    filterCustomers,
+    customers // jika butuh juga yang belum difilter
   };
 }

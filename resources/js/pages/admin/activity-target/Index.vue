@@ -20,7 +20,7 @@ const currentYear = new Date().getFullYear();
 const filter = reactive(
   storage.get("filter", {
     search: "",
-    user_id: "all",
+    // user_id: "all", sering ngunci ke user
     year: currentYear,
     quarter: "all",
     ...getQueryParams(),
