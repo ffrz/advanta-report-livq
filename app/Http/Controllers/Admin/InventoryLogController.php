@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -19,18 +20,34 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InventoryLogController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
+        $current_user = Auth::user();
+        $q = User::query();
+        if ($current_user->role == User::Role_BS) {
+            $q->where('id', $current_user->id);
+        } else if ($current_user->role == User::Role_Agronomist) {
+            $q->where('parent_id', $current_user->id);
+        }
+
+        $users = $q->where('role', User::Role_BS)
+            ->where('active', true)
+            ->orderBy('name')
+            ->get();
+
         return inertia('admin/inventory-log/Index', [
             'products' => Product::all(['id', 'name']),
             'customers' => Customer::all(['id', 'name']),
-            'users' => User::all(['id', 'name']),
+            'users' => $users,
         ]);
     }
 
     public function detail($id = 0)
     {
         $item = InventoryLog::with(['product', 'product.category', 'user', 'customer'])->findOrFail($id);
+        $this->authorize('view', $item);
         return inertia('admin/inventory-log/Detail', [
             'data' => $item,
         ]);
@@ -38,11 +55,24 @@ class InventoryLogController extends Controller
 
     public function data(Request $request)
     {
+        $current_user = Auth::user();
+
         $orderBy = $request->get('order_by', 'date');
         $orderType = $request->get('order_type', 'desc');
         $filter = $request->get('filter', []);
 
         $q = InventoryLog::with(['product', 'product.category', 'user', 'customer']);
+
+        if ($current_user->role == User::Role_Agronomist) {
+            $q->where(function ($query) use ($current_user) {
+                $query->whereHas('user', function ($sub) use ($current_user) {
+                    $sub->where('parent_id', $current_user->id);
+                })
+                ->orWhere('user_id', $current_user->id);
+            });
+        } else if ($current_user->role == User::Role_BS) {
+            $q->where('user_id', $current_user->id);
+        }
 
         if (!empty($filter['search'])) {
             $q->where(function ($q) use ($filter) {
@@ -62,6 +92,9 @@ class InventoryLogController extends Controller
     {
         $item = InventoryLog::findOrFail($id);
         $item->id = null;
+
+        $this->authorize('update', $item);
+
         return inertia('admin/inventory-log/Editor', [
             'data' => $item,
             'categories' => ProductCategory::all(['id', 'name']),
@@ -70,16 +103,21 @@ class InventoryLogController extends Controller
 
     public function editor($id = 0)
     {
+        $currentUserId = Auth::user()->id;
         $item = $id ? InventoryLog::findOrFail($id) : new InventoryLog(
             [
                 'check_date' => current_date(),
-                'user_id' => Auth::user()->id,
+                'user_id' => $currentUserId,
             ]
         );
+
+        $this->authorize('update', $item);
+
         return inertia('admin/inventory-log/Editor', [
             'data' => $item,
             'products' => Product::all(['id', 'name']),
-            'customers' => Customer::all(['id', 'name']),
+            'customers' => Customer::where('assigned_user_id', $currentUserId)
+                               ->get(['id', 'name']),
             'users' => User::all(['id', 'name']),
         ]);
     }
@@ -106,6 +144,9 @@ class InventoryLogController extends Controller
         ]);
 
         $item = $request->id ? InventoryLog::findOrFail($request->id) : new InventoryLog();
+
+        $this->authorize('update', $item);
+
         $item->fill($validated);
         $item->save();
 

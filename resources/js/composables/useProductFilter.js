@@ -15,7 +15,6 @@ export function useProductFilter(rawItems, includeAllOption = false) {
   const filterItems = (val, update) => {
     const search = val.toLowerCase();
     update(() => {
-      console.log('updating');
       filteredItems.value = items.filter(item =>
         item.label.toLowerCase().includes(search)
       );
