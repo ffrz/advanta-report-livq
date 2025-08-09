@@ -12,10 +12,10 @@ export function formateDatetime(val, fmt = 'DD-MM-YYYY hh:mm:ss', locale = 'id-I
     throw new Error('val must be string or Date object');
   }
 
-  return dayjs(this.currentDate).format(fmt);
+  return dayjs(date).format(fmt);
 }
 
-export function formateDate(val, fmt = 'DD-MM-YYYY', locale = 'id-ID') {
+export function formatDate(val, fmt = 'DD-MM-YYYY', locale = 'id-ID') {
   let date;
   if (val instanceof Date) {
     date = val;
@@ -27,5 +27,5 @@ export function formateDate(val, fmt = 'DD-MM-YYYY', locale = 'id-ID') {
     throw new Error('val must be string or Date object');
   }
 
-  return dayjs(this.currentDate).format(fmt);
+  return dayjs(date).format(fmt);
 }

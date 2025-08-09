@@ -6,7 +6,7 @@ import { getQueryParams, formatNumber } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { useProductCategoryFilter } from "@/helpers/useProductCategoryFilter";
 import { usePageStorage } from "@/helpers/usePageStorage";
-import { formateDate, formateDatetime } from "@/helpers/datetime";
+import { formatDate } from "@/helpers/datetime";
 
 const page = usePage();
 const storage = usePageStorage("inventory-log");
@@ -274,7 +274,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
           >
             <q-td key="check_date" :props="props" class="wrap-column">
               <template v-if="!$q.screen.gt.sm">Tgl: </template
-              >{{ formateDate(props.row.check_date) }}
+              >{{ formatDate(props.row.check_date) }}
               <template v-if="!$q.screen.gt.sm">
                 <div>Area: {{ props.row.area }}</div>
                 <div>Crops: {{ props.row.product.category.name }}</div>
