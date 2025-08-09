@@ -284,7 +284,9 @@ class ActivityTargetController extends Controller
         ]);
 
         if ($current_user->role == User::Role_Agronomist) {
-            $q->where('user_id', '=', $current_user->id);
+            $q->whereHas('user', function ($q) use ($current_user) {
+                $q->where('parent_id', $current_user->id);
+            });
         }
         else if ($current_user->role == User::Role_Admin) {
             if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
