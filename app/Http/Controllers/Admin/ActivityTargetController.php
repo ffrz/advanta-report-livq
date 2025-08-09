@@ -28,8 +28,7 @@ class ActivityTargetController extends Controller
             ->where('role', User::Role_BS);
 
         if (Auth::user()->role == User::Role_Agronomist) {
-            $q->where('parent_id', Auth::user()->id)
-                ->orWhere('id', Auth::user()->id);
+            $q->where('parent_id', Auth::user()->id);
         }
 
         $users = $q->select(['id', 'username', 'name'])
@@ -275,6 +274,7 @@ class ActivityTargetController extends Controller
 
     protected function createQuery(Request $request)
     {
+        $current_user = Auth::user();
         $filter = $request->get('filter', []);
 
         $q = ActivityTarget::with([
@@ -283,8 +283,13 @@ class ActivityTargetController extends Controller
             'details.type:id,name',
         ]);
 
-        if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
-            $q->where('user_id', '=', $filter['user_id']);
+        if ($current_user->role == User::Role_Agronomist) {
+            $q->where('user_id', '=', $current_user->id);
+        }
+        else if ($current_user->role == User::Role_Admin) {
+            if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
+                $q->where('user_id', '=', $filter['user_id']);
+            }
         }
 
         if (!empty($filter['year']) && ($filter['year'] != 'all')) {

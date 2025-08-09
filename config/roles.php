@@ -59,6 +59,13 @@ return [
         'admin.customer.edit',
         'admin.customer.save',
         'admin.customer.duplicate',
+
+        'admin.inventory-log.index',
+        'admin.inventory-log.data',
+        'admin.inventory-log.detail',
+        'admin.inventory-log.add',
+        'admin.inventory-log.edit',
+        'admin.inventory-log.save',
     ],
     User::Role_Agronomist => [
         'admin.user.index',
@@ -124,6 +131,13 @@ return [
         'admin.report.demo-activity-plan-detail',
         'admin.report.demo-activity-realization-detail',
         'admin.report.demo-activity-target-detail',
+
+        'admin.inventory-log.index',
+        'admin.inventory-log.data',
+        'admin.inventory-log.detail',
+        'admin.inventory-log.add',
+        'admin.inventory-log.edit',
+        'admin.inventory-log.save',
     ],
     User::Role_ASM => [
         'admin.user.index',

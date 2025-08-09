@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DatabaseController;
 use App\Http\Controllers\Admin\DemoPlotController;
 use App\Http\Controllers\Admin\DemoPlotVisitController;
+use App\Http\Controllers\Admin\InventoryLogController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -182,6 +183,18 @@ Route::middleware([Auth::class])->group(function () {
                 Route::get('edit/{id}', [DemoPlotVisitController::class, 'editor'])->name('admin.demo-plot-visit.edit');
                 Route::post('save', [DemoPlotVisitController::class, 'save'])->name('admin.demo-plot-visit.save');
                 Route::post('delete/{id}', [DemoPlotVisitController::class, 'delete'])->name('admin.demo-plot-visit.delete');
+            });
+
+            Route::prefix('inventory-logs')->group(function () {
+                Route::get('', [InventoryLogController::class, 'index'])->name('admin.inventory-log.index');
+                Route::get('data', [InventoryLogController::class, 'data'])->name('admin.inventory-log.data');
+                Route::get('add', [InventoryLogController::class, 'editor'])->name('admin.inventory-log.add');
+                // Route::get('duplicate/{id}', [InventoryLogController::class, 'duplicate'])->name('admin.inventory-log.duplicate');
+                Route::get('edit/{id}', [InventoryLogController::class, 'editor'])->name('admin.inventory-log.edit');
+                Route::post('save', [InventoryLogController::class, 'save'])->name('admin.inventory-log.save');
+                Route::post('delete/{id}', [InventoryLogController::class, 'delete'])->name('admin.inventory-log.delete');
+                Route::get('detail/{id}', [InventoryLogController::class, 'detail'])->name('admin.inventory-log.detail');
+                // Route::get('export', [InventoryLogController::class, 'export'])->name('admin.inventory-log.export');
             });
         });
 

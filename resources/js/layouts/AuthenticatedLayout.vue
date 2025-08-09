@@ -256,6 +256,20 @@ onMounted(() => {
               <q-item-label>Target Kegiatan</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item
+            v-if="$can('admin.inventory-log.index')"
+            clickable
+            v-ripple
+            :active="$page.url.startsWith('/admin/inventory-logs')"
+            @click="router.get(route('admin.inventory-log.index'))"
+          >
+            <q-item-section avatar>
+              <q-icon name="inventory" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Log Inventori</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-separator />
           <q-item
             clickable

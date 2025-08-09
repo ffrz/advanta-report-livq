@@ -1,128 +1,180 @@
 <template>
-  <q-input :model-value="displayValue" :label="props.label" :outlined="props.outlined" @update:model-value="onInput"
-    @blur="onBlur" @keydown="filterInput" :lazy-rules="lazyRules" :disable="disable" :error="error" :rules="rules"
-    :error-message="errorMessage" />
+  <q-input
+    :model-value="displayValue"
+    :label="props.label"
+    :outlined="props.outlined"
+    @update:model-value="onInput"
+    @focus="onFocus"
+    @blur="onBlur"
+    @keydown="filterInput"
+    :lazy-rules="lazyRules"
+    :disable="disable"
+    :error="error"
+    :rules="rules"
+    :error-message="errorMessage"
+  />
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
-// Props
 const props = defineProps({
-  modelValue: { type: Number, required: true, default: 0 }, // Always expect a Number
-  label: { type: String, default: '' },
-  locale: { type: String, default: 'id-ID' },
+  modelValue: { type: Number, required: true, default: 0 },
+  label: { type: String, default: "" },
+  locale: { type: String, default: "id-ID" },
   outlined: { type: Boolean, default: false },
   allowNegative: { type: Boolean, default: false },
   maxDecimals: { type: Number, default: 0 },
   lazyRules: { type: String },
   disable: { type: Boolean, default: false },
   error: { type: Boolean, default: false },
-  errorMessage: { type: String, default: '' },
-  rules: {type: Array, default: []}
+  errorMessage: { type: String, default: "" },
+  rules: { type: Array, default: () => [] },
 });
 
-// Emit events
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
+const displayValue = ref("");
+const isFocused = ref(false);
 
-// Internal state for display value
-const displayValue = ref('');
-
-// Detect locale's decimal and thousand separators
+// Dapatkan separator berdasarkan locale
 const getLocaleSeparators = (locale) => {
   const sampleNumber = 1234567.89;
   const formatted = new Intl.NumberFormat(locale).format(sampleNumber);
-  const [integerPart, decimalPart] = formatted.split('.');
 
-  const decimalSeparator = decimalPart ? formatted[formatted.indexOf(decimalPart[0])] : '.';
-  const thousandSeparator = formatted[integerPart.length] === ',' ? ',' : '.';
+  let decimalSep = ".";
+  let thousandSep = ",";
 
-  return { decimalSeparator, thousandSeparator };
+  if (formatted.includes(",") || formatted.includes(".")) {
+    const lastComma = formatted.lastIndexOf(",");
+    const lastDot = formatted.lastIndexOf(".");
+    decimalSep = lastComma > lastDot ? "," : ".";
+    thousandSep = decimalSep === "," ? "." : ",";
+  }
+  return { decimalSeparator: decimalSep, thousandSeparator: thousandSep };
 };
 
-const { decimalSeparator, thousandSeparator } = getLocaleSeparators(props.locale);
+const { decimalSeparator, thousandSeparator } = getLocaleSeparators(
+  props.locale
+);
 
-// Format a number according to the locale
+// Format angka sesuai locale + maxDecimals
 const formatNumber = (value) => {
-  let number = value;
-
-  if (number === null || number === undefined || isNaN(number)) {
-    number = 0;
-  }
-
+  if (value === null || value === undefined || isNaN(value)) value = 0;
   return new Intl.NumberFormat(props.locale, {
     minimumFractionDigits: props.maxDecimals,
     maximumFractionDigits: props.maxDecimals,
-  }).format(number);
+  }).format(value);
 };
 
-displayValue.value = formatNumber(props.modelValue);
-
-// Watch for changes in modelValue and sync displayValue
+// Hanya sinkronkan display ketika TIDAK sedang fokus (user mengetik)
 watch(
   () => props.modelValue,
-  (newValue) => {
-    displayValue.value = formatNumber(newValue);
+  (newVal) => {
+    if (!isFocused.value) {
+      displayValue.value = formatNumber(newVal);
+    }
   },
   { immediate: true }
 );
 
-// Sanitize input and convert to a valid number
-const sanitizeInput = (value) => {
-  // Regex for valid input
-  const regex = props.allowNegative
-    ? /^-?[0-9]+([.,][0-9]*)?$/
-    : /^[0-9]+([.,][0-9]*)?$/;
+// Sanitasi input -> number. Jika round=false, tidak menggunakan toFixed (biar user bebas mengetik)
+const sanitizeInput = (value, round = true) => {
+  if (value === null || value === undefined) return NaN;
+  const raw = String(value).trim();
+  if (raw === "" || raw === "-" || raw === decimalSeparator) return NaN;
 
-  // Remove invalid characters and normalize decimal separator
-  const sanitized = value
-    .replace(/[^0-9.,-]+/g, '') // Remove unwanted characters
-    .replace(new RegExp(`\\${thousandSeparator}`, 'g'), '') // Remove thousand separator
-    .replace(new RegExp(`\\${decimalSeparator}`, 'g'), '.'); // Replace decimal separator
+  // remove non numeric except ., - and ,
+  let sanitized = raw
+    .replace(/[^0-9.,-]+/g, "")
+    .replace(new RegExp(`\\${thousandSeparator}`, "g"), "")
+    .replace(new RegExp(`\\${decimalSeparator}`, "g"), ".");
 
-  if (!regex.test(sanitized)) {
-    return props.modelValue || 0; // Fallback to current modelValue if input is invalid
+  // if multiple dots - keep first dot, remove others
+  const firstDotIndex = sanitized.indexOf(".");
+  if (firstDotIndex !== -1) {
+    sanitized =
+      sanitized.slice(0, firstDotIndex + 1) +
+      sanitized.slice(firstDotIndex + 1).replace(/\./g, "");
   }
 
   const parsed = parseFloat(sanitized);
-  return isNaN(parsed) ? 0 : parseFloat(parsed.toFixed(props.maxDecimals));
+  if (isNaN(parsed)) return NaN;
+
+  return round ? parseFloat(parsed.toFixed(props.maxDecimals)) : parsed;
 };
 
-const emitUpdateModelValue = () => {
-  const sanitizedValue = sanitizeInput(displayValue.value);
-  emit('update:modelValue', sanitizedValue); // Emit as Number
-}
-
-// Update display value on input
-const onInput = (value) => {
-  displayValue.value = value; // Update the input field
-  emitUpdateModelValue();
+// Fokus / blur handlers
+const onFocus = () => {
+  isFocused.value = true;
+  // jangan ubah displayValue di fokus — biarkan apa yang sedang diketik user
 };
 
-// Emit sanitized value on blur
 const onBlur = () => {
-  displayValue.value = formatNumber(sanitizeInput(displayValue.value)); // Format the input
-  emitUpdateModelValue();
+  isFocused.value = false;
+  const rounded = sanitizeInput(displayValue.value, true);
+  const finalValue = isNaN(rounded) ? 0 : rounded;
+  emit("update:modelValue", finalValue);
+  displayValue.value = formatNumber(finalValue);
 };
 
-// Filter keyboard input
+// Input handler (saat user mengetik)
+// IMPORTANT: jangan emit bila user baru mengetik tanda desimal terakhir (mis "1,"), atau input kosong / hanya "-"
+const onInput = (val) => {
+  displayValue.value = val;
+
+  const str = String(val);
+  if (str === "" || str === "-") {
+    // tidak emit, biarkan user menyelesaikan
+    return;
+  }
+
+  const lastChar = str.charAt(str.length - 1);
+  // jika terakhir adalah pemisah desimal, jangan emit (user belum selesai mengetik bagian desimal)
+  if (lastChar === decimalSeparator || lastChar === "." || lastChar === ",") {
+    return;
+  }
+
+  // jika ada decimal separator dan user baru mengetik bagian desimal (tetapi masih lebih pendek dari maxDecimals), tetap boleh emit
+  const numericValue = sanitizeInput(str, false);
+  if (!isNaN(numericValue)) {
+    emit("update:modelValue", numericValue);
+  }
+};
+
+// Keyboard filter: izinkan digit, satu pemisah decimal, minus di awal, dan navigasi
 const filterInput = (event) => {
   const allowedKeys = [
-    'Backspace',
-    'Delete',
-    'Tab',
-    'ArrowLeft',
-    'ArrowRight',
-    'Home',
-    'End',
+    "Backspace",
+    "Delete",
+    "Tab",
+    "ArrowLeft",
+    "ArrowRight",
+    "Home",
+    "End",
   ];
-
   if (event.ctrlKey || event.metaKey) return;
-  if (event.key >= '0' && event.key <= '9') return;
-  if ((event.key === decimalSeparator || event.key === thousandSeparator) && !displayValue.value.includes(decimalSeparator)) return;
-  if (props.allowNegative && event.key === '-' && event.target.selectionStart === 0) return;
   if (allowedKeys.includes(event.key)) return;
+  if (event.key >= "0" && event.key <= "9") return;
 
-  event.preventDefault(); // Block other keys
+  // izinkan pemisah desimal (dot atau comma) jika belum ada
+  const isDecimalKey =
+    event.key === decimalSeparator || event.key === "." || event.key === ",";
+  if (
+    isDecimalKey &&
+    !displayValue.value.includes(decimalSeparator) &&
+    !displayValue.value.includes(".") &&
+    !displayValue.value.includes(",")
+  ) {
+    return;
+  }
+
+  if (
+    props.allowNegative &&
+    event.key === "-" &&
+    event.target.selectionStart === 0
+  )
+    return;
+
+  event.preventDefault();
 };
 </script>
