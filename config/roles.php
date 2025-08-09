@@ -138,6 +138,7 @@ return [
         'admin.inventory-log.add',
         'admin.inventory-log.edit',
         'admin.inventory-log.save',
+        'admin.inventory-log.export',
     ],
     User::Role_ASM => [
         'admin.user.index',

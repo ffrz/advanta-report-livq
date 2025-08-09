@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
-import { getQueryParams, formatNumber } from "@/helpers/utils";
+import { getQueryParams, formatNumber, check_role } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { useProductCategoryFilter } from "@/helpers/useProductCategoryFilter";
 import { usePageStorage } from "@/helpers/usePageStorage";
@@ -19,6 +19,10 @@ const loading = ref(true);
 const filter = reactive(
   storage.get("filter", {
     search: "",
+    user_id:
+      page.props.auth.user.role == "bs"
+        ? Number(page.props.auth.user.id)
+        : "all",
     ...getQueryParams(),
   })
 );
@@ -85,6 +89,14 @@ const columns = [
   { name: "action", align: "right" },
 ];
 
+const users = [
+  { value: "all", label: "Semua" },
+  ...page.props.users.map((user) => ({
+    value: user.id,
+    label: `${user.name} (${user.username})`,
+  })),
+];
+
 onMounted(() => {
   fetchItems();
 });
@@ -108,14 +120,9 @@ const fetchItems = (props = null) => {
   });
 };
 
-// const onFilterChange = () => {
-//   fetchItems();
-// };
-
-// const { filteredCategories, filterCategories } = useProductCategoryFilter(
-//   page.props.categories,
-//   true
-// );
+const onFilterChange = () => {
+  fetchItems();
+};
 
 const computedColumns = computed(() =>
   $q.screen.gt.sm
@@ -151,7 +158,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
         dense
         @click="showFilter = !showFilter"
       />
-      <!-- <q-btn
+      <q-btn
         v-if="$can('admin.inventory-log.export')"
         icon="file_export"
         dense
@@ -191,36 +198,24 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             </q-item>
           </q-list>
         </q-menu>
-      </q-btn> -->
+      </q-btn>
     </template>
     <template #header v-if="showFilter">
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
-          <!-- <q-select
-            v-model="filter.status"
+          <q-select
             class="custom-select col-xs-12 col-sm-2"
-            :options="statuses"
-            label="Status"
+            style="min-width: 150px"
+            v-model="filter.user_id"
+            v-show="check_role(['admin', 'agronomist'])"
+            :options="users"
+            label="Checker"
             dense
             map-options
             emit-value
             outlined
-            style="min-width: 150px"
             @update:model-value="onFilterChange"
           />
-          <q-select
-            v-model="filter.category_id"
-            label="Kategori"
-            class="custom-select col-xs-12 col-sm-2"
-            outlined
-            input-debounce="300"
-            :options="filteredCategories"
-            map-options
-            dense
-            emit-value
-            style="min-width: 150px"
-            @update:model-value="onFilterChange"
-          /> -->
           <q-input
             class="col"
             outlined

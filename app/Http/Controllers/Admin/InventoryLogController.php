@@ -26,14 +26,19 @@ class InventoryLogController extends Controller
     {
         $current_user = Auth::user();
         $q = User::query();
+
         if ($current_user->role == User::Role_BS) {
+            // BS hanya melihat dirinya sendiri
             $q->where('id', $current_user->id);
-        } else if ($current_user->role == User::Role_Agronomist) {
-            $q->where('parent_id', $current_user->id);
+        } elseif ($current_user->role == User::Role_Agronomist) {
+            // Agronomist melihat dirinya sendiri + semua BS di bawahnya
+            $q->where(function ($query) use ($current_user) {
+                $query->where('parent_id', $current_user->id)
+                    ->orWhere('id', $current_user->id);
+            });
         }
 
-        $users = $q->where('role', User::Role_BS)
-            ->where('active', true)
+        $users = $q->where('active', true)
             ->orderBy('name')
             ->get();
 
@@ -75,10 +80,34 @@ class InventoryLogController extends Controller
         }
 
         if (!empty($filter['search'])) {
-            $q->where(function ($q) use ($filter) {
-                $q->where('area', 'like', '%' . $filter['search'] . '%');
-                $q->orWhere('notes', 'like', '%' . $filter['search'] . '%');
+            $search = '%' . $filter['search'] . '%';
+
+            $q->where(function ($q) use ($search) {
+                // Kolom langsung di tabel inventory_log
+                $q->where('area', 'like', $search)
+                ->orWhere('notes', 'like', $search)
+                ->orWhere('lot_package', 'like', $search)
+
+                // Relasi: nama produk
+                ->orWhereHas('product', function ($sub) use ($search) {
+                    $sub->where('name', 'like', $search);
+                })
+
+                // Relasi: nama kategori produk
+                ->orWhereHas('product.category', function ($sub) use ($search) {
+                    $sub->where('name', 'like', $search);
+                })
+
+                // Relasi: nama pelanggan
+                ->orWhereHas('customer', function ($sub) use ($search) {
+                    $sub->where('name', 'like', $search);
+                });
             });
+        }
+
+
+        if (!empty($filter['user_id']) && ($filter['user_id'] != 'all')) {
+            $q->where('user_id', '=', $filter['user_id']);
         }
 
         $q->orderBy($orderBy, $orderType);
@@ -164,61 +193,61 @@ class InventoryLogController extends Controller
         ]);
     }
 
-    // /**
-    //  * Mengekspor daftar client ke dalam format PDF atau Excel.
-    //  */
-    // public function export(Request $request)
-    // {
-    //     $items = InventoryLog::orderBy('name', 'asc')->get();
+    /**
+     * Mengekspor daftar client ke dalam format PDF atau Excel.
+     */
+    public function export(Request $request)
+    {
+        $items = InventoryLog::orderBy('name', 'asc')->get();
 
-    //     $title = 'Daftar Varietas';
-    //     $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
+        $title = 'Daftar Log Inventory';
+        $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
 
-    //     if ($request->get('format') == 'pdf') {
-    //         $pdf = Pdf::loadView('export.inventory-log-list-pdf', compact('items', 'title'))
-    //             ->setPaper('a4', 'landscape');
-    //         return $pdf->download($filename . '.pdf');
-    //     }
+        if ($request->get('format') == 'pdf') {
+            $pdf = Pdf::loadView('export.inventory-log-list-pdf', compact('items', 'title'))
+                ->setPaper('a4', 'landscape');
+            return $pdf->download($filename . '.pdf');
+        }
 
-    //     if ($request->get('format') == 'excel') {
-    //         $spreadsheet = new Spreadsheet();
-    //         $sheet = $spreadsheet->getActiveSheet();
+        if ($request->get('format') == 'excel') {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-    //         // Tambahkan header
-    //         $sheet->setCellValue('A1', 'No');
-    //         $sheet->setCellValue('B1', 'Kategori');
-    //         $sheet->setCellValue('C1', 'Nama Varietas');
-    //         $sheet->setCellValue('D1', 'Harga Distributor (Rp / sat)');
-    //         $sheet->setCellValue('E1', 'Harga (Rp / sat)');
-    //         $sheet->setCellValue('F1', 'Status');
-    //         $sheet->setCellValue('G1', 'Catatan');
+            // Tambahkan header
+            $sheet->setCellValue('A1', 'No');
+            $sheet->setCellValue('B1', 'Kategori');
+            $sheet->setCellValue('C1', 'Nama Varietas');
+            $sheet->setCellValue('D1', 'Harga Distributor (Rp / sat)');
+            $sheet->setCellValue('E1', 'Harga (Rp / sat)');
+            $sheet->setCellValue('F1', 'Status');
+            $sheet->setCellValue('G1', 'Catatan');
 
-    //         // Tambahkan data ke Excel
-    //         $row = 2;
-    //         foreach ($items as $num => $item) {
-    //             $sheet->setCellValue('A' . $row, $num + 1);
-    //             $sheet->setCellValue('B' . $row, $item->category ? $item->category->name : '');
-    //             $sheet->setCellValue('C' . $row, $item->name);
-    //             $sheet->setCellValue('D' . $row, "$item->price_1 / $item->uom_1");
-    //             $sheet->setCellValue('E' . $row, "$item->price_2 / $item->uom_2");
-    //             $sheet->setCellValue('F' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
-    //             $sheet->setCellValue('G' . $row, $item->notes);
-    //             $row++;
-    //         }
+            // Tambahkan data ke Excel
+            $row = 2;
+            foreach ($items as $num => $item) {
+                $sheet->setCellValue('A' . $row, $num + 1);
+                $sheet->setCellValue('B' . $row, $item->category ? $item->category->name : '');
+                $sheet->setCellValue('C' . $row, $item->name);
+                $sheet->setCellValue('D' . $row, "$item->price_1 / $item->uom_1");
+                $sheet->setCellValue('E' . $row, "$item->price_2 / $item->uom_2");
+                $sheet->setCellValue('F' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('G' . $row, $item->notes);
+                $row++;
+            }
 
-    //         // Kirim ke memori tanpa menyimpan file
-    //         $response = new StreamedResponse(function () use ($spreadsheet) {
-    //             $writer = new Xlsx($spreadsheet);
-    //             $writer->save('php://output');
-    //         });
+            // Kirim ke memori tanpa menyimpan file
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
 
-    //         // Atur header response untuk download
-    //         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    //         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+            // Atur header response untuk download
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
 
-    //         return $response;
-    //     }
+            return $response;
+        }
 
-    //     return abort(400, 'Format tidak didukung');
-    // }
+        return abort(400, 'Format tidak didukung');
+    }
 }

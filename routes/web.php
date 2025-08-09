@@ -194,7 +194,7 @@ Route::middleware([Auth::class])->group(function () {
                 Route::post('save', [InventoryLogController::class, 'save'])->name('admin.inventory-log.save');
                 Route::post('delete/{id}', [InventoryLogController::class, 'delete'])->name('admin.inventory-log.delete');
                 Route::get('detail/{id}', [InventoryLogController::class, 'detail'])->name('admin.inventory-log.detail');
-                // Route::get('export', [InventoryLogController::class, 'export'])->name('admin.inventory-log.export');
+                Route::get('export', [InventoryLogController::class, 'export'])->name('admin.inventory-log.export');
             });
         });
 
