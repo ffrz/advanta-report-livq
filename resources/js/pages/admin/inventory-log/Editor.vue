@@ -23,6 +23,12 @@ const form = useForm({
 });
 
 const areas = [{ value: "West Java", label: "West Java" }];
+const users = page.props.users.map((u) => {
+  return {
+    value: u.id,
+    label: u.name,
+  };
+});
 
 const submit = () =>
   handleSubmit({ form, url: route("admin.inventory-log.save") });
@@ -59,6 +65,18 @@ const updateQuantity = () => {
                 :error="!!form.errors.check_date"
                 :disable="form.processing"
                 :error-message="form.errors.check_date"
+              />
+              <q-select
+                v-if="page.props.auth.user.role == 'admin'"
+                v-model="form.user_id"
+                label="Checker"
+                clearable
+                :options="users"
+                map-options
+                emit-value
+                :error="!!form.errors.user_id"
+                :disable="form.processing"
+                :error-message="form.errors.user_id"
               />
               <q-select
                 v-model="form.area"

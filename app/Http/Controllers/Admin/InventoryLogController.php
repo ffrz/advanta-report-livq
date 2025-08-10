@@ -43,8 +43,8 @@ class InventoryLogController extends Controller
             ->get();
 
         return inertia('admin/inventory-log/Index', [
-            'products' => Product::all(['id', 'name']),
-            'customers' => Customer::all(['id', 'name']),
+            'products' => Product::orderBy('name', 'asc')->get(['id', 'name']),
+            'customers' => Customer::orderBy('name', 'asc')->get(['id', 'name']),
             'users' => $users,
         ]);
     }
@@ -142,12 +142,17 @@ class InventoryLogController extends Controller
 
         $this->authorize('update', $item);
 
+        $customersQuery = Customer::query();
+        if (Auth::user()->role !== User::Role_Admin) {
+            $customersQuery->where('assigned_user_id', $currentUserId);
+        }
+        $customers = $customersQuery->orderBy('name', 'asc')->get(['id', 'name']);
+
         return inertia('admin/inventory-log/Editor', [
             'data' => $item,
-            'products' => Product::all(['id', 'name', 'weight']),
-            'customers' => Customer::where('assigned_user_id', $currentUserId)
-                ->get(['id', 'name']),
-            'users' => User::all(['id', 'name']),
+            'products' => Product::orderBy('name', 'asc')->get(['id', 'name', 'weight']),
+            'customers' => $customers,
+            'users' => User::orderBy('name', 'asc')->get(['id', 'name']),
         ]);
     }
 
