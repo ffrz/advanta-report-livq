@@ -62,6 +62,13 @@ if (page.props.auth.user.role != "bs") {
       align: "right",
       sortable: true,
     },
+    {
+      name: "weight",
+      label: "Bobot (gr)",
+      field: "weight",
+      align: "right",
+      sortable: true,
+    },
     { name: "action", align: "right" },
   ];
 } else {
@@ -284,6 +291,10 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
                     {{ formatNumber(props.row.price_1) }} /
                     {{ props.row.uom_1 }}
                   </div>
+                  <div>
+                    <q-icon name="weight" /> Bobot:
+                    {{ formatNumber(props.row.weight) }} gr
+                  </div>
                 </template>
               </template>
             </q-td>
@@ -292,6 +303,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             </q-td>
             <q-td key="price_2" :props="props" class="wrap-column">
               {{ formatNumber(props.row.price_2) }} / {{ props.row.uom_2 }}
+            </q-td>
+            <q-td key="weight" :props="props" class="wrap-column">
+              {{ formatNumber(props.row.weight) }} gr
             </q-td>
             <q-td key="action" :props="props">
               <div
