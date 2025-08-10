@@ -24,6 +24,7 @@ class InventoryLog extends Model
         'lot_package',
         'quantity',
         'notes',
+        'base_quantity',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class InventoryLog extends Model
         'customer_id' => 'integer',
         'user_id' => 'integer',
         'quantity' => 'float',
+        'base_quantity' => 'integer',
         'check_date' => 'date',
     ];
 
@@ -61,7 +63,7 @@ class InventoryLog extends Model
     /**
      * Get the author of the product.
      */
-    public function createdBy()
+    public function created_by()
     {
         return $this->belongsTo(User::class, 'created_by_uid');
     }
@@ -69,9 +71,8 @@ class InventoryLog extends Model
     /**
      * Get the updater of the product.
      */
-    public function updatedBy()
+    public function updated_by()
     {
         return $this->belongsTo(User::class, 'updated_by_uid');
     }
-
 }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('lot_package');
             $table->decimal('quantity', 8, 3);
             $table->text('notes')->nullable();
+            $table->unsignedInteger('base_quantity')->nullable();
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();

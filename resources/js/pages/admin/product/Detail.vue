@@ -45,7 +45,7 @@ const $q = useQuasar();
               <table class="detail">
                 <tbody>
                   <tr>
-                    <td style="width: 120px">Brand</td>
+                    <td style="width: 125px">Brand</td>
                     <td style="width: 1px">:</td>
                     <td>
                       {{ page.props.data.name }}
@@ -80,6 +80,13 @@ const $q = useQuasar();
                       </td>
                     </tr>
                   </template>
+                  <tr>
+                    <td>Bobot per pcs (gr)</td>
+                    <td>:</td>
+                    <td>
+                      {{ formatNumber(page.props.data.weight) }}
+                    </td>
+                  </tr>
                   <tr>
                     <td>Catatan</td>
                     <td>:</td>

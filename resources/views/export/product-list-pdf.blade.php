@@ -11,6 +11,7 @@
         <th>Nama</th>
         <th>Harga Distributor (Rp / sat)</th>
         <th>Harga (Rp / sat)</th>
+        <th>Bobot</th>
         <th>Status</th>
         <th>Catatan</th>
       </tr>
@@ -23,6 +24,7 @@
           <td>{{ $item->name }}</td>
           <td align="right">{{ format_number($item->price_1) }} / {{ $item->uom_1 }}</td>
           <td align="right">{{ format_number($item->price_2) }} / {{ $item->uom_2 }}</td>
+          <td align="right">{{ format_number($item->weight) }}</td>
           <td align="center">{{ $item->active ? 'Aktif' : 'Non Aktif' }}</td>
           <td>{{ $item->notes }}</td>
         </tr>

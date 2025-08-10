@@ -25,6 +25,7 @@ class Product extends Model
         'price_2',
         'uom_2',
         'notes',
+        'weight',
     ];
 
     protected $casts = [
@@ -35,6 +36,7 @@ class Product extends Model
         'price_2' => 'float',
         'created_by_uid' => 'integer',
         'updated_by_uid' => 'integer',
+        'weight' => 'integer',
     ];
 
     /**

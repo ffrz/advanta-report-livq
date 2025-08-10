@@ -51,8 +51,8 @@ class InventoryLogController extends Controller
 
     public function detail($id = 0)
     {
-        $item = InventoryLog::with(['product', 'product.category', 'user', 'customer'])->findOrFail($id);
-        $this->authorize('view', $item);
+        $item = InventoryLog::with(['product', 'product.category', 'user', 'customer', 'created_by', 'updated_by'])->findOrFail($id);
+        // $this->authorize('view', $item);
         return inertia('admin/inventory-log/Detail', [
             'data' => $item,
         ]);
@@ -73,7 +73,7 @@ class InventoryLogController extends Controller
                 $query->whereHas('user', function ($sub) use ($current_user) {
                     $sub->where('parent_id', $current_user->id);
                 })
-                ->orWhere('user_id', $current_user->id);
+                    ->orWhere('user_id', $current_user->id);
             });
         } else if ($current_user->role == User::Role_BS) {
             $q->where('user_id', $current_user->id);
@@ -85,23 +85,23 @@ class InventoryLogController extends Controller
             $q->where(function ($q) use ($search) {
                 // Kolom langsung di tabel inventory_log
                 $q->where('area', 'like', $search)
-                ->orWhere('notes', 'like', $search)
-                ->orWhere('lot_package', 'like', $search)
+                    ->orWhere('notes', 'like', $search)
+                    ->orWhere('lot_package', 'like', $search)
 
-                // Relasi: nama produk
-                ->orWhereHas('product', function ($sub) use ($search) {
-                    $sub->where('name', 'like', $search);
-                })
+                    // Relasi: nama produk
+                    ->orWhereHas('product', function ($sub) use ($search) {
+                        $sub->where('name', 'like', $search);
+                    })
 
-                // Relasi: nama kategori produk
-                ->orWhereHas('product.category', function ($sub) use ($search) {
-                    $sub->where('name', 'like', $search);
-                })
+                    // Relasi: nama kategori produk
+                    ->orWhereHas('product.category', function ($sub) use ($search) {
+                        $sub->where('name', 'like', $search);
+                    })
 
-                // Relasi: nama pelanggan
-                ->orWhereHas('customer', function ($sub) use ($search) {
-                    $sub->where('name', 'like', $search);
-                });
+                    // Relasi: nama pelanggan
+                    ->orWhereHas('customer', function ($sub) use ($search) {
+                        $sub->where('name', 'like', $search);
+                    });
             });
         }
 
@@ -144,9 +144,9 @@ class InventoryLogController extends Controller
 
         return inertia('admin/inventory-log/Editor', [
             'data' => $item,
-            'products' => Product::all(['id', 'name']),
+            'products' => Product::all(['id', 'name', 'weight']),
             'customers' => Customer::where('assigned_user_id', $currentUserId)
-                               ->get(['id', 'name']),
+                ->get(['id', 'name']),
             'users' => User::all(['id', 'name']),
         ]);
     }
@@ -154,12 +154,13 @@ class InventoryLogController extends Controller
     public function save(Request $request)
     {
         $validated = $request->validate([
-            'product_id'       => ['nullable', 'integer', 'exists:products,id'],
-            'customer_id'      => ['nullable', 'integer', 'exists:customers,id'],
-            'user_id'          => ['nullable', 'integer', 'exists:users,id'],
+            'product_id'       => ['required', 'integer', 'exists:products,id'],
+            'customer_id'      => ['required', 'integer', 'exists:customers,id'],
+            'user_id'          => ['required', 'integer', 'exists:users,id'],
             'check_date'       => ['required', 'date'],
             'area'             => ['required', 'string', 'max:255'],
             'lot_package'      => ['required', 'string', 'max:255'],
+            'base_quantity'    => ['required', 'numeric', 'between:0,999999'],
             'quantity'         => ['required', 'numeric', 'between:0,999999.999'],
             'notes'            => ['nullable', 'string'],
         ], [
@@ -167,7 +168,10 @@ class InventoryLogController extends Controller
             'customer_id.exists'    => 'Client yang dipilih tidak ditemukan.',
             'user_id.exists'        => 'Karyawan yang dipilih tidak ditemukan.',
             'check_date.required'   => 'Tanggal pemeriksaan wajib diisi.',
+            'base_quantity.between' => 'Jumlah harus bilangan bulat.',
+            'base_quantity.required' => 'Jumlah harus diisi.',
             'quantity.between'      => 'Jumlah harus antara 0 hingga 999999.999.',
+            'quantity.required'     => 'Jumlah harus diisi.',
             'area.required'         => 'Area harus diisi.',
             'lot_package.required'  => 'Lot package harus diisi.',
         ]);

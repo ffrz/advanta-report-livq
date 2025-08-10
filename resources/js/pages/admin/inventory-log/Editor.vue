@@ -19,6 +19,7 @@ const form = useForm({
   quantity: parseFloat(page.props.data.quantity),
   check_date: page.props.data.check_date,
   notes: page.props.data.notes,
+  base_quantity: parseInt(page.props.data.base_quantity),
 });
 
 const areas = [{ value: "West Java", label: "West Java" }];
@@ -34,7 +35,12 @@ const { filteredCustomers, filterCustomers } = useCustomerFilter(
   page.props.customers
 );
 
-console.log(filterCustomers);
+const updateQuantity = () => {
+  if (!form.product_id) return;
+  const product = page.props.products.find((p) => p.id === form.product_id);
+  if (!product) return;
+  form.quantity = (form.base_quantity * product.weight) / 1000;
+};
 </script>
 
 <template>
@@ -121,9 +127,19 @@ console.log(filterCustomers);
                 :error-message="form.errors.lot_package"
               />
               <LocaleNumberInput
+                v-model:modelValue="form.base_quantity"
+                label="Quantity (pcs)"
+                lazyRules
+                :disable="form.processing"
+                :error="!!form.errors.base_quantity"
+                :errorMessage="form.errors.base_quantity"
+                @change="updateQuantity"
+              />
+              <LocaleNumberInput
                 v-model:modelValue="form.quantity"
                 label="Quantity (kg)"
                 lazyRules
+                readonly
                 :maxDecimals="3"
                 :disable="form.processing"
                 :error="!!form.errors.quantity"

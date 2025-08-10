@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('uom_2')->default('');
             $table->boolean('active')->default(true);
             $table->text('notes')->nullable();
+            $table->unsignedSmallInteger('weight')->nullable();
 
             $table->datetime('created_datetime')->nullable();
             $table->datetime('updated_datetime')->nullable();

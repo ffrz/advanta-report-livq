@@ -83,7 +83,11 @@ const $q = useQuasar();
                   <tr>
                     <td>Quantity</td>
                     <td>:</td>
-                    <td>{{ formatNumber(page.props.data.quantity, 3) }} kg</td>
+                    <td>
+                      {{ formatNumber(page.props.data.base_quantity) }} pcs /
+                      {{ formatNumber(page.props.data.quantity, "id-ID", 3) }}
+                      kg
+                    </td>
                   </tr>
                   <tr>
                     <td>Catatan</td>
@@ -91,7 +95,7 @@ const $q = useQuasar();
                     <td>{{ page.props.data.notes || "-" }}</td>
                   </tr>
                   <tr v-if="!!page.props.data.created_datetime">
-                    <td>Dibuat Oleh</td>
+                    <td>Dibuat</td>
                     <td>:</td>
                     <td>
                       <template v-if="page.props.data.created_by">
@@ -116,7 +120,7 @@ const $q = useQuasar();
                   </tr>
 
                   <tr v-if="!!page.props.data.updated_datetime">
-                    <td>Diperbarui Oleh</td>
+                    <td>Diperbarui</td>
                     <td>:</td>
                     <td>
                       <template v-if="page.props.data.updated_by">

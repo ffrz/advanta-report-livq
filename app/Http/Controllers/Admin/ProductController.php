@@ -106,6 +106,7 @@ class ProductController extends Controller
             'price_2' => 'nullable|numeric',
             'active' => 'nullable|boolean',
             'notes' => 'nullable|max:1000',
+            'weight' => 'required|numeric',
         ]);
 
         $item = $request->id ? Product::findOrFail($request->id) : new Product();
@@ -152,8 +153,9 @@ class ProductController extends Controller
             $sheet->setCellValue('C1', 'Nama Varietas');
             $sheet->setCellValue('D1', 'Harga Distributor (Rp / sat)');
             $sheet->setCellValue('E1', 'Harga (Rp / sat)');
-            $sheet->setCellValue('F1', 'Status');
-            $sheet->setCellValue('G1', 'Catatan');
+            $sheet->setCellValue('F1', 'Bobot');
+            $sheet->setCellValue('G1', 'Status');
+            $sheet->setCellValue('H1', 'Catatan');
 
             // Tambahkan data ke Excel
             $row = 2;
@@ -163,8 +165,9 @@ class ProductController extends Controller
                 $sheet->setCellValue('C' . $row, $item->name);
                 $sheet->setCellValue('D' . $row, "$item->price_1 / $item->uom_1");
                 $sheet->setCellValue('E' . $row, "$item->price_2 / $item->uom_2");
-                $sheet->setCellValue('F' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
-                $sheet->setCellValue('G' . $row, $item->notes);
+                $sheet->setCellValue('F' . $row, $item->weight);
+                $sheet->setCellValue('G' . $row, $item->active ? 'Aktif' : 'Tidak Aktif');
+                $sheet->setCellValue('H' . $row, $item->notes);
                 $row++;
             }
 

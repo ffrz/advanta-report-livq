@@ -278,7 +278,8 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
                 <div>Hybrid: {{ props.row.product.name }}</div>
                 <div>Lot Package: {{ props.row.lot_package }}</div>
                 <div>
-                  Qty: {{ formatNumber(props.row.quantity, "id-ID", 3) }}
+                  Qty: {{ formatNumber(props.row.base_quantity) }} pcs /
+                  {{ formatNumber(props.row.quantity, "id-ID", 3) }} kg
                 </div>
               </template>
             </q-td>
@@ -301,13 +302,13 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
               {{ props.row.lot_package }}
             </q-td>
             <q-td key="quantity" :props="props">
-              {{ formatNumber(props.row.quantity, "id-ID", 3) }}
+              {{ formatNumber(props.row.base_quantity) }} pcs /
+              {{ formatNumber(props.row.quantity, "id-ID", 3) }} kg
             </q-td>
             <q-td key="action" :props="props">
               <div
                 class="flex justify-end"
                 v-if="
-                  $can('admin.inventory-log.duplicate') ||
                   $can('admin.inventory-log.edit') ||
                   $can('admin.inventory-log.delete')
                 "
@@ -326,22 +327,6 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
                     transition-hide="scale"
                   >
                     <q-list style="width: 200px">
-                      <q-item
-                        v-if="$can('admin.inventory-log.duplicate')"
-                        clickable
-                        v-ripple
-                        v-close-popup
-                        @click.stop="
-                          router.get(
-                            route('admin.inventory-log.duplicate', props.row.id)
-                          )
-                        "
-                      >
-                        <q-item-section avatar>
-                          <q-icon name="file_copy" />
-                        </q-item-section>
-                        <q-item-section icon="copy">Duplikat</q-item-section>
-                      </q-item>
                       <q-item
                         v-if="$can('admin.inventory-log.edit')"
                         clickable
