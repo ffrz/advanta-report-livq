@@ -4,9 +4,10 @@ import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { getQueryParams, formatNumber, check_role } from "@/helpers/utils";
 import { useQuasar } from "quasar";
-import { useProductCategoryFilter } from "@/helpers/useProductCategoryFilter";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import { formatDate } from "@/helpers/datetime";
+import { useProductFilter } from "@/composables/useProductFilter";
+import { useCustomerFilter } from "@/composables/useCustomerFilter";
 
 const page = usePage();
 const storage = usePageStorage("inventory-log");
@@ -19,6 +20,8 @@ const loading = ref(true);
 const filter = reactive(
   storage.get("filter", {
     search: "",
+    customer_id: null,
+    product_id: "all",
     user_id:
       page.props.auth.user.role == "bs"
         ? Number(page.props.auth.user.id)
@@ -97,6 +100,12 @@ const users = [
   })),
 ];
 
+const { products } = useProductFilter(page.props.products, true);
+const { filterCustomers, filteredCustomers } = useCustomerFilter(
+  page.props.customers
+);
+const productOptions = products;
+
 onMounted(() => {
   fetchItems();
 });
@@ -159,7 +168,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
         @click="showFilter = !showFilter"
       />
       <q-btn
-        v-if="$can('admin.inventory-log.export')"
+        v-if="false"
         icon="file_export"
         dense
         class="q-ml-sm"
@@ -216,6 +225,40 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             outlined
             @update:model-value="onFilterChange"
           />
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.product_id"
+            :options="productOptions"
+            label="Varietas"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
+          <q-select
+            class="custom-select col-xs-12 col-sm-2"
+            v-model="filter.customer_id"
+            style="min-width: 150px"
+            label="Cient"
+            use-input
+            dense
+            outlined
+            input-debounce="300"
+            clearable
+            :options="filteredCustomers"
+            map-options
+            emit-value
+            @filter="filterCustomers"
+            @update:model-value="onFilterChange"
+          >
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section>Client tidak ditemukan</q-item-section>
+              </q-item>
+            </template>
+          </q-select>
           <q-input
             class="col"
             outlined

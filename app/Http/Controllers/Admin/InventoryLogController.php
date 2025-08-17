@@ -44,7 +44,7 @@ class InventoryLogController extends Controller
 
         return inertia('admin/inventory-log/Index', [
             'products' => Product::orderBy('name', 'asc')->get(['id', 'name']),
-            'customers' => Customer::orderBy('name', 'asc')->get(['id', 'name']),
+            'customers' => $this->getCustomers(),
             'users' => $users,
         ]);
     }
@@ -110,6 +110,10 @@ class InventoryLogController extends Controller
             $q->where('user_id', '=', $filter['user_id']);
         }
 
+        if (!empty($filter['customer_id']) && ($filter['customer_id'] != 'all')) {
+            $q->where('customer_id', '=', $filter['customer_id']);
+        }
+
         $q->orderBy($orderBy, $orderType);
 
         $items = $q->paginate($request->get('per_page', 10))->withQueryString();
@@ -142,16 +146,10 @@ class InventoryLogController extends Controller
 
         $this->authorize('update', $item);
 
-        $customersQuery = Customer::query();
-        if (Auth::user()->role !== User::Role_Admin) {
-            $customersQuery->where('assigned_user_id', $currentUserId);
-        }
-        $customers = $customersQuery->orderBy('name', 'asc')->get(['id', 'name']);
-
         return inertia('admin/inventory-log/Editor', [
             'data' => $item,
             'products' => Product::orderBy('name', 'asc')->get(['id', 'name', 'weight']),
-            'customers' => $customers,
+            'customers' => $this->getCustomers(),
             'users' => User::orderBy('name', 'asc')->get(['id', 'name']),
         ]);
     }
@@ -258,5 +256,15 @@ class InventoryLogController extends Controller
         }
 
         return abort(400, 'Format tidak didukung');
+    }
+
+    private function getCustomers()
+    {
+        $currentUser = Auth::user();
+        $customersQuery = Customer::query();
+        if ($currentUser->role !== User::Role_Admin) {
+            $customersQuery->where('assigned_user_id', $currentUser->id);
+        }
+        return $customersQuery->orderBy('name', 'asc')->get(['id', 'name']);
     }
 }

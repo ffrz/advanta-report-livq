@@ -75,4 +75,16 @@ class Customer extends Model
             ->orderByDesc('created_datetime')
             ->get();
     }
+
+    public function inventoryLogs()
+    {
+        return $this->hasMany(InventoryLog::class);
+    }
+
+    public function lastInventoryLog()
+    {
+        return $this->hasOne(InventoryLog::class)
+            ->latest('check_date')
+            ->latest('id'); // fallback kalau check_date sama
+    }
 }

@@ -5,6 +5,7 @@ import { useProductFilter } from "@/composables/useProductFilter";
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { useCustomerFilter } from "@/helpers/useCustomerFilter";
+import { formatDateForEditing } from "@/helpers/formatter";
 
 const page = usePage();
 const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Log Inventori";
@@ -17,7 +18,7 @@ const form = useForm({
   area: page.props.data.area,
   lot_package: page.props.data.lot_package,
   quantity: parseFloat(page.props.data.quantity),
-  check_date: page.props.data.check_date,
+  check_date: formatDateForEditing(page.props.data.check_date),
   notes: page.props.data.notes,
   base_quantity: parseInt(page.props.data.base_quantity),
 });

@@ -28,6 +28,9 @@ return new class extends Migration
 
             $table->foreignId('created_by_uid')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by_uid')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->index(['customer_id', 'product_id', 'check_date', 'id'], 'idx_customer_product_checkdate');
+            $table->index('user_id'); // untuk filter user
         });
     }
 

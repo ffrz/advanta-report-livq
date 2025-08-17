@@ -27,6 +27,7 @@ const report_types = [
   { value: "demo-plot-detail", label: "Laporan Demo Plot" },
   { value: "new-demo-plot-detail", label: "Laporan Demo Plot Baru" },
   { value: "demo-plot-with-photo", label: "Laporan Demo Plot dengan Foto" },
+  { value: "client-actual-inventory", label: "Laporan Inventori Aktual" },
   { value: "activity-plan-detail", label: "Laporan Rencana Kegiatan" },
   { value: "activity-realization-detail", label: "Laporan Realisasi Kegiatan" },
   { value: "activity-target-detail", label: "Laporan KPI Kegiatan" },
@@ -168,6 +169,10 @@ function updateState() {
     filter_options.show_period = true;
     filter_options.show_user = true;
     // filter_options.show_product = true;
+  }
+  if (["client-actual-inventory"].includes(form.report_type)) {
+    filter_options.show_user = true;
+    filter_options.show_product = true;
   }
   // else if ([
   // ].includes(form.report_type)
