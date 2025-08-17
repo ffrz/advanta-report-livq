@@ -110,6 +110,10 @@ class InventoryLogController extends Controller
             $q->where('user_id', '=', $filter['user_id']);
         }
 
+        if (!empty($filter['product_id']) && ($filter['product_id'] != 'all')) {
+            $q->where('product_id', '=', $filter['product_id']);
+        }
+
         if (!empty($filter['customer_id']) && ($filter['customer_id'] != 'all')) {
             $q->where('customer_id', '=', $filter['customer_id']);
         }
