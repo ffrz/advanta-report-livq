@@ -241,7 +241,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             class="custom-select col-xs-12 col-sm-2"
             v-model="filter.customer_id"
             style="min-width: 150px"
-            label="Cient"
+            label="Client"
             use-input
             dense
             outlined

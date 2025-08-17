@@ -230,7 +230,7 @@ watch(
               <q-select
                 v-if="filter_options.show_user"
                 v-model="form.user_id"
-                label="BS"
+                label="User"
                 :options="users"
                 map-options
                 emit-value

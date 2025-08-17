@@ -11,6 +11,7 @@
         <th>Cehcker</th>
         <th>Kiosk / Distributor</th>
         <th>Hybrid</th>
+        <th>Check Date</th>
         <th>Lot Package</th>
         <th>Quantity (Kg)</th>
       </tr>
@@ -18,23 +19,14 @@
     <tbody>
       @forelse ($items as $index => $item)
         <tr>
-          @if ($item->lastInventoryLog)
-            <td>{{ $item->lastInventoryLog->area }}</td>
-            <td>{{ $item->lastInventoryLog->product->category->name }}</td>
-            <td>{{ $item->lastInventoryLog->user->name }}</td>
-            <td>{{ $item->name }}</td>
-            <td>{{ $item->lastInventoryLog->product->name }}</td>
-            <td>{{ $item->lastInventoryLog->lot_package }}</td>
-            <td align="right">{{ $item->lastInventoryLog->quantity }}</td>
-          @else
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>{{ $item->name }}</td>
-            <td>-</td>
-            <td>-</td>
-            <td align="right">-</td>
-          @endif
+          <td>{{ $item->area }}</td>
+          <td>{{ $item->product->category->name }}</td>
+          <td>{{ $item->user->name }}</td>
+          <td>{{ $item->customer->name }}</td>
+          <td>{{ $item->product->name }}</td>
+          <td>{{ format_date($item->check_date) }}</td>
+          <td>{{ $item->lot_package }}</td>
+          <td align="right">{{ $item->quantity }}</td>
         </tr>
       @empty
         <tr>

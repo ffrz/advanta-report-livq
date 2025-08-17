@@ -17,10 +17,10 @@ const form = useForm({
   user_id: page.props.data.user_id,
   area: page.props.data.area,
   lot_package: page.props.data.lot_package,
-  quantity: parseFloat(page.props.data.quantity),
+  quantity: parseFloat(page.props.data.quantity) || 0,
+  base_quantity: parseInt(page.props.data.base_quantity) || 0,
   check_date: formatDateForEditing(page.props.data.check_date),
   notes: page.props.data.notes,
-  base_quantity: parseInt(page.props.data.base_quantity),
 });
 
 const areas = [{ value: "West Java", label: "West Java" }];

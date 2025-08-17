@@ -167,8 +167,8 @@ class InventoryLogController extends Controller
             'check_date'       => ['required', 'date'],
             'area'             => ['required', 'string', 'max:255'],
             'lot_package'      => ['required', 'string', 'max:255'],
-            'base_quantity'    => ['required', 'numeric', 'between:0,999999'],
-            'quantity'         => ['required', 'numeric', 'between:0,999999.999'],
+            'base_quantity'    => ['required', 'numeric', 'min:0', 'max:999999'],
+            'quantity'         => ['required', 'numeric', 'min:0', 'max:999999'],
             'notes'            => ['nullable', 'string'],
         ], [
             'product_id.exists'     => 'Produk yang dipilih tidak ditemukan.',
