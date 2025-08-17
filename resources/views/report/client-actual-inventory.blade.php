@@ -6,25 +6,35 @@
   <table>
     <thead>
       <tr>
-        <th>No</th>
-        <th>ID</th>
-        <th>Klien</th>
-        <th>Status</th>
-        <th>Sales</th>
-        <th>Closing Terakhir</th>
-        <th>Intraksi Terakhir</th>
+        <th>Area</th>
+        <th>Crops</th>
+        <th>Cehcker</th>
+        <th>Kiosk / Distributor</th>
+        <th>Hybrid</th>
+        <th>Lot Package</th>
+        <th>Quantity (Kg)</th>
       </tr>
     </thead>
     <tbody>
       @forelse ($items as $index => $item)
         <tr>
-          <td align="right">{{ $index + 1 }}</td>
-          <td>{{ $item['id'] }}</td>
-          <td>{{ $item['client'] }}</td>          
-          <td>{{ $item['status'] }}</td>
-          <td>{{ $item['sales'] }}</td>
-          <td>{{ $item['last_closing'] }}</td>
-          <td>{{ $item['last_interaction'] }} - {{ $item['engagement_level'] }}</td>
+          @if ($item->lastInventoryLog)
+            <td>{{ $item->lastInventoryLog->area }}</td>
+            <td>{{ $item->lastInventoryLog->product->category->name }}</td>
+            <td>{{ $item->lastInventoryLog->user->name }}</td>
+            <td>{{ $item->name }}</td>
+            <td>{{ $item->lastInventoryLog->product->name }}</td>
+            <td>{{ $item->lastInventoryLog->lot_package }}</td>
+            <td align="right">{{ $item->lastInventoryLog->quantity }}</td>
+          @else
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>{{ $item->name }}</td>
+            <td>-</td>
+            <td>-</td>
+            <td align="right">-</td>
+          @endif
         </tr>
       @empty
         <tr>

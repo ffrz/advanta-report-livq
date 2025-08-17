@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\DemoPlot;
 use App\Models\Interaction;
+use App\Models\InventoryLog;
 use App\Models\Product;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -192,6 +193,76 @@ class ReportController extends Controller
                 'end_date',
             ));
         }
+    }
+
+    public function clientActualInventory(Request $request)
+    {
+        $user_id    = $request->get('user_id');
+        $product_id = $request->get('product_id');
+        $current_user = Auth::user();
+
+        // query ini sudah ok
+        $q = Customer::select('id', 'name', 'type', 'active')
+            ->with([
+                'lastInventoryLog:id,customer_id,product_id,user_id,area,lot_package,check_date,quantity,base_quantity,notes',
+                'lastInventoryLog.product:id,name,category_id',
+                'lastInventoryLog.product.category:id,name',
+                'lastInventoryLog.user:id,name',
+            ])
+            ->whereHas('lastInventoryLog');
+
+        // filter user
+        if (isset($user_id) && $user_id != 'all') {
+            if ($current_user->role == User::Role_Agronomist) {
+                if ($user_id == 'all') {
+                    // ambil hanya log dari anak user
+                    $q->whereHas('lastInventoryLog.user', function ($query) use ($current_user) {
+                        $query->where('parent_id', $current_user->id);
+                    });
+                } else {
+                    $q->whereHas('lastInventoryLog', function ($query) use ($user_id) {
+                        $query->where('user_id', $user_id);
+                    });
+                }
+            }
+        }
+
+        // filter product
+        if (isset($product_id) && $product_id != 'all') {
+            $q->whereHas('lastInventoryLog', function ($query) use ($product_id) {
+                $query->where('product_id', $product_id);
+            });
+        }
+
+        $items = $q->get();
+        $items = $items->sort(function ($a, $b) {
+            // ambil nama user
+            $userA = optional(optional($a->lastInventoryLog)->user)->name ?? '';
+            $userB = optional(optional($b->lastInventoryLog)->user)->name ?? '';
+
+            if ($userA !== $userB) {
+                return strcmp($userA, $userB);
+            }
+
+            // ambil nama produk
+            $productA = optional(optional($a->lastInventoryLog)->product)->name ?? '';
+            $productB = optional(optional($b->lastInventoryLog)->product)->name ?? '';
+
+            if ($productA !== $productB) {
+                return strcmp($productA, $productB);
+            }
+
+            // terakhir urutkan nama customer
+            return strcmp($a->name ?? '', $b->name ?? '');
+        })->values();
+        [$title, $user, $product] = $this->resolveTitle('Laporan Inventori Aktual', $user_id, $product_id);
+
+        return $this->generatePdfReport('report.client-actual-inventory', 'landscape', compact(
+            'items',
+            'title',
+            'user',
+            'product',
+        ));
     }
 
     // public function salesActivity(Request $request)
@@ -692,7 +763,7 @@ class ReportController extends Controller
     //     ));
     // }
 
-    protected function resolveTitle(string $baseTitle, $user_id): array
+    protected function resolveTitle(string $baseTitle, $user_id, $product_id = 'all'): array
     {
         $user = null;
         if ($user_id !== 'all') {
@@ -701,7 +772,16 @@ class ReportController extends Controller
         } else {
             $title = "$baseTitle - All BS";
         }
-        return [$title, $user];
+
+        $product = null;
+        if ($product_id !== 'all') {
+            $product = Product::find($product_id);
+            $title .= ' - ' . $product->name;
+        } else {
+            $title .= ' - All Varietas';
+        }
+
+        return [$title, $user, $product];
     }
 
 
@@ -716,7 +796,7 @@ class ReportController extends Controller
             $data['subtitles'][] = 'Periode ' . format_date($data['start_date']) . ' s/d ' . format_date($data['end_date']);
         }
 
-        // return view($view, $data);
+        return view($view, $data);
 
         if ($response == 'pdf') {
             return Pdf::loadView($view, $data)
@@ -728,6 +808,11 @@ class ReportController extends Controller
             return view($view, $data);
         }
 
+        throw new Exception('Unknown response type!');
+    }
+
+    public function generateExcelReport($header, $data)
+    {
         throw new Exception('Unknown response type!');
     }
 }
