@@ -38,7 +38,7 @@ try {
     } elseif ($action === 'clear') {
         // Hapus file config.php dan routes.php
         safeDelete($base_dir . '/bootstrap/cache/config.php');
-        safeDelete($base_dir . '/bootstrap/cache/routes.php');
+        safeDelete($base_dir . '/bootstrap/cache/routes-v7.php');
 
         echo "✅ Cache config/routes berhasil dihapus.";
     } else {
