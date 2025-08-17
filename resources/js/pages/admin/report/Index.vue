@@ -21,6 +21,7 @@ const filter_options = reactive({
   show_user: false,
   show_product: false,
   show_period: false,
+  show_download_excel: false,
 });
 
 const report_types = [
@@ -63,7 +64,7 @@ const users = [
   })),
 ];
 
-const submit = () => {
+const submit = (format) => {
   if (!validate()) return;
 
   const query = new URLSearchParams();
@@ -83,6 +84,8 @@ const submit = () => {
     query.append("start_date", form.start_date);
     query.append("end_date", form.end_date);
   }
+
+  query.append("format", format);
 
   const base_url = route("admin.report." + form.report_type);
 
@@ -173,17 +176,8 @@ function updateState() {
   if (["client-actual-inventory"].includes(form.report_type)) {
     filter_options.show_user = true;
     filter_options.show_product = true;
+    filter_options.show_download_excel = true;
   }
-  // else if ([
-  // ].includes(form.report_type)
-  // ) {
-  //   filter_options.show_period = true;
-  // }
-  // else if ([
-  //   'client-history',
-  // ].includes(form.report_type)) {
-  //   filter_options.show_period = true;
-  // }
 
   validate();
 }
@@ -294,20 +288,29 @@ watch(
             </q-card-section>
             <q-card-section class="row q-gutter-sm">
               <q-btn
-                icon="download"
-                type="submit"
-                label="Download PDF"
-                color="primary"
-                :disable="form.processing"
-                @click="submit"
-              />
-              <q-btn
                 icon="cancel"
                 type="reset"
                 label="Reset"
                 class="text-black"
                 :disable="form.processing"
                 @click="reset"
+              />
+              <q-btn
+                icon="download"
+                type="submit"
+                label="Download PDF"
+                color="primary"
+                :disable="form.processing"
+                @click="submit('pdf')"
+              />
+              <q-btn
+                v-if="filter_options.show_download_excel"
+                icon="csv"
+                type="submit"
+                label="Download Excel"
+                color="primary"
+                :disable="form.processing"
+                @click="submit('excel')"
               />
             </q-card-section>
           </q-card>

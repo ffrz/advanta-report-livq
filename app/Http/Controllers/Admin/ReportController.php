@@ -14,6 +14,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
@@ -183,8 +186,8 @@ class ReportController extends Controller
                 ->orderBy('products.name', 'asc')
                 ->get();
 
+            $format = $request->get('format', 'pdf');
             [$title, $user] = $this->resolveTitle('Laporan Demo Plot Baru', $user_id);
-
             return $this->generatePdfReport('report.new-demo-plot-detail', 'landscape', compact(
                 'items',
                 'title',
@@ -251,13 +254,59 @@ class ReportController extends Controller
             ->get();
 
         [$title, $user, $product] = $this->resolveTitle('Laporan Inventori Aktual', $userId, $productId);
+        $format = $request->get('format', 'pdf');
 
-        return $this->generatePdfReport('report.client-actual-inventory', 'landscape', compact(
-            'items',
-            'title',
-            'user',
-            'product',
-        ));
+        if ($format === 'pdf') {
+            return $this->generatePdfReport('report.client-actual-inventory', 'landscape', compact(
+                'items',
+                'title',
+                'user',
+                'product',
+            ));
+        } else if ($format === 'excel') {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Tambahkan header
+            $sheet->setCellValue('A1', 'Area');
+            $sheet->setCellValue('B1', 'Crops');
+            $sheet->setCellValue('C1', 'Checker');
+            $sheet->setCellValue('D1', 'Kiosk/Distributor');
+            $sheet->setCellValue('E1', 'Hybrid');
+            $sheet->setCellValue('F1', 'Check Date');
+            $sheet->setCellValue('G1', 'Lot Package');
+            $sheet->setCellValue('H1', 'Qty');
+
+            // Tambahkan data ke Excel
+            $row = 2;
+            foreach ($items as $num => $item) {
+                $sheet->setCellValue('A' . $row, $item->area);
+                $sheet->setCellValue('B' . $row, $item->product->category->name);
+                $sheet->setCellValue('C' . $row, $item->user->name);
+                $sheet->setCellValue('D' . $row, $item->customer->name);
+                $sheet->setCellValue('E' . $row, $item->product->name);
+                $sheet->setCellValue('F' . $row, format_date($item->check_date));
+                $sheet->setCellValue('G' . $row, $item->lot_package);
+                $sheet->setCellValue('H' . $row, $item->quantity);
+                $row++;
+            }
+
+            // Kirim ke memori tanpa menyimpan file
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
+
+            $filename = $title . ' - ' . env('APP_NAME') . Carbon::now()->format('dmY_His');
+
+            // Atur header response untuk download
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
+
+            return $response;
+        }
+
+        abort(400, "Unknown format $format.");
     }
 
     protected function resolveTitle(string $baseTitle, $user_id, $product_id = 'all'): array
@@ -303,11 +352,6 @@ class ReportController extends Controller
             return view($view, $data);
         }
 
-        throw new Exception('Unknown response type!');
-    }
-
-    public function generateExcelReport($header, $data)
-    {
         throw new Exception('Unknown response type!');
     }
 }
