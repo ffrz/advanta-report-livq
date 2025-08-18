@@ -8,7 +8,7 @@
       <tr>
         <th>Area</th>
         <th>Crops</th>
-        <th>Cehcker</th>
+        <th>Checker</th>
         <th>Kiosk / Distributor</th>
         <th>Hybrid</th>
         <th>Check Date</th>
