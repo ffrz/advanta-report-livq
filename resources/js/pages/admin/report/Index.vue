@@ -13,6 +13,7 @@ const form = useApiForm({
   user_id: "all",
   product_id: "all",
   period: "this_month",
+  plant_statuses: [],
   start_date: dayjs().format("YYYY-MM-DD"),
   end_date: dayjs().format("YYYY-MM-DD"),
 });
@@ -22,6 +23,7 @@ const filter_options = reactive({
   show_product: false,
   show_period: false,
   show_download_excel: false,
+  showPlantStatus: false,
 });
 
 const report_types = [
@@ -64,6 +66,15 @@ const users = [
   })),
 ];
 
+const plantStatusOptions = [
+  ...Object.entries(window.CONSTANTS.DEMO_PLOT_PLANT_STATUSES).map(
+    ([key, value]) => ({
+      value: key,
+      label: value,
+    })
+  ),
+];
+
 const submit = (format) => {
   if (!validate()) return;
 
@@ -78,6 +89,10 @@ const submit = (format) => {
 
   if (filter_options.show_product) {
     query.append("product_id", form.product_id);
+  }
+
+  if (filter_options.showPlantStatus) {
+    query.append("plant_statuses", form.plant_statuses);
   }
 
   if (form.period == "custom") {
@@ -159,8 +174,12 @@ function updateState() {
 
   if (["demo-plot-detail", "demo-plot-with-photo"].includes(form.report_type)) {
     filter_options.show_user = true;
-    // filter_options.show_product = true;
   }
+
+  if (["new-demo-plot-detail"].includes(form.report_type)) {
+    filter_options.showPlantStatus = true;
+  }
+
   if (
     [
       "new-demo-plot-detail",
@@ -254,6 +273,19 @@ watch(
                 emit-value
                 :error="!!form.errors.period"
                 :disable="form.processing"
+              />
+              <q-select
+                v-if="filter_options.showPlantStatus"
+                v-model="form.plant_statuses"
+                label="Status Tanaman"
+                :options="plantStatusOptions"
+                map-options
+                emit-value
+                :error="!!form.errors.plant_statuses"
+                :disable="form.processing"
+                :error-message="form.errors.plant_statuses"
+                multiple
+                use-chips
               />
               <div class="row q-gutter-md" v-if="form.period == 'custom'">
                 <div class="col">
