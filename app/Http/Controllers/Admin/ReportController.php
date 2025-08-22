@@ -214,7 +214,7 @@ class ReportController extends Controller
                 'subtitles',
                 'start_date',
                 'end_date',
-            ), 'html');
+            ));
         }
     }
 
