@@ -5,6 +5,7 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
+import useTableHeight from "@/composables/useTableHeight";
 
 const title = "Jenis Kegiatan";
 const storage = usePageStorage("activity-type");
@@ -12,6 +13,10 @@ const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
+
 const statuses = [
   { value: "all", label: "Semua" },
   { value: "active", label: "Aktif" },
@@ -78,6 +83,7 @@ const fetchItems = (props = null) => {
     rows,
     url: route("admin.activity-type.data"),
     loading,
+    tableRef,
   });
 };
 
@@ -119,7 +125,7 @@ watch(filter, () => storage.set("filter", filter), {
       />
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             v-model="filter.status"
@@ -151,6 +157,9 @@ watch(filter, () => storage.set("filter", filter), {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square

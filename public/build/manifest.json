@@ -103,12 +103,12 @@
     "src": "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-B-zRk8ZN.css",
+    "file": "assets/app-D6N-QJqv.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-C-vFYFmD.js",
+    "file": "assets/app-BLdVTlvV.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

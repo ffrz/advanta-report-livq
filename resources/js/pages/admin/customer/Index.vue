@@ -5,6 +5,7 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
+import useTableHeight from "@/composables/useTableHeight";
 
 const storage = usePageStorage("customer");
 const title = "Client";
@@ -12,6 +13,9 @@ const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
 
 const filter = reactive(
   storage.get("filter", {
@@ -85,6 +89,7 @@ const fetchItems = (props = null) => {
     rows,
     url: route("admin.customer.data"),
     loading,
+    tableRef,
   });
 };
 
@@ -166,7 +171,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
       </q-btn>
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             class="custom-select col-xs-12 col-sm-2"
@@ -210,6 +215,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square

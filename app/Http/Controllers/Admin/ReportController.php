@@ -191,8 +191,7 @@ class ReportController extends Controller
                     $statusLabels[] = DemoPlot::PlantStatuses[$statusKey];
                 }
                 $plantStatusSubtitle .= implode(', ', $statusLabels);
-            }
-            else {
+            } else {
                 $plantStatusSubtitle .= 'Semua';
             }
 

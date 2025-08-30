@@ -7,6 +7,7 @@ import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import ActivityTable from "@/components/ActivityTable.vue";
 import { calculateQuarterActivityProgress } from "@/composables/useCalculateActivityProgress";
+import useTableHeight from "@/composables/useTableHeight";
 
 const page = usePage();
 const storage = usePageStorage("activity-target");
@@ -16,6 +17,9 @@ const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
 const currentYear = new Date().getFullYear();
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
 
 const filter = reactive(
   storage.get("filter", {
@@ -96,6 +100,7 @@ const fetchItems = (props = null) =>
     rows,
     url: route("admin.activity-target.data"),
     loading,
+    tableRef,
   });
 
 const onFilterChange = () => fetchItems();
@@ -202,7 +207,7 @@ const exportPdf = () => {
       </q-btn>
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             class="custom-select col-xs-12 col-sm-2"
@@ -260,6 +265,9 @@ const exportPdf = () => {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square

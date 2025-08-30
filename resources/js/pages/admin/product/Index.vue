@@ -6,6 +6,7 @@ import { getQueryParams, formatNumber } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import { useProductCategoryFilter } from "@/helpers/useProductCategoryFilter";
 import { usePageStorage } from "@/helpers/usePageStorage";
+import useTableHeight from "@/composables/useTableHeight";
 
 const page = usePage();
 const storage = usePageStorage("product");
@@ -20,6 +21,10 @@ const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
+
 const filter = reactive(
   storage.get("filter", {
     status: "all",
@@ -105,6 +110,7 @@ const fetchItems = (props = null) => {
     rows,
     url: route("admin.product.data"),
     loading,
+    tableRef,
   });
 };
 
@@ -194,7 +200,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
       </q-btn>
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             v-model="filter.status"
@@ -239,6 +245,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square
