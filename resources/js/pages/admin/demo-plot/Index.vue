@@ -246,7 +246,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
       <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.status"
             :options="statuses"
@@ -258,7 +258,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             @update:model-value="onFilterChange"
           />
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.plant_status"
             :options="plant_statuses"
@@ -283,7 +283,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             @update:model-value="onFilterChange"
           />
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.product_id"
             :options="products"

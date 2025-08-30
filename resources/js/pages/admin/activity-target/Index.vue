@@ -210,7 +210,7 @@ const exportPdf = () => {
       <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 120px"
             v-model="filter.year"
             :options="years"
@@ -223,7 +223,7 @@ const exportPdf = () => {
           />
 
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 120px"
             v-model="filter.quarter"
             :options="quarters"

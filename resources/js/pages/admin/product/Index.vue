@@ -204,7 +204,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             v-model="filter.status"
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             :options="statuses"
             label="Status"
             dense
@@ -217,7 +217,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
           <q-select
             v-model="filter.category_id"
             label="Kategori"
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             outlined
             input-debounce="300"
             :options="filteredCategories"

@@ -8,7 +8,13 @@ import RecentCustomersCard from "./cards/RecentCustomersCard.vue";
 import { router, usePage } from "@inertiajs/vue3";
 
 import { reactive, ref } from "vue";
-import { create_month_options, current_month, current_quarter, current_year, getQueryParams } from "@/helpers/utils";
+import {
+  create_month_options,
+  current_month,
+  current_quarter,
+  current_year,
+  getQueryParams,
+} from "@/helpers/utils";
 import BsTargetCard from "./cards/BsTargetCard.vue";
 import { usePageStorage } from "@/helpers/usePageStorage";
 
@@ -34,7 +40,6 @@ const months = create_month_options();
 const onFilterChange = () => {
   router.visit(route("admin.dashboard", filter));
 };
-
 </script>
 
 <template>
@@ -54,7 +59,7 @@ const onFilterChange = () => {
       <q-toolbar class="filter-bar">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
-            class="custom-select col-xs-12 col-sm-6"
+            class="custom-select col-xs-6 col-sm-6"
             style="min-width: 120px"
             v-model="filter.year"
             :options="years"
@@ -66,7 +71,7 @@ const onFilterChange = () => {
             @update:model-value="onFilterChange"
           />
           <q-select
-            class="custom-select col-xs-12 col-sm-6"
+            class="custom-select col-xs-6 col-sm-6"
             style="min-width: 120px"
             v-model="filter.month"
             :options="months"

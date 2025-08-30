@@ -177,7 +177,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             v-model="filter.role"
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             :options="roles"
             label="Role"
             dense
@@ -189,7 +189,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
           />
           <q-select
             v-model="filter.status"
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             :options="statuses"
             label="Status"
             dense

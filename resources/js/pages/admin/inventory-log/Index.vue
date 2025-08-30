@@ -232,18 +232,6 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
           />
           <q-select
             class="custom-select col-xs-12 col-sm-2"
-            style="min-width: 150px"
-            v-model="filter.product_id"
-            :options="productOptions"
-            label="Varietas"
-            dense
-            map-options
-            emit-value
-            outlined
-            @update:model-value="onFilterChange"
-          />
-          <q-select
-            class="custom-select col-xs-12 col-sm-2"
             v-model="filter.customer_id"
             style="min-width: 150px"
             label="Client"
@@ -264,6 +252,18 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
               </q-item>
             </template>
           </q-select>
+          <q-select
+            class="custom-select col-xs-6 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.product_id"
+            :options="productOptions"
+            label="Varietas"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
           <q-input
             class="col"
             outlined
