@@ -55,7 +55,7 @@ const updateBreakdown = () => {
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <q-page class="row justify-center">
-      <div class="col col-lg-6 q-pa-sm">
+      <div class="col col-md-6 q-pa-sm">
         <q-form
           class="row"
           @submit.prevent="submit"
@@ -75,6 +75,7 @@ const updateBreakdown = () => {
                 :rules="[
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]"
+                hide-bottom-space
               />
               <q-input
                 autofocus
@@ -84,7 +85,7 @@ const updateBreakdown = () => {
                 :error="!!form.errors.description"
                 :disable="form.processing"
                 :error-message="form.errors.description"
-                :rules="[]"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.default_quarter_target"
@@ -94,6 +95,7 @@ const updateBreakdown = () => {
                 :error="!!form.errors.default_quarter_target"
                 :errorMessage="form.errors.default_quarter_target"
                 @change="updateBreakdown()"
+                hide-bottom-space
               />
               <div class="text-subtitile2 text-bold text-grey-6">
                 Default Target (Monthly Breakdown)
@@ -107,6 +109,7 @@ const updateBreakdown = () => {
                   :disable="form.processing"
                   :error="!!form.errors.default_month1_target"
                   :errorMessage="form.errors.default_month1_target"
+                  hide-bottom-space
                 />
                 <LocaleNumberInput
                   class="col"
@@ -116,6 +119,7 @@ const updateBreakdown = () => {
                   :disable="form.processing"
                   :error="!!form.errors.default_month2_target"
                   :errorMessage="form.errors.default_month2_target"
+                  hide-bottom-space
                 />
                 <LocaleNumberInput
                   class="col"
@@ -125,6 +129,7 @@ const updateBreakdown = () => {
                   :disable="form.processing"
                   :error="!!form.errors.default_month3_target"
                   :errorMessage="form.errors.default_month3_target"
+                  hide-bottom-space
                 />
               </div>
               <LocaleNumberInput
@@ -134,6 +139,7 @@ const updateBreakdown = () => {
                 :disable="form.processing"
                 :error="!!form.errors.weight"
                 :errorMessage="form.errors.weight"
+                hide-bottom-space
               />
               <div style="margin-left: -10px">
                 <q-checkbox

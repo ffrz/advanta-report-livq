@@ -33,7 +33,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <q-page class="row justify-center">
-      <div class="col col-lg-6 q-pa-sm">
+      <div class="col col-md-6 q-pa-sm">
         <q-form
           class="row"
           @submit.prevent="submit"
@@ -52,6 +52,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 :rules="[
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.category_id"
@@ -67,6 +68,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 option-value="value"
                 :error="!!form.errors.category_id"
                 :disable="form.processing"
+                hide-bottom-space
               >
                 <template v-slot:no-option>
                   <q-item>
@@ -81,6 +83,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 :error="!!form.errors.uom"
                 :disable="form.processing"
                 :error-message="form.errors.uom_1"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.uom_2"
@@ -89,6 +92,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 :error="!!form.errors.uom"
                 :disable="form.processing"
                 :error-message="form.errors.uom_2"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.price_1"
@@ -97,6 +101,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 :disable="form.processing"
                 :error="!!form.errors.price_1"
                 :errorMessage="form.errors.price_1"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.price_2"
@@ -105,6 +110,7 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 :disable="form.processing"
                 :error="!!form.errors.price_2"
                 :errorMessage="form.errors.price_2"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.weight"
@@ -113,10 +119,11 @@ const { filteredCategories, filterCategories } = useProductCategoryFilter(
                 :disable="form.processing"
                 :error="!!form.errors.weight"
                 :errorMessage="form.errors.weight"
+                hide-bottom-space
               />
               <div style="margin-left: -10px">
                 <q-checkbox
-                  class="full-width q-pl-none"
+                  class="full-width q-pl-none q-pb-none"
                   v-model="form.active"
                   :disable="form.processing"
                   label="Aktif"

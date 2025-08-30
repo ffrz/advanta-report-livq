@@ -62,6 +62,7 @@ const submit = () => handleSubmit({ form, url: route("admin.customer.save") });
                 :rules="[
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.type"
@@ -73,6 +74,7 @@ const submit = () => handleSubmit({ form, url: route("admin.customer.save") });
                 :disable="form.processing"
                 :error-message="form.errors.type"
                 :rules="[(val) => !!val || 'Jenis harus dipilih']"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.phone"
@@ -82,30 +84,33 @@ const submit = () => handleSubmit({ form, url: route("admin.customer.save") });
                 :disable="form.processing"
                 :error="!!form.errors.phone"
                 :error-message="form.errors.phone"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.address"
                 type="textarea"
                 autogrow
                 counter
-                maxlength="1000"
+                maxlength="500"
                 label="Alamat"
                 lazy-rules
                 :disable="form.processing"
                 :error="!!form.errors.address"
                 :error-message="form.address"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.shipping_address"
                 type="textarea"
                 autogrow
                 counter
-                maxlength="1000"
+                maxlength="500"
                 label="Alamat Pengiriman"
                 lazy-rules
                 :disable="form.processing"
                 :error="!!form.errors.shipping_address"
                 :error-message="form.shipping_address"
+                hide-bottom-space
               />
               <q-select
                 v-if="
@@ -119,6 +124,7 @@ const submit = () => handleSubmit({ form, url: route("admin.customer.save") });
                 emit-value
                 :error="!!form.errors.assigned_user_id"
                 :disable="form.processing"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -131,6 +137,7 @@ const submit = () => handleSubmit({ form, url: route("admin.customer.save") });
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
+                hide-bottom-space
               />
               <div style="margin-left: -10px">
                 <q-checkbox

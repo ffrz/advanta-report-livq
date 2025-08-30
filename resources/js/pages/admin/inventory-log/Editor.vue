@@ -55,7 +55,7 @@ const updateQuantity = () => {
   <authenticated-layout>
     <template #title>{{ title }}</template>
     <q-page class="row justify-center">
-      <div class="col col-lg-6 q-pa-sm">
+      <div class="col col-md-6 q-pa-sm">
         <q-form class="row" @submit.prevent="submit">
           <q-card square flat bordered class="col">
             <q-card-section class="q-pt-md">
@@ -66,6 +66,7 @@ const updateQuantity = () => {
                 :error="!!form.errors.check_date"
                 :disable="form.processing"
                 :error-message="form.errors.check_date"
+                hide-bottom-space
               />
               <q-select
                 v-if="page.props.auth.user.role == 'admin'"
@@ -78,6 +79,7 @@ const updateQuantity = () => {
                 :error="!!form.errors.user_id"
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.area"
@@ -90,6 +92,7 @@ const updateQuantity = () => {
                 :error="!!form.errors.area"
                 :disable="form.processing"
                 :error-message="form.errors.area"
+                hide-bottom-space
               >
                 <template v-slot:no-option>
                   <q-item>
@@ -110,6 +113,7 @@ const updateQuantity = () => {
                 :error="!!form.errors.product_id"
                 :disable="form.processing"
                 :error-message="form.errors.product_id"
+                hide-bottom-space
               >
                 <template v-slot:no-option>
                   <q-item>
@@ -130,6 +134,7 @@ const updateQuantity = () => {
                 :error="!!form.errors.customer_id"
                 :disable="form.processing"
                 :error-message="form.errors.customer_id"
+                hide-bottom-space
               >
                 <template v-slot:no-option>
                   <q-item>
@@ -144,6 +149,7 @@ const updateQuantity = () => {
                 :disable="form.processing"
                 :error="!!form.errors.lot_package"
                 :error-message="form.errors.lot_package"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.base_quantity"
@@ -153,6 +159,7 @@ const updateQuantity = () => {
                 :error="!!form.errors.base_quantity"
                 :errorMessage="form.errors.base_quantity"
                 @change="updateQuantity"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.quantity"
@@ -163,6 +170,7 @@ const updateQuantity = () => {
                 :disable="form.processing"
                 :error="!!form.errors.quantity"
                 :errorMessage="form.errors.quantity"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -175,6 +183,7 @@ const updateQuantity = () => {
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
+                hide-bottom-space
               />
             </q-card-section>
             <q-card-section class="q-gutter-sm">

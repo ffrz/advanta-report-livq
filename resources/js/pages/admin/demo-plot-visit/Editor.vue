@@ -141,6 +141,7 @@ function removeLocation() {
                 :error="!!form.errors.user_id"
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
+                hide-bottom-space
               />
               <date-picker
                 v-model="form.visit_date"
@@ -148,6 +149,7 @@ function removeLocation() {
                 :error="!!form.errors.visit_date"
                 :disable="form.processing"
                 :error-message="form.errors.visit_date"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.plant_status"
@@ -158,6 +160,7 @@ function removeLocation() {
                 :error-message="form.errors.plant_status"
                 :error="!!form.errors.plant_status"
                 :disable="form.processing"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -170,7 +173,7 @@ function removeLocation() {
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
-                :rules="[]"
+                hide-bottom-space
               />
               <div class="q-pt-md">
                 <div class="text-subtitle2 text-bold text-grey-9">Foto:</div>

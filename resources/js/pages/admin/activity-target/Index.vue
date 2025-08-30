@@ -221,7 +221,6 @@ const exportPdf = () => {
             outlined
             @update:model-value="onFilterChange"
           />
-
           <q-select
             class="custom-select col-xs-6 col-sm-2"
             style="min-width: 120px"

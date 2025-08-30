@@ -75,6 +75,7 @@ const submit = () => handleSubmit({ form, url: route("admin.user.save") });
                 :rules="[
                   (val) => (val && val.length > 0) || 'Nama harus diisi.',
                 ]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.username"
@@ -89,6 +90,7 @@ const submit = () => handleSubmit({ form, url: route("admin.user.save") });
                     (val && val.length > 0) || 'ID Pengguna harus diisi.',
                   (val) => validateUsername(val) || 'ID Pengguna tidak valid.',
                 ]"
+                hide-bottom-space
               />
               <q-input
                 v-model="form.password"
@@ -98,6 +100,7 @@ const submit = () => handleSubmit({ form, url: route("admin.user.save") });
                 :disable="form.processing"
                 :error="!!form.errors.password"
                 :error-message="form.errors.password"
+                hide-bottom-space
               />
               <p v-if="form.id" class="text-subtitle text-grey-8 q-pt-none">
                 Isi jika ingin mengatur ulang sandi.
@@ -114,6 +117,7 @@ const submit = () => handleSubmit({ form, url: route("admin.user.save") });
                 transition-hide="jump-up"
                 :error="!!form.errors.role"
                 :error-message="form.errors.role"
+                hide-bottom-space
               >
               </q-select>
               <q-select
@@ -124,6 +128,7 @@ const submit = () => handleSubmit({ form, url: route("admin.user.save") });
                 emit-value
                 :error="!!form.errors.parent_id"
                 :disable="form.processing"
+                hide-bottom-space
               />
               <q-input
                 v-model="form.work_area"
@@ -133,6 +138,7 @@ const submit = () => handleSubmit({ form, url: route("admin.user.save") });
                 :disable="form.processing"
                 :error="!!form.errors.work_area"
                 :error-message="form.errors.work_area"
+                hide-bottom-space
               />
               <div style="margin-left: -10px">
                 <q-checkbox

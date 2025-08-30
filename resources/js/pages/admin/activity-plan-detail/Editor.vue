@@ -64,6 +64,7 @@ const submit = () =>
                 :disable="form.processing"
                 :error-message="form.errors.type_id"
                 :rules="[(val) => (val && val > 0) || 'Pilih kegiatan.']"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.product_id"
@@ -74,6 +75,7 @@ const submit = () =>
                 :error="!!form.errors.product_id"
                 :disable="form.processing"
                 :error-message="form.errors.product_id"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.location"
@@ -84,7 +86,7 @@ const submit = () =>
                 :disable="form.processing"
                 :error="!!form.errors.location"
                 :error-message="form.errors.location"
-                :rules="[]"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.cost"
@@ -93,7 +95,7 @@ const submit = () =>
                 :disable="form.processing"
                 :error="!!form.errors.cost"
                 :errorMessage="form.errors.cost"
-                :rules="[]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -106,7 +108,7 @@ const submit = () =>
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
-                :rules="[]"
+                hide-bottom-space
               />
             </q-card-section>
             <q-card-section class="q-gutter-sm">

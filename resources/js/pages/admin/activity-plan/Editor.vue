@@ -89,6 +89,7 @@ onMounted(() => {
                 :error="!!form.errors.user_id"
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.year"
@@ -99,6 +100,7 @@ onMounted(() => {
                 :error="!!form.errors.year"
                 :disable="form.processing"
                 :error-message="form.errors.year"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.month"
@@ -109,6 +111,7 @@ onMounted(() => {
                 :error="!!form.errors.month"
                 :disable="form.processing"
                 :error-message="form.errors.month"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.total_cost"
@@ -118,7 +121,7 @@ onMounted(() => {
                 :disable="form.processing"
                 :error="!!form.errors.total_cost"
                 :errorMessage="form.errors.total_cost"
-                :rules="[]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -131,7 +134,7 @@ onMounted(() => {
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
-                :rules="[]"
+                hide-bottom-space
               />
             </q-card-section>
             <q-card-section class="q-gutter-sm">

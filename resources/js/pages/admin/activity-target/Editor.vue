@@ -106,6 +106,7 @@ function getQuarterError(typeId) {
                 :error="!!form.errors.user_id"
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.quarter"
@@ -116,13 +117,14 @@ function getQuarterError(typeId) {
                 :error="!!form.errors.quarter"
                 :disable="form.processing"
                 :error-message="form.errors.quarter"
+                hide-bottom-space
               />
               <div
                 v-for="(type, index) in types"
                 :key="type.id || index"
-                class="q-mb-md"
+                class="q-mb-sm"
               >
-                <div class="text-subtitle2 q-mb-xs">
+                <div class="text-subtitle2 q-mb-xs q-mt-sm">
                   {{ `Target ${type.label}` }}
                 </div>
                 <div class="row q-col-gutter-sm">
@@ -134,6 +136,7 @@ function getQuarterError(typeId) {
                       dense
                       outlined
                       :disable="form.processing"
+                      hide-bottom-space
                     />
                   </div>
                   <div class="col-3">
@@ -144,6 +147,7 @@ function getQuarterError(typeId) {
                       dense
                       outlined
                       :disable="form.processing"
+                      hide-bottom-space
                     />
                   </div>
                   <div class="col-3">
@@ -154,6 +158,7 @@ function getQuarterError(typeId) {
                       dense
                       outlined
                       :disable="form.processing"
+                      hide-bottom-space
                     />
                   </div>
                   <div class="col-3">
@@ -164,6 +169,7 @@ function getQuarterError(typeId) {
                       dense
                       outlined
                       :disable="form.processing"
+                      hide-bottom-space
                     />
                   </div>
                 </div>
@@ -186,7 +192,7 @@ function getQuarterError(typeId) {
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
-                :rules="[]"
+                hide-bottom-space
               />
             </q-card-section>
             <q-card-section class="q-gutter-sm">
