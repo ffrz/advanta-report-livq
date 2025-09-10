@@ -78,6 +78,7 @@ class ActivityPlanDetailController extends Controller
             'cost'       => 'nullable|numeric',
             'location'   => 'nullable|string|max:100',
             'notes'      => 'nullable|string|max:500',
+            'date'       => 'nullable',
         ]);
 
         $item = !$request->id
@@ -89,6 +90,7 @@ class ActivityPlanDetailController extends Controller
         DB::beginTransaction();
         $validated['cost'] = !empty($validated['cost']) ? $validated['cost'] : 0;
         $validated['location'] = !empty($validated['location']) ? $validated['location'] : '';
+        $validated['date'] = !empty($validated['date']) ? $validated['date'] : '';
         $item->fill($validated);
         $item->save();
 

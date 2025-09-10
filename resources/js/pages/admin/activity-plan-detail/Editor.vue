@@ -24,6 +24,7 @@ const form = useForm({
     ? Number(page.props.data.product_id)
     : null,
   type_id: page.props.data.type_id ? Number(page.props.data.type_id) : null,
+  date: dayjs(page.props.data.date).format("YYYY-MM-DD"),
   cost: Number(page.props.data.cost),
   location: page.props.data.location,
   notes: page.props.data.notes,

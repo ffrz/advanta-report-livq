@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->constrained('activity_plans')->cascadeOnDelete();
             $table->foreignId('type_id')->nullable()->constrained('activity_types')->restrictOnDelete();
             $table->foreignId('product_id')->nullable()->constrained('products')->restrictOnDelete();
+            $table->date('date')->nullable(true)->default(null);
             $table->decimal('cost', 10, 2)->default(0);
             $table->string('location', 500)->nullable();
             $table->text('notes')->nullable();

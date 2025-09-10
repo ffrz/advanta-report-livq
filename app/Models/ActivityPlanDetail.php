@@ -13,6 +13,7 @@ class ActivityPlanDetail extends Model
         'type_id',
         'product_id',
         'cost',
+        'date',
         'location',
         'notes',
     ];
@@ -22,6 +23,7 @@ class ActivityPlanDetail extends Model
         'type_id' => 'integer',
         'product_id' => 'integer',
         'cost' => 'float',
+        'date' => 'date',
         'created_by_uid' => 'integer',
         'updated_by_uid' => 'integer',
     ];
