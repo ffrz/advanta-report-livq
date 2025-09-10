@@ -402,11 +402,12 @@ onMounted(() => {
           </q-item>
 
           <div class="absolute-bottom text-grey-6 q-pa-md">
-            &copy; 2025 -
-            {{ $config.APP_NAME + " v" + $config.APP_VERSION_STR }}
             <div>
-              Developed by
-              <a href="https://shiftech.my.id">Shiftech </a>
+              {{ $config.APP_NAME + " v" + $config.APP_VERSION_STR }}
+            </div>
+            <div class="q-mt-xs">
+              &copy;2025
+              <a href="https://shiftech.my.id">Shiftech Indonesia</a>
             </div>
           </div>
         </q-list>

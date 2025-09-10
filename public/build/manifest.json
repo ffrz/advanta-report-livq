@@ -103,12 +103,12 @@
     "src": "node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-B-zRk8ZN.css",
+    "file": "assets/app-D6N-QJqv.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BTpO-fu2.js",
+    "file": "assets/app-BQQx_wJc.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -118,7 +118,7 @@
       "_vendor3-7kC9Vpik.js"
     ],
     "css": [
-      "assets/app-58cXsF2X.css"
+      "assets/app-RFZPbQay.css"
     ],
     "assets": [
       "assets/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ-D-x-0Q06.woff2",
