@@ -89,6 +89,7 @@ const columns = [
   },
   { name: "type", label: "Jenis Kegiatan", field: "type", align: "left" },
   { name: "bs", label: "BS", field: "bs", align: "left" },
+  { name: "product", label: "Varietas", field: "product", align: "left" },
   { name: "location", label: "Lokasi", field: "location", align: "left" },
   { name: "cost", label: "Biaya (Rp)", field: "cost", align: "right" },
   { name: "status", label: "Status", field: "status", align: "left" },
@@ -415,7 +416,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
                   <q-icon name="person" />
                   {{ props.row.user.name }} ({{ props.row.user.username }})
                 </div>
-                <div v-if="props.row.product_id">
+                <div v-if="props.row.product">
                   <q-icon name="potted_plant" />
                   {{ props.row.product.name }}
                 </div>
@@ -460,6 +461,9 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             </q-td>
             <q-td key="bs" :props="props">
               {{ props.row.user.name }} ({{ props.row.user.username }})
+            </q-td>
+            <q-td key="product" :props="props">
+              {{ props.row.product ? props.row.product.name : "" }}
             </q-td>
             <q-td key="location" :props="props">
               {{ props.row.location }}

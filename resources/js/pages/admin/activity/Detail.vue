@@ -1,11 +1,9 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
 import MainInfo from "./partial/MainInfo.vue";
 
 const page = usePage();
 const title = "Rincian Kegiatan";
-const tab = ref("main");
 </script>
 
 <template>

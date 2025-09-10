@@ -30,6 +30,9 @@ const form = useForm({
   id: page.props.data.id,
   user_id: page.props.data.user_id ? Number(page.props.data.user_id) : null,
   type_id: page.props.data.type_id ? Number(page.props.data.type_id) : null,
+  product_id: page.props.data.product_id
+    ? Number(page.props.data.product_id)
+    : null,
   date: dayjs(page.props.data.date).format("YYYY-MM-DD"),
   notes: page.props.data.notes,
   cost: page.props.data.cost ? Number(page.props.data.cost) : 0,

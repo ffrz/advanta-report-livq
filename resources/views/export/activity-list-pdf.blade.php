@@ -10,6 +10,7 @@
         <th>Tanggal</th>
         <th>Jenis</th>
         <th>BS</th>
+        <th>Varietas</th>
         <th>Lokasi</th>
         <th>Biaya (Rp)</th>
         <th>Status</th>
@@ -23,6 +24,7 @@
           <td>{{ \Carbon\Carbon::parse($item->date)->format('d F Y') }}</td>
           <td>{{ $item->type->name }}</td>
           <td>{{ $item->user->name }}</td>
+          <td>{{ $item->product ? $item->product->name : '' }}</td>
           <td>{{ $item->location }}</td>
           <td align="right">{{ format_number($item->cost) }}</td>
           <td>{{ \App\Models\Activity::Statuses[$item->status] }}</td>

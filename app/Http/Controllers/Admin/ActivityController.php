@@ -179,6 +179,7 @@ class ActivityController extends Controller
         $validated['location'] = $validated['location'] ? $validated['location'] : '';
         $validated['latlong'] = $validated['latlong'] ? $validated['latlong'] : '';
         $validated['notes'] = $validated['notes'] ? $validated['notes'] : '';
+        $validated['product_id'] = $validated['product_id'] ? $validated['product_id'] : null;
 
         $item->fill($validated);
         $item->save();
@@ -262,10 +263,11 @@ class ActivityController extends Controller
             $sheet->setCellValue('B1', 'Tanggal');
             $sheet->setCellValue('C1', 'Jenis');
             $sheet->setCellValue('D1', 'BS');
-            $sheet->setCellValue('E1', 'Lokasi');
-            $sheet->setCellValue('F1', 'Biaya (Rp)');
-            $sheet->setCellValue('G1', 'Status');
-            $sheet->setCellValue('H1', 'Catatan');
+            $sheet->setCellValue('E1', 'Varietas');
+            $sheet->setCellValue('F1', 'Lokasi');
+            $sheet->setCellValue('G1', 'Biaya (Rp)');
+            $sheet->setCellValue('H1', 'Status');
+            $sheet->setCellValue('I1', 'Catatan');
 
             // Tambahkan data ke Excel
             $row = 2;
@@ -274,10 +276,11 @@ class ActivityController extends Controller
                 $sheet->setCellValue('B' . $row, $item->date);
                 $sheet->setCellValue('C' . $row, $item->type->name);
                 $sheet->setCellValue('D' . $row, $item->user->name);
-                $sheet->setCellValue('E' . $row, $item->location);
-                $sheet->setCellValue('F' . $row, $item->cost);
-                $sheet->setCellValue('G' . $row, Activity::Statuses[$item->status]);
-                $sheet->setCellValue('H' . $row, $item->notes);
+                $sheet->setCellValue('E' . $row, $item->product ? $item->product->name : '');
+                $sheet->setCellValue('F' . $row, $item->location);
+                $sheet->setCellValue('G' . $row, $item->cost);
+                $sheet->setCellValue('H' . $row, Activity::Statuses[$item->status]);
+                $sheet->setCellValue('I' . $row, $item->notes);
                 $row++;
             }
 
@@ -304,9 +307,11 @@ class ActivityController extends Controller
         $q = Activity::select('activities.*')
             ->join('users', 'users.id', '=', 'activities.user_id')
             ->join('activity_types', 'activity_types.id', '=', 'activities.type_id')
+            ->leftJoin('products', 'products.id', '=', 'activities.product_id')
             ->with([
                 'user:id,username,name',
                 'responded_by:id,username,name',
+                'product:id,name',
                 'type:id,name',
             ]);
 
