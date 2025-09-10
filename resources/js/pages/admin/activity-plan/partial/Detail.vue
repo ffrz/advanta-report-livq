@@ -4,6 +4,7 @@ import { router, usePage } from "@inertiajs/vue3";
 import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { formatNumber, getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
+import { formatDate } from "@/helpers/datetime";
 
 const $q = useQuasar();
 const rows = ref([]);
@@ -22,6 +23,13 @@ const pagination = ref({
 });
 
 const columns = [
+  {
+    name: "date",
+    label: "Tanggal",
+    field: "date",
+    align: "left",
+    sortable: true,
+  },
   {
     name: "location",
     label: "Lokasi",
@@ -75,9 +83,6 @@ const fetchItems = (props = null) =>
     }),
     loading,
   });
-
-const onRowClicked = (row) =>
-  router.get(route("admin.activity-plan-detail.detail", { id: row.id }));
 
 const computedColumns = computed(() =>
   $q.screen.gt.sm
@@ -138,14 +143,19 @@ const computedColumns = computed(() =>
         <q-tr
           :props="props"
           :class="props.row.active == 'inactive' ? 'bg-red-1' : ''"
-          class="cursor-pointer"
-          @click="onRowClicked(props.row)"
         >
+          <q-td key="date" :props="props">
+            {{ props.row.date ? formatDate(props.row.date) : "-" }}
+          </q-td>
           <q-td key="location" :props="props">
             <template v-if="!$q.screen.lt.md">
               {{ props.row.location }}
             </template>
             <template v-else>
+              <div v-if="props.row.date">
+                <q-icon name="calendar_clock" />
+                {{ props.row.date ? formatDate(props.row.date) : "-" }}
+              </div>
               <div><q-icon name="home_pin" /> {{ props.row.location }}</div>
               <div>
                 <q-icon name="event_upcoming" /> {{ props.row.type.name }}

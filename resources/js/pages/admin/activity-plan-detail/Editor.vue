@@ -3,6 +3,8 @@ import { useForm, usePage } from "@inertiajs/vue3";
 import { handleSubmit } from "@/helpers/client-req-handler";
 import { scrollToFirstErrorField } from "@/helpers/utils";
 import LocaleNumberInput from "@/components/LocaleNumberInput.vue";
+import dayjs from "dayjs";
+import DatePicker from "@/components/DatePicker.vue";
 
 const page = usePage();
 const title = (!!page.props.data.id ? "Edit" : "Tambah") + " Rincian Plan";
@@ -55,6 +57,13 @@ const submit = () =>
             <q-card-section class="q-pt-md">
               <input type="hidden" name="id" v-model="form.id" />
               <input type="hidden" name="parent_id" v-model="form.parent_id" />
+              <DatePicker
+                v-model="form.date"
+                label="Tanggal"
+                :error="!!form.errors.date"
+                :disable="form.processing"
+                :error-message="form.errors.date"
+              />
               <q-select
                 v-model="form.type_id"
                 label="Kegiatan"

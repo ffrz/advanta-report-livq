@@ -2,9 +2,8 @@
 import { defineComponent } from "vue";
 
 defineComponent({
-  name: 'AuthLayout'
-})
-
+  name: "AuthLayout",
+});
 </script>
 <style scoped>
 .q-toolbar a {
@@ -17,23 +16,30 @@ defineComponent({
 </style>
 
 <template>
-  <q-layout view="hHh lpR fff" style="background:#f5f5f5">
+  <q-layout view="hHh lpR fff" style="background: #f5f5f5">
     <q-header elevated class="bg-primary text-white">
-      <q-toolbar style="max-width: 980px; margin:0 auto;">
+      <q-toolbar style="max-width: 980px; margin: 0 auto">
         <q-toolbar-title align="center">
           <q-avatar>
-            <img src="/assets/img/app-logo.png">
+            <img src="/assets/img/app-logo.png" />
           </q-avatar>
-          <a class="q-pl-md text-white" :href="route('home')">{{ $config.APP_NAME }}</a>
+          <a class="q-pl-md text-white" :href="route('home')">{{
+            $config.APP_NAME
+          }}</a>
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
-    <q-page-container style="max-width: 1024px; margin:20px auto 0;">
+    <q-page-container style="max-width: 1024px; margin: 20px auto 0">
       <slot></slot>
     </q-page-container>
     <q-footer class="transparent">
       <div class="q-mt-lg q-mb-md justify-center items-center flex text-grey-6">
-        <span>&copy; 2025 - {{ $config.APP_NAME }} v{{ $config.APP_VERSION_STR }}</span>
+        <span
+          >&copy; 2025 - {{ $config.APP_NAME }} v{{
+            $config.APP_VERSION_STR
+          }}</span
+        >
+        <div>Developed by <a href="https://shiftech.my.id">Shiftech </a></div>
       </div>
     </q-footer>
   </q-layout>

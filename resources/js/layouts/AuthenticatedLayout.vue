@@ -404,6 +404,10 @@ onMounted(() => {
           <div class="absolute-bottom text-grey-6 q-pa-md">
             &copy; 2025 -
             {{ $config.APP_NAME + " v" + $config.APP_VERSION_STR }}
+            <div>
+              Developed by
+              <a href="https://shiftech.my.id">Shiftech </a>
+            </div>
           </div>
         </q-list>
       </q-scroll-area>
