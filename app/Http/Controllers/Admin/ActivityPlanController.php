@@ -223,10 +223,11 @@ class ActivityPlanController extends Controller
             $sheet->setCellValue('B1', 'Tanggal');
             $sheet->setCellValue('C1', 'Jenis');
             $sheet->setCellValue('D1', 'BS');
-            $sheet->setCellValue('E1', 'Lokasi');
-            $sheet->setCellValue('F1', 'Biaya (Rp)');
-            $sheet->setCellValue('G1', 'Status');
-            $sheet->setCellValue('H1', 'Catatan');
+            $sheet->setCellValue('E1', 'Tanggal');
+            $sheet->setCellValue('F1', 'Lokasi');
+            $sheet->setCellValue('G1', 'Biaya (Rp)');
+            $sheet->setCellValue('H1', 'Status');
+            $sheet->setCellValue('I1', 'Catatan');
 
             // Tambahkan data ke Excel
             $row = 2;
@@ -235,10 +236,11 @@ class ActivityPlanController extends Controller
                 $sheet->setCellValue('B' . $row, $detail->date);
                 $sheet->setCellValue('C' . $row, $detail->type->name);
                 $sheet->setCellValue('D' . $row, $detail->user->name);
-                $sheet->setCellValue('E' . $row, $detail->location);
-                $sheet->setCellValue('F' . $row, $detail->cost);
-                $sheet->setCellValue('G' . $row, ActivityPlan::Statuses[$detail->status]);
-                $sheet->setCellValue('H' . $row, $detail->notes);
+                $sheet->setCellValue('E' . $row, $detail->date ? format_date($detail->date) : '-');
+                $sheet->setCellValue('F' . $row, $detail->location);
+                $sheet->setCellValue('G' . $row, $detail->cost);
+                $sheet->setCellValue('H' . $row, ActivityPlan::Statuses[$detail->status]);
+                $sheet->setCellValue('I' . $row, $detail->notes);
                 $row++;
             }
 
@@ -286,10 +288,11 @@ class ActivityPlanController extends Controller
             $sheet->setCellValue('B1', 'BS');
             $sheet->setCellValue('C1', 'Kegiatan');
             $sheet->setCellValue('D1', 'Varietas');
-            $sheet->setCellValue('E1', 'Lokasi');
-            $sheet->setCellValue('F1', 'Biaya (Rp)');
-            $sheet->setCellValue('G1', 'Status');
-            $sheet->setCellValue('H1', 'Catatan');
+            $sheet->setCellValue('E1', 'Tanggal');
+            $sheet->setCellValue('F1', 'Lokasi');
+            $sheet->setCellValue('G1', 'Biaya (Rp)');
+            $sheet->setCellValue('H1', 'Status');
+            $sheet->setCellValue('I1', 'Catatan');
 
             // Data isi
             $row = 2;
@@ -298,10 +301,11 @@ class ActivityPlanController extends Controller
                 $sheet->setCellValue('B' . $row, $item->bs_name);
                 $sheet->setCellValue('C' . $row, $item->activity_type);
                 $sheet->setCellValue('D' . $row, $item->product_name);
-                $sheet->setCellValue('E' . $row, $item->location);
-                $sheet->setCellValue('F' . $row, $item->cost);
-                $sheet->setCellValue('G' . $row, \App\Models\ActivityPlan::Statuses[$item->status] ?? '-');
-                $sheet->setCellValue('H' . $row, $item->notes);
+                $sheet->setCellValue('E' . $row, $item->date ? format_date($item->date) : '-');
+                $sheet->setCellValue('F' . $row, $item->location);
+                $sheet->setCellValue('G' . $row, $item->cost);
+                $sheet->setCellValue('H' . $row, \App\Models\ActivityPlan::Statuses[$item->status] ?? '-');
+                $sheet->setCellValue('I' . $row, $item->notes);
                 $row++;
             }
 

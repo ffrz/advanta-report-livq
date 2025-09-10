@@ -10,6 +10,7 @@
         <th>BS</th>
         <th>Kegiatan</th>
         <th>Varietas</th>
+        <th>Tanggal</th>
         <th>Lokasi</th>
         <th>Biaya</th>
         <th>Status</th>
@@ -23,6 +24,7 @@
           <td>{{ $row->bs_name }}</td>
           <td>{{ $row->activity_type }}</td>
           <td>{{ $row->product_name }}</td>
+          <td>{{ $row->date ? format_date($row->date) : '' }}</td>
           <td>{{ $row->location }}</td>
           <td align="right">{{ number_format($row->cost, 0, ',', '.') }}</td>
           <td>{{ \App\Models\ActivityPlan::Statuses[$row->status] }}</td>
