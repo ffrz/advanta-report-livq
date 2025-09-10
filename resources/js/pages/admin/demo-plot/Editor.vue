@@ -136,6 +136,7 @@ function removeLocation() {
                 :error="!!form.errors.user_id"
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.product_id"
@@ -146,6 +147,7 @@ function removeLocation() {
                 :error="!!form.errors.product_id"
                 :disable="form.processing"
                 :error-message="form.errors.product_id"
+                hide-bottom-space
               />
               <date-picker
                 v-model="form.plant_date"
@@ -153,17 +155,8 @@ function removeLocation() {
                 :error="!!form.errors.plant_date"
                 :disable="form.processing"
                 :error-message="form.errors.plant_date"
+                hide-bottom-space
               />
-              <!-- <q-select
-                v-model="form.plant_status"
-                label="Status"
-                :options="plant_statuses"
-                map-options
-                emit-value
-                :error-message="form.errors.plant_status"
-                :error="!!form.errors.plant_status"
-                :disable="form.processing"
-              /> -->
               <q-input
                 v-model.trim="form.owner_name"
                 type="text"
@@ -176,6 +169,7 @@ function removeLocation() {
                   (val) =>
                     (val && val.length > 0) || 'Pemilik lahan harus diisi.',
                 ]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.owner_phone"
@@ -185,7 +179,7 @@ function removeLocation() {
                 :disable="form.processing"
                 :error="!!form.errors.owner_phone"
                 :error-message="form.errors.owner_phone"
-                :rules="[]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.field_location"
@@ -198,6 +192,7 @@ function removeLocation() {
                 :rules="[
                   (val) => (val && val.length > 0) || 'Lokasi harus diisi.',
                 ]"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model.trim="form.population"
@@ -214,6 +209,7 @@ function removeLocation() {
                     return number > 0 || 'Populasi harus lebih dari 0.';
                   },
                 ]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -226,7 +222,7 @@ function removeLocation() {
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
-                :rules="[]"
+                hide-bottom-space
               />
               <div style="margin-left: -10px">
                 <q-checkbox

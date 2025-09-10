@@ -6,8 +6,13 @@ import { create_options, getQueryParams } from "@/helpers/utils";
 import i18n from "@/i18n";
 import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
+import useTableHeight from "@/composables/useTableHeight";
 
 const storage = usePageStorage("users");
+
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
 
 const roles = [
   { value: "all", label: "Semua" },
@@ -79,6 +84,7 @@ const fetchItems = (props = null) =>
     loading,
     filter,
     url: route("admin.user.data"),
+    tableRef,
   });
 
 const deleteItem = (row) =>
@@ -167,11 +173,11 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
       </q-btn>
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             v-model="filter.role"
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             :options="roles"
             label="Role"
             dense
@@ -183,7 +189,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
           />
           <q-select
             v-model="filter.status"
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             :options="statuses"
             label="Status"
             dense
@@ -211,6 +217,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square

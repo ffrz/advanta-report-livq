@@ -12,6 +12,7 @@ import { useQuasar } from "quasar";
 import { usePageStorage } from "@/helpers/usePageStorage";
 import dayjs from "dayjs";
 import { Notify, Dialog } from "quasar";
+import useTableHeight from "@/composables/useTableHeight";
 
 const page = usePage();
 const storage = usePageStorage("activity");
@@ -20,6 +21,9 @@ const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
 
 const filter = reactive(
   storage.get("filter", {
@@ -162,6 +166,7 @@ const fetchItems = (props = null) =>
     rows,
     url: route("admin.activity.data"),
     loading,
+    tableRef,
   });
 
 const onFilterChange = () => fetchItems();
@@ -256,10 +261,10 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
       </q-btn>
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.year"
             :options="years"
@@ -271,7 +276,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             @update:model-value="onFilterChange"
           />
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.month"
             :options="months"
@@ -283,7 +288,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             @update:model-value="onFilterChange"
           />
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.status"
             :options="statuses"
@@ -295,7 +300,7 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
             @update:model-value="onFilterChange"
           />
           <q-select
-            class="custom-select col-xs-12 col-sm-2"
+            class="custom-select col-xs-6 col-sm-2"
             style="min-width: 150px"
             v-model="filter.type_id"
             :options="types"
@@ -337,6 +342,9 @@ watch(showFilter, () => storage.set("show-filter", showFilter.value), {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square

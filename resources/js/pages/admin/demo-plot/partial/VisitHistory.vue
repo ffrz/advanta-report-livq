@@ -5,11 +5,15 @@ import { handleDelete, handleFetchItems } from "@/helpers/client-req-handler";
 import { getQueryParams } from "@/helpers/utils";
 import { useQuasar } from "quasar";
 import dayjs from "dayjs";
+import useTableHeight from "@/composables/useTableHeight";
 
 const $q = useQuasar();
 const rows = ref([]);
 const loading = ref(true);
 const page = usePage();
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef, 165);
 const filter = reactive({
   ...getQueryParams(),
 });
@@ -67,6 +71,7 @@ const fetchItems = (props = null) =>
       demo_plot_id: page.props.data.id,
     }),
     loading,
+    tableRef,
   });
 
 const onRowClicked = (row) =>
@@ -99,6 +104,9 @@ const computedColumns = computed(() =>
       />
     </div>
     <q-table
+      ref="tableRef"
+      :style="{ height: tableHeight }"
+      class="full-height-table"
       flat
       bordered
       square

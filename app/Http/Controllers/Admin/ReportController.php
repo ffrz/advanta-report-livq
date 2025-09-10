@@ -180,6 +180,21 @@ class ReportController extends Controller
                 }
             }
 
+            $plantStatusSubtitle = 'Status Tanaman: ';
+            $plant_statuses = $request->get("plant_statuses", "all");
+            if (!empty($plant_statuses)) {
+                $status = explode(',', $plant_statuses);
+                $q->whereIn('demo_plots.plant_status', $status);
+
+                $statusLabels = [];
+                foreach ($status as $statusKey) {
+                    $statusLabels[] = DemoPlot::PlantStatuses[$statusKey];
+                }
+                $plantStatusSubtitle .= implode(', ', $statusLabels);
+            } else {
+                $plantStatusSubtitle .= 'Semua';
+            }
+
             $items = $q->where('demo_plots.active', true)
                 ->whereBetween('plant_date', [$start_date, $end_date])
                 ->orderBy('users.name', 'asc')
@@ -188,10 +203,14 @@ class ReportController extends Controller
 
             $format = $request->get('format', 'pdf');
             [$title, $user] = $this->resolveTitle('Laporan Demo Plot Baru', $user_id);
+            $subtitles = [
+                $plantStatusSubtitle
+            ];
             return $this->generatePdfReport('report.new-demo-plot-detail', 'landscape', compact(
                 'items',
                 'title',
                 'user',
+                'subtitles',
                 'start_date',
                 'end_date',
             ));
@@ -339,7 +358,7 @@ class ReportController extends Controller
             if (empty($data['subtitles'])) {
                 $data['subtitles'] = [];
             }
-            $data['subtitles'][] = 'Periode ' . format_date($data['start_date']) . ' s/d ' . format_date($data['end_date']);
+            $data['subtitles'][] = 'Periode: ' . format_date($data['start_date']) . ' s/d ' . format_date($data['end_date']);
         }
 
         if ($response == 'pdf') {

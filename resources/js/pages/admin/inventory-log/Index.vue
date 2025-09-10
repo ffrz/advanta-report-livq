@@ -8,6 +8,7 @@ import { usePageStorage } from "@/helpers/usePageStorage";
 import { formatDate } from "@/helpers/datetime";
 import { useProductFilter } from "@/composables/useProductFilter";
 import { useCustomerFilter } from "@/composables/useCustomerFilter";
+import useTableHeight from "@/composables/useTableHeight";
 
 const page = usePage();
 const storage = usePageStorage("inventory-log");
@@ -17,6 +18,9 @@ const $q = useQuasar();
 const showFilter = ref(storage.get("show-filter", false));
 const rows = ref([]);
 const loading = ref(true);
+const tableRef = ref(null);
+const filterToolbarRef = ref(null);
+const tableHeight = useTableHeight(filterToolbarRef);
 const filter = reactive(
   storage.get("filter", {
     search: "",
@@ -126,6 +130,7 @@ const fetchItems = (props = null) => {
     rows,
     url: route("admin.inventory-log.data"),
     loading,
+    tableRef,
   });
 };
 
@@ -210,7 +215,7 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
       </q-btn>
     </template>
     <template #header v-if="showFilter">
-      <q-toolbar class="filter-bar">
+      <q-toolbar class="filter-bar" ref="filterToolbarRef">
         <div class="row q-col-gutter-xs items-center q-pa-sm full-width">
           <q-select
             class="custom-select col-xs-12 col-sm-2"
@@ -219,18 +224,6 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
             v-show="check_role(['admin', 'agronomist'])"
             :options="users"
             label="Checker"
-            dense
-            map-options
-            emit-value
-            outlined
-            @update:model-value="onFilterChange"
-          />
-          <q-select
-            class="custom-select col-xs-12 col-sm-2"
-            style="min-width: 150px"
-            v-model="filter.product_id"
-            :options="productOptions"
-            label="Varietas"
             dense
             map-options
             emit-value
@@ -259,6 +252,18 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
               </q-item>
             </template>
           </q-select>
+          <q-select
+            class="custom-select col-xs-6 col-sm-2"
+            style="min-width: 150px"
+            v-model="filter.product_id"
+            :options="productOptions"
+            label="Varietas"
+            dense
+            map-options
+            emit-value
+            outlined
+            @update:model-value="onFilterChange"
+          />
           <q-input
             class="col"
             outlined
@@ -277,6 +282,9 @@ watch(pagination, () => storage.set("pagination", pagination.value), {
     </template>
     <div class="q-pa-sm">
       <q-table
+        ref="tableRef"
+        :style="{ height: tableHeight }"
+        class="full-height-table"
         flat
         bordered
         square

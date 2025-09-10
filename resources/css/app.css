@@ -13,7 +13,7 @@ a:hover {
   padding-right: 12px;
 }
 
-#main-nav .q-item__section--side > .q-icon {
+#main-nav .q-item__section--side>.q-icon {
   font-size: 20px;
   color: #555;
 }
@@ -36,6 +36,7 @@ a:hover {
   padding-left: 35px;
   box-shadow: inset 2px 0 0 #888;
 }
+
 #main-nav .subnav .subnav {
   box-shadow: inset 4px 0 0 #666;
 }
@@ -70,6 +71,7 @@ a:hover {
 .cursor-pointer {
   cursor: pointer;
 }
+
 .va-top td {
   vertical-align: top !important;
 }
@@ -83,7 +85,7 @@ a:hover {
   justify-content: center !important;
 }
 
-.q-table__card > * {
+.q-table__card>* {
   width: 100%;
 }
 
@@ -147,6 +149,7 @@ table.detail {
   border-collapse: collapse;
   width: 100%;
 }
+
 table.detail td {
   vertical-align: top;
   padding: 2px 5px;
@@ -172,6 +175,7 @@ table.detail tr:nth-child(even) td {
 .q-timeline__subtitle {
   margin: 0 !important;
 }
+
 .q-timeline__entry {
   margin: 0 !important;
 }
@@ -194,6 +198,7 @@ table.detail tr:nth-child(even) td {
 .full-height-table thead tr:first-child th {
   background-color: #fff;
 }
+
 .full-height-table thead tr th {
   position: sticky;
   z-index: 1;
@@ -233,14 +238,15 @@ table.detail tr:nth-child(even) td {
   text-overflow: ellipsis;
 }
 
-.full-height-table tbody tr:last-child td {
-  border-bottom: 1px solid #eee;
+.full-height-table .q-virtual-scroll__content tr:last-child td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .q-table th {
   font-weight: bold !important;
   color: #666;
 }
+
 .q-table td .q-btn,
 .q-table__bottom * {
   color: #555;
@@ -256,4 +262,12 @@ table.detail tr:nth-child(even) td {
 
 .q-table .over-stock {
   color: orange;
+}
+
+.q-icon.inline-icon {
+  vertical-align: top;
+  font-size: 14px;
+  top: 2px;
+  line-height: 1;
+  margin-right: 2px;
 }

@@ -135,6 +135,7 @@ const showProductField = computed(() => {
                 :error="!!form.errors.date"
                 :disable="form.processing"
                 :error-message="form.errors.date"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.user_id"
@@ -148,6 +149,7 @@ const showProductField = computed(() => {
                 :error="!!form.errors.user_id"
                 :disable="form.processing"
                 :error-message="form.errors.user_id"
+                hide-bottom-space
               />
               <q-select
                 v-model="form.type_id"
@@ -158,6 +160,7 @@ const showProductField = computed(() => {
                 :error="!!form.errors.type_id"
                 :disable="form.processing"
                 :error-message="form.errors.type_id"
+                hide-bottom-space
               />
               <q-select
                 v-if="showProductField"
@@ -169,6 +172,7 @@ const showProductField = computed(() => {
                 :error="!!form.errors.product_id"
                 :disable="form.processing"
                 :error-message="form.errors.product_id"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.location"
@@ -181,7 +185,7 @@ const showProductField = computed(() => {
                 :disable="form.processing"
                 :error="!!form.errors.location"
                 :error-message="form.errors.location"
-                :rules="[]"
+                hide-bottom-space
               />
               <LocaleNumberInput
                 v-model:modelValue="form.cost"
@@ -190,7 +194,7 @@ const showProductField = computed(() => {
                 :disable="form.processing"
                 :error="!!form.errors.cost"
                 :errorMessage="form.errors.cost"
-                :rules="[]"
+                hide-bottom-space
               />
               <q-input
                 v-model.trim="form.notes"
@@ -203,7 +207,7 @@ const showProductField = computed(() => {
                 :disable="form.processing"
                 :error="!!form.errors.notes"
                 :error-message="form.errors.notes"
-                :rules="[]"
+                hide-bottom-space
               />
               <div class="q-pt-md">
                 <div class="text-subtitle2 text-bold text-grey-9">Foto:</div>

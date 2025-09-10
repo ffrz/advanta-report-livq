@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>{{ env('APP_NAME') }}</title>
-  <meta name="description" content="{{ env('APP_NAME') }} adalah solusi digital untuk mengelola proses produksi maklun dan konveksi secara transparan, terstruktur, dan mudah diawasi — dari penyerahan bahan hingga pembayaran hasil kerja.">
-  <meta name="keywords" content="">
+  <meta name="description" content="{{ env('APP_NAME') }} aplikasi utang-piutang simpel dan gratis. Catat, kelola, dan pantau transaksi pribadi atau bisnis dengan mudah.">
+  <meta name="keywords" content="aplikasi utang piutang, catat utang piutang, utang piutang pribadi, utang piutang bisnis, aplikasi gratis utang piutang, aplikasi sederhana untuk utang piutang, kelola utang piutang mudah, pencatatan utang piutang online, aplikasi keuangan pribadi gratis, aplikasi pencatatan keuangan kecil">
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com" rel="preconnect">
