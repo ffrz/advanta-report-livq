@@ -42,8 +42,12 @@ class CustomerPolicy
                 return $item->assigned_user_id === $user->id;
 
             case User::Role_Agronomist:
-                // boleh lihat jika punya bawahan sendiri
-                return $action === 'view' && $item->user->parent_id === $user->id;
+                if ($action === 'update') {
+                    // boleh add atau edit jika punya sendiri
+                    return !$item->id || $item->assigned_user_id === $user->id;
+                } else if ($action === 'view') {
+                    return $item->assigned_user_id === $user->id || $item->user->parent_id === $user->id;
+                }
 
             default:
                 return false;
